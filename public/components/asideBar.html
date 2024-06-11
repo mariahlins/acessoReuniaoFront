@@ -1,52 +1,43 @@
-<div id="asideBar" class="d-flex flex-column top-0 left-0 bg-white col-1 p-0">
-    <div class="nav flex-column text-center flex-grow-1 mx-2 p-2">
-        <a class="nav-link" href="/">
-            <img src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fkinsta.com%2Fpt%2Fblog%2Farquitetura-aplicativos-web%2F&psig=AOvVaw2H4VDcXemoZHswNZDyYOri&ust=1718189141976000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCPDnz9iw04YDFQAAAAAdAAAAABAE" alt="Logo" style="width: 50px;">
-        </a>
-    </div>
-    <ul class="nav flex-column text-center flex-grow-1 mx-2 pt-4 pb-5">
+<div id="asideBar" class="d-flex flex-column bg-white col-1 p-0 top-0 left-0">
+    <ul class="nav flex-column text-center pb-5 ">
+        <li class="nav-item mx-3 mb-5 mt-2">
+            <a class="" href="/">
+                <img src="/public/css/imagem/cipt.png" class="img-fluid" alt="Logo"></img>
+            </a>
+        </li>
         <li class="nav-item mb-1">
             <a class="nav-link" href="/public/views/afterLogin/home.html">
-                <div class="icon">
-                    <i class="bi bi-house-door"></i>
-                </div>
-                <div class="label">Início</div>
+                <i class="bi bi-house-door"></i>
+                <dt style="font-size: .8rem;">Início</dt>
             </a>
         </li>
         <li class="nav-item mb-1">
             <a class="nav-link" href="/public/views/afterLogin/reservas.html">
-                <div class="icon">
-                    <i class="bi bi-calendar-check"></i>
-                </div>
-                <div class="label">Agendados</div>
+                <i class="bi bi-calendar-check"></i>
+                <dt style="font-size: .8rem;">Agendados</dt>
             </a>
         </li>
         <li class="nav-item mb-1">
             <a class="nav-link" href="/public/views/afterLogin/salas.html">
-                <div class="icon">
-                    <i class="bi bi-door-open"></i>
-                </div>
-                <div class="label">Salas</div>
+                <i class="bi bi-door-open"></i>
+                <dt style="font-size: .8rem;">Salas</dt>
             </a>
         </li>
         <li class="nav-item mb-1">
             <a class="nav-link" href="/public/views/afterLogin/usuarios.html">
-                <div class="icon">
-                    <i class="bi bi-people"></i>
-                </div>
-                <div class="label">Usuários</div>
+                <i class="bi bi-people"></i>
+                <dt style="font-size: .8rem;">Usuários</dt>
             </a>
         </li>
     </ul>
-    <div class="nav flex-column text-center flex-grow-1 mx-2 p-2">
+    <div class="mt-auto p-2">
         <a class="nav-link bg-secondary" href="/">
-            <div class="icon">
-                <i class="bi bi-box-arrow-left"></i>
-            </div>
-            <div class="label">Sair</div>
+            <i class="bi bi-box-arrow-left"></i>
+            <dt style="font-size: .8rem;">Sair</dt>
         </a>
     </div>
 </div>
+
 <!--
 O que cada classe é responsável por fazer:
 top-0 = fixa o elemento no topo
@@ -57,7 +48,7 @@ h-100 = height: 100%
 w-20 = width: 20%
 label = texto
 icon = icone
-nav-link = link da barra de navegação
+nav-link w-50 h-75link da barra de navegação
 nav-item p-2 = item da barra de navegação
 nav = barra de navegação
 d-flex = display flex
