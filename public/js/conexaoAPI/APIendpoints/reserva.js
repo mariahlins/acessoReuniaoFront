@@ -184,4 +184,4 @@ class ReservaController{
         }
     }
 }
-module.exports = ReservaController;
+module.exports = { ReservaController, ocultarDocumento};
