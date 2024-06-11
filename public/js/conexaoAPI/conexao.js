@@ -20,6 +20,9 @@ class Controller{
         SalaController.mostrarSalasTerreo();
     }
 
+    static async listarReservasHoje(){
+        ReservaController.listarReservasHoje();
+    }
 
 }
 document.addEventListener('DOMContentLoaded', () => {
@@ -27,4 +30,5 @@ document.addEventListener('DOMContentLoaded', () => {
     Controller.listarReservas();
     Controller.listarSalasDropdown();
     Controller.mostrarSalasTerreo();
+    Controller.listarReservasHoje();
 });
