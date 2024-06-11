@@ -32,7 +32,7 @@ class UsuarioController{
         tableBody.innerHTML = '';
 
         try{
-            const response = await UsuarioController.obterUsuarios();
+            const response = await this.obterUsuarios();
             const user = response.data;
 
             const userPromises = user.map(user => UsuarioController.obterUsuarioporId(user.idUsuario));

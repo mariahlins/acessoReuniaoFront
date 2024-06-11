@@ -52,10 +52,10 @@ class ReservaController{
         tableBody.innerHTML = '';
 
         try{
-            const response = await ReservaController.obterReservas();
+            const response = await this.obterReservas();
             const reservas = response.data;
 
-            const reservistaPromises = reservas.map(reserva => ReservaController.obterReservista(reserva.idUsuario));
+            const reservistaPromises = reservas.map(reserva => this.obterReservista(reserva.idUsuario));
             const salaPromises = reservas.map(reserva => SalaController.obterSalaPorId(reserva.idSala));
 
             const [reservistasResponses, salasResponses] = await Promise.all([Promise.all(reservistaPromises), Promise.all(salaPromises)]);

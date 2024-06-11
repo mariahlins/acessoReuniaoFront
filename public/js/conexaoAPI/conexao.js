@@ -2,6 +2,7 @@ const RecepcionistaController = require('./APIendpoints/recepcionista.js');
 const ReservaController = require('./APIendpoints/reserva.js');
 const SalaController = require('./APIendpoints/sala.js');
 const UsuarioController = require('./APIendpoints/usuario.js');
+
 class Controller{
 
     static async fazerLogin(){
@@ -26,7 +27,11 @@ class Controller{
 
     static async listarUsuarios(){
         UsuarioController.listarUsuarios();
-    }  
+    }
+
+    static async listarSalas(){
+        SalaController.listarSalas();
+    }
 
 }
 document.addEventListener('DOMContentLoaded', () => {
@@ -36,4 +41,5 @@ document.addEventListener('DOMContentLoaded', () => {
     Controller.mostrarSalasTerreo();
     Controller.listarReservasHoje();
     Controller.listarUsuarios();
+    Controller.listarSalas();
 });
