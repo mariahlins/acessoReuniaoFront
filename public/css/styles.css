@@ -41,12 +41,12 @@ table{
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 11vh;
-    height: 11vh;
+    width: 12vh;
+    height: 12vh;
     border-radius: 10%;
-    background-color: #F2F6FA;
+    background-color: #f2f6fa;
     text-decoration: none;
-    color: #000;
+    color: #565d6d;
     transition: background-color 0.3s;
 }
 
