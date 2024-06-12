@@ -13,11 +13,10 @@ html, body {
     background-color: #565D6D;
 }
 .input{
-    padding-left: 0 !important;
     padding-right: 8rem;
 }
 .input input{
-    width: 90%;
+    width: 100%;
 }
 .bg-azul-claro{
     background-color: #6ea8fe;
@@ -107,13 +106,32 @@ table {
     border-collapse: separate;
     width: 100%;
 }
-
-th, td {
+.input-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     border: 1px solid #adb5bd;
     border-radius: 5px !important;
+    padding: 0.5rem; /* Ajusta o padding conforme necessário */
+}
+
+.input-container input {
+    border: none;
+    outline: none;
+    flex: 1;
+    padding-right: 8rem; /* Adiciona espaçamento para o ícone */
+}
+
+.input-container svg {
+    margin-left: 0.5rem;
+}
+
+th, td {
     text-align: left;
     vertical-align: middle;
     padding: 10px; 
+    border: 1px solid #adb5bd;
+    border-radius: 5px !important;
 }
 
 tbody tr:last-child td:last-child {
