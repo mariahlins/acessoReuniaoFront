@@ -12,22 +12,33 @@ html, body {
 .bg-cinza{
     background-color: #565D6D;
 }
-
-.bg-azul-claro{
-    background-color: #4973E8;
+.input{
+    padding-right: 8rem;
 }
-
+.input input{
+    width: 100%;
+}
+.bg-azul-claro{
+    background-color: #6ea8fe;
+}
+h1, h2, h3, h4, h5, h6{
+    width: fit-content !important;
+}
 .titulo{
     color: #0624AA;
     font-weight:700;
+    width: fit-conten;
 }
 
 table{
+    max-width: 100%;
+    padding-right: 8rem;
     width: fit-content;
 }
 .subtitulo{
     color: #CACCCE;
     font-weight: 700;
+    width: fit-content;
 }
 
 .full-height {
@@ -41,13 +52,33 @@ table{
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 12vh;
-    height: 12vh;
+    width: 13vh;
+    height: 13vh;
     border-radius: 10%;
     background-color: #f2f6fa;
     text-decoration: none;
     color: #565d6d;
     transition: background-color 0.3s;
+    padding: unset;
+}
+
+input {
+    font-family: 'Inter', sans-serif;
+    color:#adb5bd;
+}
+
+
+input[type="text"] {
+    border: none;
+    border-bottom: 2px solid #ccc; /* Borda inferior inicial */
+    padding: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus {
+    outline: none; /* Remove o contorno padrão do navegador */
+    border-bottom: 2px solid #888; /* Cor da borda inferior no foco */
 }
 
 .nav-link:hover {
@@ -71,9 +102,46 @@ table{
 .btn-action hover{
     text-decoration: underline;
 }
+table {
+    text-align: center;
+    margin-top: 1rem !important;
+    border-collapse: separate;
+    width: 100%;
+}
+.input-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #adb5bd;
+    border-radius: 5px !important;
+    padding: 0.5rem; /* Ajusta o padding conforme necessário */
+}
 
-.table thead th{
-    background-color: #d9d9d9;
+.input-container input {
+    border: none;
+    outline: none;
+    flex: 1;
+    padding-right: 8rem; /* Adiciona espaçamento para o ícone */
+}
+
+.input-container svg {
+    margin-left: 0.5rem;
+}
+
+th, td {
+    text-align: left;
+    vertical-align: middle;
+    padding: 10px; 
+    border: 1px solid #adb5bd;
+    border-radius: 5px !important;
+}
+
+tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 5px !important;
+}
+dt{
+    font-size: 90%;
+    font-weight: 600;
 }
 
 .btn-primary{
