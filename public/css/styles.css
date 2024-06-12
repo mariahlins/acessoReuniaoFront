@@ -13,6 +13,10 @@ html, body {
     background-color: #565D6D;
 }
 
+.bg-azul-claro{
+    background-color: #4973E8;
+}
+
 .titulo{
     color: #0624AA;
     font-weight:700;
@@ -39,7 +43,6 @@ table{
     justify-content: center;
     width: 11vh;
     height: 11vh;
-    padding: 5px;
     border-radius: 10%;
     background-color: #F2F6FA;
     text-decoration: none;
@@ -71,4 +74,9 @@ table{
 
 .table thead th{
     background-color: #565D6D;
+}
+
+.btn-primary{
+    width: 333px;
+    height: 88px;
 }
