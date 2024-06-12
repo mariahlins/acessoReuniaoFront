@@ -21,8 +21,8 @@ html, body {
 .bg-azul-claro{
     background-color: #6ea8fe;
 }
-h, h1, h2, h3, h4, h5, h6{
-    width: fit-content;
+h1, h2, h3, h4, h5, h6{
+    width: fit-content !important;
 }
 .titulo{
     color: #0624AA;
