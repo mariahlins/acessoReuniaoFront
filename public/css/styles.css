@@ -12,9 +12,15 @@ html, body {
 .bg-cinza{
     background-color: #565D6D;
 }
-
+.input{
+    padding-left: 0 !important;
+    padding-right: 8rem;
+}
+.input input{
+    width: 90%;
+}
 .bg-azul-claro{
-    background-color: #4973E8;
+    background-color: #6ea8fe;
 }
 h, h1, h2, h3, h4, h5, h6{
     width: fit-content;
