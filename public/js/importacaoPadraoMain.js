@@ -12,8 +12,26 @@ $(function() {
             // Importa o conteúdo do footer após o corpo ser carregado
             $.get("/public/components/footer.html", function(footerContent) {
                 // Adiciona o conteúdo do footer após o corpo dentro do main
-                $("main").append(footerContent); 
+                $("main").append(footerContent);
+
+                //os if que na minha cabeça fazem sentido
+                const page = window.location.pathname.split("/").pop();
+                if (page === "home.html") {
+                    loadHomeContent();
+                } else if (page === "salas.html") {
+                    loadSalasContent();
+                } else if (page === "reservas.html") {
+                    loadReservasContent();
+                } else if (page === "usuarios.html") {
+                    loadUsuariosContent();
+                } 
             });
         });
     });
+
+    function loadHomeContent(){
+        
+    }
+
+
 });

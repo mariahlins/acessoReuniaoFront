@@ -4,6 +4,15 @@ html, body {
     padding: 0;
     overflow: hidden; /* Impede a barra de rolagem */
 }
+
+.titulo{
+    color: #0624AA;
+}
+
+.subtitulo{
+    color: #CACCCE;
+}
+
 .full-height {
     height: 100vh; /* Define a altura como 100% da altura da viewport */
 }
@@ -36,4 +45,18 @@ html, body {
 
 .nav-link .label {
     font-size: 12px;
+}
+
+.table thead th{
+    background-color: #00047E;
+    color: white;
+}
+
+.btn-action{
+    color: #00047E;
+    cursor: pointer;
+}
+
+.btn-action hover{
+    text-decoration: underline;
 }
