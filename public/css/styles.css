@@ -5,11 +5,22 @@ html, body {
     overflow: hidden; /* Impede a barra de rolagem */
 }
 
+.bg-azul{
+    background: #0624AA;
+}
+
+.bg-cinza{
+    background-color: #565D6D;
+}
+
 .titulo{
     color: #0624AA;
     font-weight:700;
 }
 
+table{
+    width: fit-content;
+}
 .subtitulo{
     color: #CACCCE;
     font-weight: 700;
@@ -49,11 +60,6 @@ html, body {
     font-size: 12px;
 }
 
-.table thead th{
-    background-color: #00047E;
-    color: white;
-}
-
 .btn-action{
     color: #00047E;
     cursor: pointer;
@@ -61,4 +67,8 @@ html, body {
 
 .btn-action hover{
     text-decoration: underline;
+}
+
+.table thead th{
+    background-color: #565D6D;
 }

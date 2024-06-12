@@ -16,15 +16,7 @@ $(function() {
 
                 //os if que na minha cabeça fazem sentido
                 const page = window.location.pathname.split("/").pop();
-                if (page === "home.html") {
-                    loadHomeContent();
-                } else if (page === "salas.html") {
-                    loadSalasContent();
-                } else if (page === "reservas.html") {
-                    loadReservasContent();
-                } else if (page === "usuarios.html") {
-                    loadUsuariosContent();
-                } 
+                
             });
         });
     });
