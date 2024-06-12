@@ -1,5 +1,4 @@
-<body>
-    <main class="col-12 px-0 h-100 d-flex flex-column mh-100" style="background-image: url(public/css/imagem/login_back_graund.png)">
+<main class="col-12 px-0 h-100 d-flex flex-column mh-100" style="background-image: url(public/css/imagem/login_back_graund.png)">
         <section class="vh-100 gradient-custom d-flex align-items-center justify-content-center">
             <div class="container py-3">
                 <div class="row justify-content-center align-items-center">
@@ -9,16 +8,18 @@
                                 <div class="mb-md-5 mt-md-4 pb-3">
                                     <h2 class="fw-bold mb-2 text-uppercase" style="width: unset !important;">Login</h2>
                                     <p class="text-black-50 mb-5">Por favor informe seu login e senha!</p>
-                                    <div class="form-outline form-white mb-4">
-                                        <input type="email" id="login" class="form-control form-control-lg" />
-                                        <label class="form-label" for="typeEmailX">LOGIN</label>
-                                    </div>
-                                    <div class="form-outline form-white mb-4">
-                                        <input type="password" id="login" class="form-control form-control-lg" />
-                                        <label class="form-label" for="typePasswordX">SENHA</label>
-                                    </div>
-                                    <p class="small mb-5 pb-lg-2"><a class="text-black-50" href="#!">Esqueceu sua senha?</a></p>
-                                    <button class="btn btn-secondary btn-lg px-5" type="submit">LOGIN</button>
+                                    <form id="login-form">
+                                        <div class="form-outline form-white mb-4">
+                                            <input type="email" id="login" name="login" class="form-control form-control-lg" />
+                                            <label class="form-label" for="login">LOGIN</label>
+                                        </div>
+                                        <div class="form-outline form-white mb-4">
+                                            <input type="password" id="senha" name="senha" class="form-control form-control-lg" />
+                                            <label class="form-label" for="senha">SENHA</label>
+                                        </div>
+                                        <p class="small mb-5 pb-lg-2"><a class="text-black-50" href="#!">Esqueceu sua senha?</a></p>
+                                        <button class="btn btn-secondary btn-lg px-5" type="submit">LOGIN</button>
+                                    </form>
                                 </div>
                                 <div>
                                     <p class="mb-0">CONTA? ENTRE EM CONTATO: <a href="#!" class="text-black-50 fw-bold">NOS CONTATE!</a></p>
@@ -29,4 +30,3 @@
                 </div>
             </div>
         </section>
-    </main>
