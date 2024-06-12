@@ -59,6 +59,7 @@ table{
     text-decoration: none;
     color: #565d6d;
     transition: background-color 0.3s;
+    padding: unset;
 }
 
 input {
