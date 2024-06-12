@@ -1,4 +1,4 @@
-const { ocultarDocumento } = require('./reserva.js');
+const { ocultarDocumento } = require('./helpers/functions.js');
 
 class UsuarioController{
 
