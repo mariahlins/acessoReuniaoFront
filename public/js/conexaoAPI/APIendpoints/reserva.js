@@ -1,6 +1,6 @@
 const UsuarioController = require('./usuario');
 const SalaController = require('./sala');
-const { ocultarDocumento, formatarData } = require('./helpers/functions.js');
+const { ocultarDocumento, formatarData, checkHoje } = require('./helpers/functions.js');
 
 class ReservaController{
 
@@ -106,18 +106,14 @@ class ReservaController{
         const tableBody = document.getElementById('reservas-hoje-lista');
         if(!tableBody) return;
         tableBody.innerHTML = '';
-
+    
         try{
             const response = await ReservaController.obterReservas();
             let reservas = response.data;
     
-            const hoje = new Date();
-            hoje.setHours(0, 0, 0, 0);
-    
             reservas = reservas.filter(reserva => {
                 const reservaDate = new Date(reserva.dataReservada);
-                reservaDate.setHours(0, 0, 0, 0);
-                return reservaDate.getTime() === hoje.getTime();
+                return checkHoje(reservaDate);
             });
     
             const reservistaPromises = reservas.map(reserva => ReservaController.obterReservista(reserva.idUsuario));
@@ -130,9 +126,9 @@ class ReservaController{
             reservas.forEach((reserva, index) => {
                 const reservista = reservistas[index];
                 const sala = salas[index];
-
+    
                 const row = document.createElement('tr');
-
+    
                 const salaCell = document.createElement('td');
                 salaCell.textContent = sala.nome;
                 row.appendChild(salaCell);
@@ -140,11 +136,11 @@ class ReservaController{
                 const nomeCell = document.createElement('td');
                 nomeCell.textContent = reservista.nome;
                 row.appendChild(nomeCell);
-
+    
                 const documentoCell = document.createElement('td');
                 documentoCell.textContent = ocultarDocumento(reservista.identificador);
                 row.appendChild(documentoCell);
-
+    
                 const entradaCell = document.createElement('td');
                 const dataReservada = new Date(reserva.dataReservada);
                 entradaCell.textContent = formatarData(dataReservada);
@@ -156,7 +152,7 @@ class ReservaController{
                 saidaCell.textContent = formatarData(dataReservadaSaida);
                 saidaCell.textContent += ' ' + reserva.horaFimReserva;
                 row.appendChild(saidaCell);
-
+    
                 const acaoCell = document.createElement('td');
                 const concluirButton = document.createElement('button');
                 concluirButton.textContent = 'Concluir';
@@ -172,5 +168,17 @@ class ReservaController{
             console.error('Erro ao listar reservas', error);
         }
     }
+
+    static async mostrarDataHoje(){
+        const dataHoje = document.getElementById('data-hoje');
+        if(!dataHoje) return;
+        dataHoje.innerHTML = '';
+        dataHoje.textContent = formatarData(new Date());
+    }
 }
 module.exports = { ReservaController};
+document.addEventListener('DOMContentLoaded', () => {
+    ReservaController.listarReservas();
+    ReservaController.listarReservasHoje();
+    ReservaController.mostrarDataHoje();
+});

@@ -11,4 +11,10 @@ function formatarData(data){
     return moment(data).tz('America/Sao_Paulo').format('DD/MM/YYYY');
 }
 
-module.exports = { ocultarDocumento, formatarData }
+function checkHoje(data) {
+    const hoje = formatarData(new Date());
+    const dataAlvo = formatarData(data);
+    return hoje === dataAlvo;
+}
+
+module.exports = { ocultarDocumento, formatarData, checkHoje }
