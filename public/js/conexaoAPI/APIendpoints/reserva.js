@@ -1,13 +1,6 @@
 const UsuarioController = require('./usuario');
 const SalaController = require('./sala');
-
-function ocultarDocumento(documento) {
-    if (documento.length <= 5) return documento; 
-    const inicio = documento.slice(0, 3);
-    const fim = documento.slice(-2);
-    const asteriscos = '*'.repeat(documento.length - 5);
-    return inicio + asteriscos + fim;
-}
+const { ocultarDocumento, formatarData } = require('./helpers/functions.js');
 
 class ReservaController{
 
@@ -82,17 +75,15 @@ class ReservaController{
                 row.appendChild(documentoCell);
 
                 const entradaCell = document.createElement('td');
-                const dataReservada = new Date(reserva.dataReservada).toISOString().split('T')[0];
-                const [ano, mes, dia] = dataReservada.split('-');
-                entradaCell.textContent = `${dia}/${mes}/${ano}`;
-                entradaCell.textContent = reserva.horaInicio;
+                const dataReservada = new Date(reserva.dataReservada);
+                entradaCell.textContent = formatarData(dataReservada);
+                entradaCell.textContent += ' ' + reserva.horaInicio;
                 row.appendChild(entradaCell);
-
+                
                 const saidaCell = document.createElement('td');
-                const dataReservadaSaida = new Date(reserva.dataReservada).toISOString().split('T')[0];
-                const [anoS, mesS, diaS] = dataReservadaSaida.split('-');
-                saidaCell.textContent = `${diaS}/${mesS}/${anoS}`;
-                saidaCell.textContent = reserva.horaFimReserva;
+                const dataReservadaSaida = new Date(reserva.dataReservada);
+                saidaCell.textContent = formatarData(dataReservadaSaida);
+                saidaCell.textContent += ' ' + reserva.horaFimReserva;
                 row.appendChild(saidaCell);
 
                 const acaoCell = document.createElement('td');
@@ -155,17 +146,15 @@ class ReservaController{
                 row.appendChild(documentoCell);
 
                 const entradaCell = document.createElement('td');
-                const dataReservada = new Date(reserva.dataReservada).toISOString().split('T')[0];
-                const [ano, mes, dia] = dataReservada.split('-');
-                entradaCell.textContent = `${dia}/${mes}/${ano}`;
-                entradaCell.textContent = reserva.horaInicio;
+                const dataReservada = new Date(reserva.dataReservada);
+                entradaCell.textContent = formatarData(dataReservada);
+                entradaCell.textContent += ' ' + reserva.horaInicio;
                 row.appendChild(entradaCell);
-
+                
                 const saidaCell = document.createElement('td');
-                const dataReservadaSaida = new Date(reserva.dataReservada).toISOString().split('T')[0];
-                const [anoS, mesS, diaS] = dataReservadaSaida.split('-');
-                saidaCell.textContent = `${diaS}/${mesS}/${anoS}`;
-                saidaCell.textContent = reserva.horaFimReserva;
+                const dataReservadaSaida = new Date(reserva.dataReservada);
+                saidaCell.textContent = formatarData(dataReservadaSaida);
+                saidaCell.textContent += ' ' + reserva.horaFimReserva;
                 row.appendChild(saidaCell);
 
                 const acaoCell = document.createElement('td');
@@ -184,4 +173,4 @@ class ReservaController{
         }
     }
 }
-module.exports = { ReservaController, ocultarDocumento};
+module.exports = { ReservaController};

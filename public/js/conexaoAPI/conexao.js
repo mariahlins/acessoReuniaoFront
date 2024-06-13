@@ -1,16 +1,16 @@
-const RecepcionistaController = require('./APIendpoints/recepcionista.js');
-const ReservaController = require('./APIendpoints/reserva.js');
-const SalaController = require('./APIendpoints/sala.js');
-const UsuarioController = require('./APIendpoints/usuario.js');
+import { fazerLogin as _fazerLogin } from './APIendpoints/recepcionista.js';
+import { listarReservas as _listarReservas, listarReservasHoje as _listarReservasHoje } from './APIendpoints/reserva.js';
+import { listarSalasDropdown as _listarSalasDropdown, mostrarSalasTerreo as _mostrarSalasTerreo, listarSalas as _listarSalas } from './APIendpoints/sala.js';
+import { listarUsuarios as _listarUsuarios } from './APIendpoints/usuario.js';
 
 class Controller{
-    static async fazerLogin() { RecepcionistaController.fazerLogin(); }
-    static async listarReservas() { ReservaController.listarReservas(); }
-    static async listarSalasDropdown() { SalaController.listarSalasDropdown(); }
-    static async mostrarSalasTerreo() { SalaController.mostrarSalasTerreo(); }
-    static async listarReservasHoje() { ReservaController.listarReservasHoje(); }
-    static async listarUsuarios() { UsuarioController.listarUsuarios(); }
-    static async listarSalas() { SalaController.listarSalas(); }
+    static async fazerLogin() { _fazerLogin(); }
+    static async listarReservas() { _listarReservas(); }
+    static async listarSalasDropdown() { _listarSalasDropdown(); }
+    static async mostrarSalasTerreo() { _mostrarSalasTerreo(); }
+    static async listarReservasHoje() { _listarReservasHoje(); }
+    static async listarUsuarios() { _listarUsuarios(); }
+    static async listarSalas() { _listarSalas(); }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
