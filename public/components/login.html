@@ -8,17 +8,21 @@
                                 <div class="mb-md-5 mt-md-4 pb-3">
                                     <h2 class="fw-bold mb-2 text-uppercase" style="width: unset !important;">Login</h2>
                                     <p class="text-black-50 mb-5">Por favor informe seu login e senha!</p>
-                                    <form id="login-form">
+                                    <form action="#" method="POST" class="login-form" id="login-form">
                                         <div class="form-outline form-white mb-4">
-                                            <input type="email" id="login" name="login" class="form-control form-control-lg" />
-                                            <label class="form-label" for="login">LOGIN</label>
+                                            <label for="login">login:</label>
+                                            <input type="text" id="login" name="login" required placeholder="Insira aqui o login">
                                         </div>
                                         <div class="form-outline form-white mb-4">
-                                            <input type="password" id="senha" name="senha" class="form-control form-control-lg" />
-                                            <label class="form-label" for="senha">SENHA</label>
+                                            <label for="password">senha:</label>
+                                            <input type="password" id="senha" name="senha" required placeholder="Insira aqui a senha">
                                         </div>
-                                        <p class="small mb-5 pb-lg-2"><a class="text-black-50" href="#!">Esqueceu sua senha?</a></p>
-                                        <button class="btn btn-secondary btn-lg px-5" type="submit">LOGIN</button>
+                                        <div class="form-buttons">
+                                            <button type="submit">Entrar</button>
+                                            <div class="links">
+                                                <p>Não tem uma conta? <a href="/src/views/register.html">Cadastre-se</a></p>
+                                            </div>
+                                        </div>
                                     </form>
                                 </div>
                                 <div>
@@ -30,3 +34,6 @@
                 </div>
             </div>
         </section>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script type="module" src="/public/js/conexaoAPI/APIendpoints/recepcionista.js"></script>
+    </main>
