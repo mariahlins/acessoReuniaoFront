@@ -34,7 +34,8 @@ class Controller{
                 };
                 try {
                     const response = await axios.post(`http://localhost:3000/recepcionista/login`, data);
-                    window.location.href = './public/views/afterLogin/home.html';
+                    if(response.status === 200) 
+                        window.location.href = './public/views/afterLogin/home.html';
                 } catch (error) {
                     throw error;
                 }
