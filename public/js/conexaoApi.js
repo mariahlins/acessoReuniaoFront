@@ -55,45 +55,51 @@ class Controller{
         }
     }
 
-    static async filtrarTabela(){
-        const valorFiltro=document.getElementById('pesquisa-filtro').value;
-        const tabela=document.getElementById('reservas-hoje-tabela');
-        const linhas=tabela.getElementsByTagName('tr');
-        const idColunaAcao='coluna-acao'; 
-
+    static async filtrarTabela(idTabela){
+        const valorFiltro = document.getElementById('pesquisa-filtro').value;
+        const tabela = document.getElementById(idTabela);
+        
+        if (!tabela) {
+            console.error(`Tabela com id "${idTabela}" não encontrada`);
+            return;
+        }
+    
+        const linhas = tabela.getElementsByTagName('tr');
+        const idColunaAcao = 'coluna-acao'; 
+    
         const isFiltroNumero = !isNaN(valorFiltro);
-
-        for (let i=1; i < linhas.length; i++){
-            const colunas=linhas[i].getElementsByTagName('td');
-            let corresponde=false;
+    
+        for (let i = 1; i < linhas.length; i++){
+            const colunas = linhas[i].getElementsByTagName('td');
+            let corresponde = false;
         
             if(valorFiltro === ''){
-                linhas[i].style.display="";
+                linhas[i].style.display = "";
                 continue;
             }
-
-            for (let j=0; j < colunas.length; j++){
+    
+            for (let j = 0; j < colunas.length; j++){
                 if (colunas[j].id === idColunaAcao) continue;
         
-                const coluna=colunas[j];
+                const coluna = colunas[j];
                 if(coluna){
                     if(isFiltroNumero){
                         if(coluna.textContent === valorFiltro){
-                            corresponde=true;
+                            corresponde = true;
                             break;
                         }
                     }
                     else if(coluna.textContent.toLowerCase().includes(valorFiltro.toLowerCase())){
-                        corresponde=true;
+                        corresponde = true;
                         break;
                     }
                 }
             }
             if(corresponde){
-                linhas[i].style.display="";
+                linhas[i].style.display = "";
             }
             else{
-                linhas[i].style.display="none";
+                linhas[i].style.display = "none";
             }
         }
     }
@@ -170,44 +176,33 @@ class Controller{
     static async mostrarTodasReservas() {
         try {
             const reservas = await this.listarReservas();
-            const tableBody = document.querySelector('table tbody');
+            const tableBody = document.getElementById('reservas-tabela');
             if (!tableBody) {
                 console.error('Elemento tbody não encontrado');
                 return;
             }
-    
             tableBody.innerHTML = '';
     
             for (const reserva of reservas) {
                 try {
                     const usuario = await this.consultarUsuarioPorId(reserva.idUsuario);
-                    console.log(usuario);
     
                     const row = document.createElement('tr');
     
-                    const salaCell = document.createElement('td');
-                    salaCell.textContent = reserva.idSala;
-                    row.appendChild(salaCell);
+                    const colunas = [
+                        reserva.idSala,
+                        `${usuario.nome} ${usuario.sobrenome}`,
+                        ocultarDocumento(usuario.identificador),
+                        reserva.motivoReserva,
+                        formatarData(reserva.horaInicio),
+                        formatarData(reserva.horaFimReserva),
+                    ];
     
-                    const responsavelCell = document.createElement('td');
-                    responsavelCell.textContent = `${usuario.nome} ${usuario.sobrenome}`;
-                    row.appendChild(responsavelCell);
-    
-                    const documentoCell = document.createElement('td');
-                    documentoCell.textContent = ocultarDocumento(usuario.identificador);
-                    row.appendChild(documentoCell);
-    
-                    const ocupantesCell = document.createElement('td');
-                    ocupantesCell.textContent = reserva.motivoReserva;
-                    row.appendChild(ocupantesCell);
-    
-                    const entradaCell = document.createElement('td');
-                    entradaCell.textContent = formatarData(reserva.horaInicio);
-                    row.appendChild(entradaCell);
-    
-                    const saidaCell = document.createElement('td');
-                    saidaCell.textContent = formatarData(reserva.horaFimReserva);
-                    row.appendChild(saidaCell);
+                    for (const coluna of colunas) {
+                        const td = document.createElement('td');
+                        td.textContent = coluna;
+                        row.appendChild(td);
+                    }
     
                     const acoesCell = document.createElement('td');
     
@@ -232,6 +227,60 @@ class Controller{
             console.error('Erro ao mostrar reservas:', error);
         }
     }
+
+    static async mostrarReservasHoje() {
+        try {
+            const reservas = await this.obterReservas();
+            const reservasHoje = reservas.data.filter((reserva) => {
+                const dataReserva = new Date(reserva.horaInicio);
+                const dataAtual = new Date();
+                return dataReserva.getDate() === dataAtual.getDate() &&
+                    dataReserva.getMonth() === dataAtual.getMonth() &&
+                    dataReserva.getFullYear() === dataAtual.getFullYear();
+            });
+    
+            const tabela = document.getElementById('reservas-hoje-tabela');
+            if (tabela){
+                for (const reserva of reservasHoje){
+                    const usuario = await this.consultarUsuarioPorId(reserva.idUsuario);
+                    const linha = document.createElement('tr');
+                    const colunas = [
+                        reserva.idSala,
+                        `${usuario.nome} ${usuario.sobrenome}`,
+                        ocultarDocumento(usuario.identificador),
+                        reserva.motivoReserva,
+                        formatarData(reserva.horaInicio),
+                        formatarData(reserva.horaFimReserva),
+                    ];
+
+                    for (const coluna of colunas){
+                        const td = document.createElement('td');
+                        td.textContent = coluna;
+                        linha.appendChild(td);
+                    }
+                    const acoesCell = document.createElement('td');
+    
+                    const concluirButton = document.createElement('button');
+                    concluirButton.textContent = 'Concluir';
+                    concluirButton.addEventListener('click', () => this.concluirReserva(reserva.id));
+                    acoesCell.appendChild(concluirButton);
+    
+                    const cancelarButton = document.createElement('button');
+                    cancelarButton.textContent = 'Cancelar';
+                    cancelarButton.addEventListener('click', () => this.cancelarReserva(reserva.id));
+                    acoesCell.appendChild(cancelarButton);
+    
+                    linha.appendChild(acoesCell);
+    
+                    tabela.appendChild(linha);
+                }
+            }
+        } catch (error) {
+            console.error('Erro ao mostrar reservas de hoje:', error);
+        }
+    }
+
+
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -241,15 +290,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const loginComponent=document.getElementById('login-component');
         const pesquisaFiltro=document.getElementById('pesquisa-filtro');
         const afterLoginHome=document.getElementById('after-login-home');
- 
+        const afterLoginReservas=document.getElementById('after-login-reservas');
+
         if (loginComponent){
             Controller.fazerLogin();
             observer.disconnect();
         }
         if(afterLoginHome){
-            Controller.mostrarTodasReservas();
+            Controller.mostrarReservasHoje();
             Controller.exibirDataAtual();
-            pesquisaFiltro.addEventListener('input', Controller.filtrarTabela);
+            pesquisaFiltro.addEventListener('input', () => Controller.filtrarTabela('reservas-hoje-tabela'));
+            observer.disconnect();
+        }
+        if(afterLoginReservas && pesquisaFiltro){
+            Controller.mostrarTodasReservas();
+            pesquisaFiltro.addEventListener('input', () => Controller.filtrarTabela('reservas-tabela'));
             observer.disconnect();
         }
     });
