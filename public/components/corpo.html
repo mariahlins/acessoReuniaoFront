@@ -6,7 +6,7 @@
         <button class="btn btn-primary bg-azul-claro mx-2" data-toggle="modal" data-target="#modalDeEmpresa">Reservar salas para empresa</button>
 
         <h3 class="h3 mt-3 titulo">Reservas de hoje</h3>
-        <h6 id="data-hoje" class="h6 subTitulo">DD/MM/YYYY</h6>
+        <h6 id="data-hoje" class="h6 subTitulo"></h6>
     </div>
 
     <div class="align-items-center text-center m-0 p-0">
@@ -19,7 +19,7 @@
             </div>
         </div>
         <div class="">
-            <table class="table table-columns">
+            <table class="table table-columns" id="reservas-hoje-tabela">
                 <thead>
                     <tr>
                         <th scope="col">Salas</th>
@@ -28,7 +28,7 @@
                         <th scope="col">Ocupantes</th>
                         <th scope="col">Entrada</th>
                         <th scope="col">Saída</th>
-                        <th scope="col">Ações</th>
+                        <th scope="col" id="coluna-acao">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
