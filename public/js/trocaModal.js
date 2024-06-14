@@ -1,33 +1,41 @@
-function updateModalContent(step) {
-    const header = document.getElementById('modalHeader');
-    const body = document.querySelector('.custom-modal-body');
+$('.modal').on('show.bs.modal', function () {
+  const modalId = this.id;
+  resetModal(modalId);
+});
 
+function updateModalContent(step) {
     const currentStep = document.getElementById('step' + step);
     const newHeader = currentStep.getAttribute('data-header');
-    const newBody = currentStep.getAttribute('data-body');
+    document.getElementById('modalHeader').textContent = newHeader;
+  }
 
-    header.innerText = newHeader;
-      // Atualiza o conteúdo do body com o novo conteúdo
-      // Como estamos utilizando inputs e outros elementos, aqui pode-se manter a estrutura
-    }
+  //função de avançar
+  function nextStep(currentStep) {
+    document.getElementById('step' + currentStep).classList.remove('active');
+    document.getElementById('step' + (currentStep + 1)).classList.add('active');
+    updateModalContent(currentStep + 1);
+  }
 
-    function nextStep(currentStep) {
-      document.getElementById('step' + currentStep).classList.remove('active');
-      document.getElementById('step' + (currentStep + 1)).classList.add('active');
-      updateModalContent(currentStep + 1);
-    }
+  // função de voltar
+  function prevStep(currentStep) {
+    document.getElementById('step' + currentStep).classList.remove('active');
+    document.getElementById('step' + (currentStep - 1)).classList.add('active');
+    updateModalContent(currentStep - 1);
+  }
 
-    function prevStep(currentStep) {
-      document.getElementById('step' + currentStep).classList.remove('active');
-      document.getElementById('step' + (currentStep - 1)).classList.add('active');
-      updateModalContent(currentStep - 1);
-    }
+  // acaba o modal aqui
+  function finish() {
+    $('#modalDeCoworking').modal('hide');
+    resetModal();
+  }
 
-    function finish() {
-      $('#exampleModalCenter').modal('hide');
-    }
+  function resetModal() {
+    document.querySelectorAll('.step').forEach((step) => step.classList.remove('active'));
+    document.getElementById('step1').classList.add('active');
+    updateModalContent(1);
+  }
 
-    // Inicializa o conteúdo do modal com os dados da primeira etapa ao abrir o modal
-    $('#exampleModalCenter').on('show.bs.modal', function () {
-      updateModalContent(1);
-    });
+  // começa os conteudos do modal
+  $('#modalDeCoworking').on('show.bs.modal', function () {
+    resetModal();
+  });
