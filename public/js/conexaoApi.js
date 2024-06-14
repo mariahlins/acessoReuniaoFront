@@ -43,7 +43,7 @@ class Controller{
         }
     }
 
-    static async filtrarTabela() {
+    static async filtrarTabela(){
         console.log('Filtrando tabela...');
         const valorFiltro = document.getElementById('pesquisa-filtro').value;
         const tabela = document.getElementById('reservas-hoje-tabela');
@@ -54,7 +54,7 @@ class Controller{
             const colunas = linhas[i].getElementsByTagName('td');
             let corresponde = false;
         
-            for (let j = 0; j < colunas.length; j++) {
+            for (let j = 0; j < colunas.length; j++){
                 if (colunas[j].id === idColunaAcao) continue;
         
                 const coluna = colunas[j];
@@ -72,6 +72,34 @@ class Controller{
                 linhas[i].style.display = "none";
             }
         }
+    }
+
+    static async obterReservas(){
+        try{
+            return await axios.get(`http://localhost:3000/reserva`);
+        }catch(error){
+            console.error('Erro ao obter reservas', error);
+        }
+    }
+
+    static async obterReservaPorId(id){
+        try{
+            return await axios.get(`http://localhost:3000/reserva/${id}`);
+        }catch(error){
+            console.error('Erro ao obter reserva por id', error);
+        }
+    }
+
+    static async cancelarReserva(id){
+        try{
+            await axios.put(`http://localhost:3000/reserva/${id}`, { statusReserva: 'Cancelada', dataModificacaoStatus: new Date()});
+        }catch(error){
+            console.error('Erro ao cancelar reserva', error);
+        }
+    }
+
+    static async listarReservas(){
+
     }
 }
 
