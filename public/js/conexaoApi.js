@@ -31,7 +31,7 @@ class Controller{
         }
     }
 
-    static async fazerLogin() {
+    static async fazerLogin(){
         const loginForm=document.getElementById('login-form');
         if (loginForm) {
             loginForm.addEventListener('submit', async (event) => {
@@ -56,22 +56,34 @@ class Controller{
     }
 
     static async filtrarTabela(){
-        console.log('Filtrando tabela...');
         const valorFiltro=document.getElementById('pesquisa-filtro').value;
         const tabela=document.getElementById('reservas-hoje-tabela');
         const linhas=tabela.getElementsByTagName('tr');
         const idColunaAcao='coluna-acao'; 
-    
+
+        const isFiltroNumero = !isNaN(valorFiltro);
+
         for (let i=1; i < linhas.length; i++){
             const colunas=linhas[i].getElementsByTagName('td');
             let corresponde=false;
         
+            if(valorFiltro === ''){
+                linhas[i].style.display="";
+                continue;
+            }
+
             for (let j=0; j < colunas.length; j++){
                 if (colunas[j].id === idColunaAcao) continue;
         
                 const coluna=colunas[j];
                 if(coluna){
-                    if(coluna.textContent.toLowerCase().includes(valorFiltro.toLowerCase())){
+                    if(isFiltroNumero){
+                        if(coluna.textContent === valorFiltro){
+                            corresponde=true;
+                            break;
+                        }
+                    }
+                    else if(coluna.textContent.toLowerCase().includes(valorFiltro.toLowerCase())){
                         corresponde=true;
                         break;
                     }
@@ -225,22 +237,18 @@ class Controller{
 document.addEventListener('DOMContentLoaded', () => {
     // mutation observer para verificar se o elementos ja foram carregados
     const observer=new MutationObserver((_, observer) => {
-        const dataHoje=document.getElementById('data-hoje');
+
         const loginComponent=document.getElementById('login-component');
         const pesquisaFiltro=document.getElementById('pesquisa-filtro');
         const afterLoginHome=document.getElementById('after-login-home');
-        const reservasHojeTabela=document.getElementById('reservas-hoje-tabela');
-
-        if (dataHoje) {
-            Controller.exibirDataAtual();
-        }
-        if (loginComponent) {
+ 
+        if (loginComponent){
             Controller.fazerLogin();
+            observer.disconnect();
         }
         if(afterLoginHome){
             Controller.mostrarTodasReservas();
-        }
-        if (pesquisaFiltro && reservasHojeTabela) {
+            Controller.exibirDataAtual();
             pesquisaFiltro.addEventListener('input', Controller.filtrarTabela);
             observer.disconnect();
         }
