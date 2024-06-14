@@ -28,16 +28,19 @@ class Controller{
             loginForm.addEventListener('submit', async (event) => {
                 event.preventDefault(); 
                 const formData = new FormData(loginForm);
-                const data={
-                    login:formData.get('login'),
-                    senha:formData.get('senha'),
+                const data = {
+                    login: formData.get('login'),
+                    senha: formData.get('senha'),
                 };
                 try {
-                    const response = await axios.post(`http://localhost:3000/recepcionista/login`, data);
-                    if(response.status === 200) 
+                    const response = await axios.post('http://localhost:3000/recepcionista/login', data);
+                    if (response.status === 200) {
+                        localStorage.setItem('token', response.data.token);
                         window.location.href = './public/views/afterLogin/home.html';
+                    }
                 } catch (error) {
-                    throw error;
+                    const errorMsg = document.getElementById('error-msg');
+                    if (errorMsg) errorMsg.textContent = 'Login ou senha inválidos.';
                 }
             });
         }
