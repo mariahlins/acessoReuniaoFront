@@ -42,6 +42,37 @@ class Controller{
             });
         }
     }
+
+    static async filtrarTabela() {
+        console.log('Filtrando tabela...');
+        const valorFiltro = document.getElementById('pesquisa-filtro').value;
+        const tabela = document.getElementById('reservas-hoje-tabela');
+        const linhas = tabela.getElementsByTagName('tr');
+        const idColunaAcao = 'coluna-acao'; 
+    
+        for (let i = 1; i < linhas.length; i++){
+            const colunas = linhas[i].getElementsByTagName('td');
+            let corresponde = false;
+        
+            for (let j = 0; j < colunas.length; j++) {
+                if (colunas[j].id === idColunaAcao) continue;
+        
+                const coluna = colunas[j];
+                if(coluna){
+                    if(coluna.textContent.toLowerCase().includes(valorFiltro.toLowerCase())){
+                        corresponde = true;
+                        break;
+                    }
+                }
+            }
+            if(corresponde){
+                linhas[i].style.display = "";
+            }
+            else{
+                linhas[i].style.display = "none";
+            }
+        }
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -49,12 +80,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const observer = new MutationObserver((_, observer) => {
         const dataHoje = document.getElementById('data-hoje');
         const loginComponent = document.getElementById('login-component');
+        const pesquisaFiltro = document.getElementById('pesquisa-filtro');
+        const reservasHojeTabela = document.getElementById('reservas-hoje-tabela');
+
         if (dataHoje) {
             Controller.exibirDataAtual();
-            observer.disconnect();
         }
         if (loginComponent) {
             Controller.fazerLogin();
+        }
+        if (pesquisaFiltro && reservasHojeTabela) {
+            pesquisaFiltro.addEventListener('input', Controller.filtrarTabela);
+            observer.disconnect();
         }
     });
     observer.observe(document, { childList: true, subtree: true });
