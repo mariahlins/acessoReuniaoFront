@@ -154,7 +154,7 @@ class Controller{
 
     static async concluirReserva(id){
         try{
-            await axios.put(`http://localhost:3000/reserva/${id}`, { statusReserva: 'Concluída', dataModificacaoStatus: new Date()}, {headers: { 'Authorization': `Bearer ${token}` }});
+            await axios.put(`http://localhost:3000/reserva/concluir/${id}`, { statusReserva: 'Concluída', dataModificacaoStatus: new Date()}, {headers: { 'Authorization': `Bearer ${token}` }});
         }
         catch(error){
             console.error('Erro ao concluir reserva', error);
@@ -280,6 +280,60 @@ class Controller{
         }
     }
 
+    static async listarSalas(){
+        try{
+            const response = await axios.get('http://localhost:3000/sala');
+            if (response.status === 200) return response.data;
+            throw new Error('Erro ao buscar salas');
+        }catch(error){
+            console.error('Erro ao listar salas:', error);
+            throw error;
+        }
+    }
+
+    static async mostrarSalas(){
+        try{
+            const salas = await this.listarSalas();
+            const tableBody = document.getElementById('after-login-salas'); // Mudado para 'after-login-salas'
+            if (!tableBody){
+                console.error('Elemento tbody não encontrado');
+                return;
+            }
+            tableBody.innerHTML = '';
+            for (const sala of salas){
+                const row = document.createElement('tr');
+                const colunas = [
+                    sala.id,
+                    sala.andar,
+                    sala.situacao,
+                    sala.capMax,
+                ];
+                for (const coluna of colunas){
+                    const td = document.createElement('td');
+                    td.textContent = coluna;
+                    row.appendChild(td);
+                }
+    
+                const acoesCell = document.createElement('td');
+    
+                const editarButton = document.createElement('button');
+                editarButton.textContent = 'Editar';
+                editarButton.addEventListener('click', () => this.editarSala(sala.id));
+                acoesCell.appendChild(editarButton);
+    
+                const excluirButton = document.createElement('button');
+                excluirButton.textContent = 'Excluir';
+                excluirButton.addEventListener('click', () => this.excluirSala(sala.id));
+                acoesCell.appendChild(excluirButton);
+    
+                row.appendChild(acoesCell);
+    
+                tableBody.appendChild(row);
+            }
+        }catch(error){
+            console.error('Erro ao mostrar salas:', error);
+        }
+    }
 
 }
 
@@ -291,6 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const pesquisaFiltro=document.getElementById('pesquisa-filtro');
         const afterLoginHome=document.getElementById('after-login-home');
         const afterLoginReservas=document.getElementById('after-login-reservas');
+        const afterLoginSalas=document.getElementById('after-login-salas');
 
         if (loginComponent){
             Controller.fazerLogin();
@@ -305,6 +360,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if(afterLoginReservas && pesquisaFiltro){
             Controller.mostrarTodasReservas();
             pesquisaFiltro.addEventListener('input', () => Controller.filtrarTabela('reservas-tabela'));
+            observer.disconnect();
+        }
+        if(afterLoginSalas && pesquisaFiltro){
+            Controller.mostrarSalas();
+            pesquisaFiltro.addEventListener('input', () => Controller.filtrarTabela('salas-tabela'));
             observer.disconnect();
         }
     });
