@@ -364,6 +364,48 @@ class Controller{
         }
     }
 
+    static async listarRecepcionistas(){
+        try{
+            const token = localStorage.getItem('token');
+            const response = await axios.get('http://localhost:3000/recepcionista', {headers: { 'Authorization': `Bearer ${token}` }});
+            if (response.status === 200) return response.data;
+            throw new Error('Erro ao buscar recepcionistas');
+        }catch(error){
+            console.error('Erro ao listar recepcionistas:', error);
+            throw error;
+        }
+    }
+
+    static async mostrarRecepcionistas(){
+        try{
+            const recepcionistas = await this.listarRecepcionistas();
+            const tableBody = document.getElementById('after-login-recepcionistas');
+            if (!tableBody){
+                console.error('Elemento tbody não encontrado');
+                return;
+            }
+            tableBody.innerHTML = '';
+            for (const recepcionista of recepcionistas){
+                const row = document.createElement('tr');
+                const colunas = [
+                    `${recepcionista.nome} ${recepcionista.sobrenome}`,
+                    recepcionista.nivelAcesso,
+                    recepcionista.ativo,
+                ];
+                for (const coluna of colunas){
+                    const td = document.createElement('td');
+                    td.textContent = coluna;
+                    row.appendChild(td);
+                }
+                tableBody.appendChild(row);
+            }
+        }catch(error){
+            console.error('Erro ao mostrar recepcionistas:', error);
+        }
+    
+    }
+
+
 }
 
 document.addEventListener('DOMContentLoaded', () => {
