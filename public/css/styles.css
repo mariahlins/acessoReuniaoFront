@@ -223,3 +223,14 @@ dt{
 .step.active {
     display: block;
 }
+
+.h5-container {
+    display: flex;
+    justify-content: space-between;
+}
+.h5-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px; 
+}
