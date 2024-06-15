@@ -69,7 +69,7 @@ class Controller{
     
         const isFiltroNumero = !isNaN(valorFiltro);
     
-        for (let i = 1; i < linhas.length; i++){
+        for (let i = 0; i < linhas.length; i++){
             const colunas = linhas[i].getElementsByTagName('td');
             let corresponde = false;
         
@@ -77,7 +77,7 @@ class Controller{
                 linhas[i].style.display = "";
                 continue;
             }
-    
+
             for (let j = 0; j < colunas.length; j++){
                 if (colunas[j].id === idColunaAcao) continue;
         
@@ -140,7 +140,7 @@ class Controller{
         }
     }
 
-    static async listarUsuario(){
+    static async listarUsuarios(){
         try{
             const token=localStorage.getItem('token');
             const response=await axios.get('http://localhost:3000/usuario', {headers: { 'Authorization': `Bearer ${token}` }});
@@ -149,6 +149,35 @@ class Controller{
         }catch (error){
             console.error('Erro ao listar usuários:', error);
             throw error;
+        }
+    }
+
+    static async mostrarUsuarios(){
+        try{
+            const usuarios=await this.listarUsuarios();
+            const tableBody=document.getElementById('after-login-usuarios');
+            if (!tableBody){
+                console.error('Elemento tbody não encontrado');
+                return;
+            }
+            tableBody.innerHTML='';
+            for (const usuario of usuarios){
+                const row=document.createElement('tr');
+                const colunas=[
+                    `${usuario.nome} ${usuario.sobrenome}`,
+                    ocultarDocumento(usuario.identificador),
+                    usuario.email,
+                    usuario.telefone,
+                ];
+                for (const coluna of colunas){
+                    const td=document.createElement('td');
+                    td.textContent=coluna;
+                    row.appendChild(td);
+                }
+                tableBody.appendChild(row);
+            }
+        }catch(error){
+            console.error('Erro ao mostrar usuários:', error);
         }
     }
 
@@ -161,7 +190,7 @@ class Controller{
         }
     }
 
-    static async consultarUsuarioPorId(id) {
+    static async consultarUsuarioPorId(id){
         try {
             const token = localStorage.getItem('token'); 
             const response = await axios.get(`http://localhost:3000/usuario/${id}`,{headers: { 'Authorization': `Bearer ${token}` }});
@@ -173,7 +202,7 @@ class Controller{
         }
     }
     
-    static async mostrarTodasReservas() {
+    static async mostrarTodasReservas(){
         try {
             const reservas = await this.listarReservas();
             const tableBody = document.getElementById('reservas-tabela');
@@ -228,7 +257,7 @@ class Controller{
         }
     }
 
-    static async mostrarReservasHoje() {
+    static async mostrarReservasHoje(){
         try {
             const reservas = await this.obterReservas();
             const reservasHoje = reservas.data.filter((reserva) => {
@@ -346,6 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const afterLoginHome=document.getElementById('after-login-home');
         const afterLoginReservas=document.getElementById('after-login-reservas');
         const afterLoginSalas=document.getElementById('after-login-salas');
+        const afterLoginUsuarios=document.getElementById('after-login-usuarios');
 
         if (loginComponent){
             Controller.fazerLogin();
@@ -365,6 +395,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if(afterLoginSalas && pesquisaFiltro){
             Controller.mostrarSalas();
             pesquisaFiltro.addEventListener('input', () => Controller.filtrarTabela('salas-tabela'));
+            observer.disconnect();
+        }
+        if(afterLoginUsuarios && pesquisaFiltro){
+            Controller.mostrarUsuarios();
+            pesquisaFiltro.addEventListener('input', () => Controller.filtrarTabela('usuarios-tabela'));
             observer.disconnect();
         }
     });
