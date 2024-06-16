@@ -17,13 +17,12 @@
           <input type="text" id="motivoDaReuniao" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião">
           <div class="d-flex justify-content-between">
             <button class="btn btn-invisible"></button>
-            <button type="button" class="btn btn-secondary" onclick="nextStep(1)">Continuar</button>
+            <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeCoworking', 1)">Continuar</button>
           </div>
         </div>
 
         <div class="step" id="step2" data-header="Consulta de Horários">
           <div class="h6-container">
-
             <div class="h6-item">
               <h6>Selecione uma sala:</h6>
               <div class="btn-group" role="group" aria-label="Toggle buttons example">
@@ -60,8 +59,8 @@
 
           </div>
           <div class="modal-footer-custom d-flex justify-content-between">
-            <button type="button" class="btn btn-outline-primary" onclick="prevStep(2)">Voltar</button>
-            <button type="button" class="btn btn-secondary" onclick="nextStep(2)">Continuar</button>
+            <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 2)">Voltar</button>
+            <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeCoworking', 2)">Continuar</button>
           </div>
         </div>
 
@@ -69,8 +68,8 @@
           <h4>A reserva está correta?</h4>
           <p>Informações da reserva e horários selecionados.</p>
           <div class="modal-footer-custom d-flex justify-content-between">
-            <button type="button" class="btn btn-outline-primary" onclick="prevStep(3)">Voltar</button>
-            <button type="button" class="btn btn-secondary" onclick="nextStep(3)">Confirmar</button>
+            <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 3)">Voltar</button>
+            <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeCoworking', 3)">Confirmar</button>
           </div>
         </div>
 
@@ -78,8 +77,8 @@
           <h4>Resumo da Reserva:</h4>
           <p>Informações da reserva e horários selecionados.</p>
           <div class="modal-footer-custom d-flex justify-content-between">
-            <button type="button" class="btn btn-outline-primary" onclick="prevStep(4)">Voltar</button>
-            <button type="button" class="btn btn-success" onclick="finish()">Finalizar</button>
+            <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 4)">Voltar</button>
+            <button type="button" class="btn btn-success" onclick="finish('modalDeCoworking')">Finalizar</button>
           </div>
         </div>
       </div>
