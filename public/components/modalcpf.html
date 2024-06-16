@@ -2,7 +2,7 @@
   <div class="modal-dialog modal-dialog-centered custom-modal-size" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title text-center w-100" id="modalHeader">Informações da Reserva</h5>
+        <h6 class="modal-title text-center w-100" id="modalHeader">Informações da Reserva</h6>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -22,36 +22,36 @@
         </div>
 
         <div class="step" id="step2" data-header="Consulta de Horários">
-          <div class="h5-container">
+          <div class="h6-container">
 
-            <div class="h5-item">
-              <h5>Selecione uma sala:</h5>
+            <div class="h6-item">
+              <h6>Selecione uma sala:</h6>
               <div class="btn-group" role="group" aria-label="Toggle buttons example">
-                <input type="radio" class="btn-check" name="options" id="option1" autocomplete="off" checked>
+                <input type="radio" class="btn-check" name="roomOptions" id="option1" autocomplete="off" checked>
                 <label class="btn btn-outline-primary" for="option1">Sala 1</label>
           
-                <input type="radio" class="btn-check" name="options" id="option2" autocomplete="off">
+                <input type="radio" class="btn-check" name="roomOptions" id="option2" autocomplete="off">
                 <label class="btn btn-outline-primary" for="option2">Sala 2</label>
           
-                <input type="radio" class="btn-check" name="options" id="option3" autocomplete="off">
+                <input type="radio" class="btn-check" name="roomOptions" id="option3" autocomplete="off">
                 <label class="btn btn-outline-primary" for="option3">Sala 3</label>
               </div>
             </div>
 
-            <div class="h5-item">
-              <h5>Selecione um dia:</h5>
-              <div class="btn-group" role="group" aria-label="Toggle buttons example">
-                <input type="radio" class="btn-check" name="options" id="option1" autocomplete="off" checked>
-                <label class="btn btn-outline-primary" for="option1">Hoje</label>
+            <div class="h6-item">
+              <h6>Selecione um dia:</h6>
+              <div class="btn-group d-flex justify-content-between" role="group" aria-label="Toggle buttons example">
+                <input type="radio" class="btn-check" name="dayOptions" id="hoje" autocomplete="off" checked>
+                <label class="btn btn-outline-primary" for="hoje">Hoje</label>
           
-                <input type="radio" class="btn-check" name="options" id="amanha" autocomplete="off">
-                <label class="btn btn-outline-primary" for="option2">Amanhã</label>
+                <input type="radio" class="btn-check" name="dayOptions" id="amanha" autocomplete="off">
+                <label class="btn btn-outline-primary" for="amanha">Amanhã</label>
       
               </div>
             </div>
 
-            <div class="h5-item">
-              <h5>Selecione um horário:</h5>
+            <div class="h6-item">
+              <h6>Selecione um horário:</h6>
               <select class="form-select" id="horariosDropdown">
                 <option selected disabled>Escolha um horário</option>
               </select>
