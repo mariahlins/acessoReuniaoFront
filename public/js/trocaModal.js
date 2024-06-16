@@ -3,42 +3,57 @@ $('.modal').on('show.bs.modal', function () {
   resetModal(modalId);
 });
 
-function updateModalContent(step) {
-  const currentStep = document.getElementById('step' + step);
-  const newHeader = currentStep.getAttribute('data-header');
-  document.getElementById('modalHeader').textContent = newHeader;
-}
-
-//função de avançar
-function nextStep(currentStep) {
-  document.getElementById('step' + currentStep).classList.remove('active');
-  document.getElementById('step' + (currentStep + 1)).classList.add('active');
-  updateModalContent(currentStep + 1);
-}
-
-// função de voltar
-function prevStep(currentStep) {
-  document.getElementById('step' + currentStep).classList.remove('active');
-  document.getElementById('step' + (currentStep - 1)).classList.add('active');
-  updateModalContent(currentStep - 1);
-}
-
- // acaba o modal aqui
-function finish() {
-  $('#modalDeCoworking').modal('hide');
-  resetModal();
-}
-
-function resetModal() {
-  document.querySelectorAll('.step').forEach((step) => step.classList.remove('active'));
-  document.getElementById('step1').classList.add('active');
-  updateModalContent(1);
-}
-
-// começa os conteudos do modal
-$('#modalDeCoworking').on('show.bs.modal', function () {
-  resetModal();
+$('.modal').on('hidden.bs.modal', function () {
+  const modalId = this.id;
+  resetModal(modalId);
 });
+
+// atualiza o conteudo e o cabecalho
+function updateModalContent(modalId, step) {
+  const currentStep = document.getElementById(modalId).querySelector('#step' + step);
+  const newHeader = currentStep.getAttribute('data-header');
+  document.getElementById(modalId).querySelector('.modal-title').textContent = newHeader;
+}
+
+// continuar
+function nextStep(modalId, currentStep) {
+  const modalElement = document.getElementById(modalId);
+  modalElement.querySelector('#step' + currentStep).classList.remove('active');
+  modalElement.querySelector('#step' + (currentStep + 1)).classList.add('active');
+  updateModalContent(modalId, currentStep + 1);
+}
+
+// voltar
+function prevStep(modalId, currentStep) {
+  const modalElement = document.getElementById(modalId);
+  modalElement.querySelector('#step' + currentStep).classList.remove('active');
+  modalElement.querySelector('#step' + (currentStep - 1)).classList.add('active');
+  updateModalContent(modalId, currentStep - 1);
+}
+
+// finaliza e recomeça
+function finish(modalId) {
+  $('#' + modalId).modal('hide');
+  resetModal(modalId);
+}
+
+// teoricamente reseta ne
+function resetModal(modalId) {
+  const modalElement = document.getElementById(modalId);
+  modalElement.querySelectorAll('.step').forEach((step) => step.classList.remove('active'));
+  modalElement.querySelector('#step1').classList.add('active');
+  updateModalContent(modalId, 1);
+}
+
+// teoricamente reseta/2
+$('#modalDeCoworking').on('show.bs.modal', function () {
+  resetModal('modalDeCoworking');
+});
+
+$('#modalDeEmpresas').on('show.bs.modal', function () {
+  resetModal('modalDeEmpresas');
+});
+
 
 
 //botoes
@@ -51,7 +66,3 @@ function selectButton(button, group) {
   });
   button.classList.add('btn-selected');
 }
-
-
-
-// funções do dropdown de horas
