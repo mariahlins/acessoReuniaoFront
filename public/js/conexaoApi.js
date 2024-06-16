@@ -406,7 +406,53 @@ class Controller{
     
     }
 
+    static async verificarDisponibilidade(salaId, horaInicio, horaFim){
+        try{
+            const reservas = await this.obterReservas();
+            const reservasSala = reservas.data.filter((reserva) => reserva.idSala === salaId);
+            for (const reserva of reservasSala){
+                const reservaInicio = new Date(reserva.horaInicio);
+                const reservaFim = new Date(reserva.horaFimReserva);
+                const inicio = new Date(horaInicio);
+                const fim = new Date(horaFim);
+                if (inicio >= reservaInicio && inicio < reservaFim) return false;
+                if (fim > reservaInicio && fim <= reservaFim) return false;
+            }
+            return true;
+        }catch(error){
+            console.error('Erro ao verificar disponibilidade:', error);
+            return false;
+        }
+    }
 
+    static async pegarDadosFormularioReserva(idModal){
+        if(idModal === 'modalDeCoworking'){
+            const dados = {
+                cpf : document.getElementById('cpf').value,
+                dataNascimento : document.getElementById('dataNascimento').value,
+                nome : document.getElementById('nome').value,
+                email : document.getElementById('email').value,
+                telefone : document.getElementById('telefone').value,
+                motivo : document.getElementById('motivoDaReuniao').value,
+                sala : document.querySelector('input[name="roomOptions"]:checked').value,
+                dia : document.querySelector('input[name="dayOptions"]:checked').value,
+                horario : document.getElementById('horariosDropdown').value,
+            }
+        }
+        else{
+            const dados = {
+                cpf : document.getElementById('cpf').value,
+                dataNascimento : document.getElementById('dataNascimento').value,
+                nome : document.getElementById('nome').value,
+                email : document.getElementById('email').value,
+                motivo : document.getElementById('motivoDaReuniao').value,
+                sala : document.getElementById('salasDropdown').value,
+                dia : document.getElementById('data').value,
+                horario : document.getElementById('horariosDropdown').value,
+            }
+        }
+    }    
+   
 }
 
 document.addEventListener('DOMContentLoaded', () => {
