@@ -122,7 +122,8 @@ class Controller{
 
     static async cancelarReserva(id){
         try{
-            await axios.put(`http://localhost:3000/reserva/${id}`, { statusReserva: 'Cancelada', dataModificacaoStatus: new Date()});
+            let token = localStorage.getItem('token');
+            await axios.put(`http://localhost:3000/reserva/${id}`, { statusReserva: 'Cancelada', dataModificacaoStatus: new Date()}, {headers: { 'Authorization': `Bearer ${token}`}});
         }catch(error){
             console.error('Erro ao cancelar reserva', error);
         }
@@ -183,9 +184,9 @@ class Controller{
 
     static async concluirReserva(id){
         try{
-            await axios.put(`http://localhost:3000/reserva/concluir/${id}`, { statusReserva: 'Concluída', dataModificacaoStatus: new Date()}, {headers: { 'Authorization': `Bearer ${token}` }});
-        }
-        catch(error){
+            let token = localStorage.getItem('token');
+            await axios.put(`http://localhost:3000/reserva/${id}`, { statusReserva: 'Concluída', dataModificacaoStatus: new Date()}, {headers: { 'Authorization': `Bearer ${token}`}});
+       }catch(error){
             console.error('Erro ao concluir reserva', error);
         }
     }
