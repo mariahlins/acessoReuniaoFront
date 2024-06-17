@@ -11,20 +11,28 @@ html, body {
 }
 
 .bg-azul{
-    background: #0624AA;
+    background: #0624AA !important;
 }
 
 .bg-cinza{
-    background-color: #565D6D;
+    background-color: #565D6D !important;
+}
+
+
+.bg-azul-claro{
+    background-color: #6ea8fe !important;
+}
+.fc-branco{
+    color:#ffffff !important;
+}
+.peso-500{
+    font-weight: 500;
 }
 .input{
     padding-right: 8rem;
 }
 .input input{
     width: 100%;
-}
-.bg-azul-claro{
-    background-color: #6ea8fe;
 }
 h1, h2, h3, h4, h5, h6{
     width: fit-content !important;
@@ -158,9 +166,19 @@ input[type="text"]:focus {
     color: #4973E8;
     border-color: #4973E8;
 }
+.btn-confirmar:hover{
+    background-color: #F2F6FA !important;
+    color: #4973E8 !important;
+    border-color: #4973E8 !important;
+}
+
+.btn-cancelar:hover{
+    background-color: #F2F6FA !important;
+    color:  #565D6D !important;
+    border-color:  #565D6D !important;
+}
 
 .btn.btn-secondary{
-    background-color: #0624AA;
     color:#F2F6FA;
     border: 2px solid transparent;
     transition: all 0.25s ease;
