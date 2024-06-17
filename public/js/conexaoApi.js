@@ -349,7 +349,7 @@ class Controller{
             for (const sala of salas){
                 const row = document.createElement('tr');
                 const colunas = [
-                    sala.id,
+                    sala.nome,
                     sala.andar,
                     sala.situacao,
                     sala.capMax,
@@ -441,72 +441,106 @@ class Controller{
         }
     }
 
-    static async pegarDadosFormularioReserva(idModal){
-        if(idModal === 'modalDeCoworking'){
-            const dados = {
-                cpf : document.getElementById('cpf').value,
-                dataNascimento : document.getElementById('dataNascimento').value,
-                nome : document.getElementById('nome').value,
-                email : document.getElementById('email').value,
-                telefone : document.getElementById('telefone').value,
-                motivo : document.getElementById('motivoDaReuniao').value,
-                sala : document.querySelector('input[name="roomOptions"]:checked').value,
-                dia : document.querySelector('input[name="dayOptions"]:checked').value,
-                horario : document.getElementById('horariosDropdown').value,
+    static async selecionarSalaModalCoworking(){
+        try{
+            let salas = await this.listarSalas();
+            salas = salas.filter(sala => sala.andar === 0);
+            const container = document.getElementById('selecao-salas-modal');
+    
+            container.innerHTML = '';
+    
+            let salaSelecionadaId;
+            let defaultInput = null;
+            let primeiraSalaId = null;
+    
+            salas.forEach((sala, index) => {
+    
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.className = 'btn-check';
+                input.name = 'roomOptions';
+                input.id = `option${index + 1}`;
+                input.autocomplete = 'off';
+                if (index === 0) {
+                    input.checked = true;
+                    defaultInput = input;
+                    primeiraSalaId = sala.id;
+                }
+    
+                input.addEventListener('change', () => {
+                    salaSelecionadaId = sala.id;  
+                });
+    
+                const label = document.createElement('label');
+                label.className = 'btn btn-outline-primary';
+                label.htmlFor = `option${index + 1}`;
+                label.textContent = sala.nome;
+    
+                container.appendChild(input);
+                container.appendChild(label);
+            });
+    
+            if (defaultInput){
+                defaultInput.dispatchEvent(new Event('change'));
             }
+    
+            return salaSelecionadaId || primeiraSalaId;  
+        }catch(error){
+            console.error('Erro ao mostrar modal coworking:', error);
         }
-        else{
-            const dados = {
-                cpf : document.getElementById('cpf').value,
-                dataNascimento : document.getElementById('dataNascimento').value,
-                nome : document.getElementById('nome').value,
-                email : document.getElementById('email').value,
-                motivo : document.getElementById('motivoDaReuniao').value,
-                sala : document.getElementById('salasDropdown').value,
-                dia : document.getElementById('data').value,
-                horario : document.getElementById('horariosDropdown').value,
-            }
-        }
-    }    
-   
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // mutation observer para verificar se o elementos ja foram carregados
-    const observer=new MutationObserver((_, observer) => {
+    const observeElement = (elementId, callback) => {
+        const observer = new MutationObserver((_, observer) => {
+            const element = document.getElementById(elementId);
+            if (element) {
+                callback(element);
+                observer.disconnect();
+            }
+        });
+        observer.observe(document, { childList: true, subtree: true });
+    };
 
-        const loginComponent=document.getElementById('login-component');
-        const pesquisaFiltro=document.getElementById('pesquisa-filtro');
-        const afterLoginHome=document.getElementById('after-login-home');
-        const afterLoginReservas=document.getElementById('after-login-reservas');
-        const afterLoginSalas=document.getElementById('after-login-salas');
-        const afterLoginUsuarios=document.getElementById('after-login-usuarios');
+    observeElement('login-component', () => {
+        Controller.fazerLogin();
+    });
 
-        if (loginComponent){
-            Controller.fazerLogin();
-            observer.disconnect();
-        }
-        if(afterLoginHome){
+    observeElement('after-login-home', () => {
+        const pesquisaFiltro = document.getElementById('pesquisa-filtro');
+        if (pesquisaFiltro) {
             Controller.mostrarReservasHoje();
             Controller.exibirDataAtual();
             pesquisaFiltro.addEventListener('input', () => Controller.filtrarTabela('reservas-hoje-tabela'));
-            observer.disconnect();
         }
-        if(afterLoginReservas && pesquisaFiltro){
-            Controller.mostrarTodasReservas();
-            pesquisaFiltro.addEventListener('input', () => Controller.filtrarTabela('reservas-tabela'));
-            observer.disconnect();
-        }
-        if(afterLoginSalas && pesquisaFiltro){
-            Controller.mostrarSalas();
-            pesquisaFiltro.addEventListener('input', () => Controller.filtrarTabela('salas-tabela'));
-            observer.disconnect();
-        }
-        if(afterLoginUsuarios && pesquisaFiltro){
-            Controller.mostrarUsuarios();
-            pesquisaFiltro.addEventListener('input', () => Controller.filtrarTabela('usuarios-tabela'));
-            observer.disconnect();
+        const modalCoworking = document.getElementById('selecao-salas-modal');
+        if (modalCoworking) {
+            Controller.selecionarSalaModalCoworking();
         }
     });
-    observer.observe(document, { childList: true, subtree: true });
+
+    observeElement('after-login-reservas', () => {
+        const pesquisaFiltro = document.getElementById('pesquisa-filtro');
+        if (pesquisaFiltro) {
+            Controller.mostrarTodasReservas();
+            pesquisaFiltro.addEventListener('input', () => Controller.filtrarTabela('reservas-tabela'));
+        }
+    });
+
+    observeElement('after-login-salas', () => {
+        const pesquisaFiltro = document.getElementById('pesquisa-filtro');
+        if (pesquisaFiltro) {
+            Controller.mostrarSalas();
+            pesquisaFiltro.addEventListener('input', () => Controller.filtrarTabela('salas-tabela'));
+        }
+    });
+
+    observeElement('after-login-usuarios', () => {
+        const pesquisaFiltro = document.getElementById('pesquisa-filtro');
+        if (pesquisaFiltro) {
+            Controller.mostrarUsuarios();
+            pesquisaFiltro.addEventListener('input', () => Controller.filtrarTabela('usuarios-tabela'));
+        }
+    });
 });
