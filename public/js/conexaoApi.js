@@ -323,7 +323,6 @@ class Controller{
                 const dataReserva = parseDate(reserva.dataReservada);
                 return ehHoje(dataReserva);
             });
-            console.log(reservasHoje);
             const tabela = document.getElementById('reservas');
             tabela.innerHTML = '';
             await this.formatarTabelaResresas(reservasHoje, tabela);
