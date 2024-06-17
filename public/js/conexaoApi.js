@@ -489,6 +489,30 @@ class Controller{
             console.error('Erro ao mostrar modal coworking:', error);
         }
     }
+
+    static async selecionarDiaModalCoworking(){
+        const hojeInput = document.getElementById('hoje');
+        const amanhaInput = document.getElementById('amanha');
+    
+        let dataSelecionada;
+        let dataDefault = new Date();
+    
+        hojeInput.addEventListener('change', () => {
+            dataSelecionada = new Date();
+        });
+    
+        amanhaInput.addEventListener('change', () => {
+            dataSelecionada = new Date();
+            dataSelecionada.setDate(dataSelecionada.getDate() + 1);
+        });
+    
+        if (!hojeInput.checked && !amanhaInput.checked) {
+            hojeInput.dispatchEvent(new Event('change'));
+        }
+    
+        return dataSelecionada || dataDefault;
+    }
+    
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -517,6 +541,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const modalCoworking = document.getElementById('selecao-salas-modal');
         if (modalCoworking) {
             Controller.selecionarSalaModalCoworking();
+            Controller.selecionarDiaModalCoworking();
         }
     });
 
