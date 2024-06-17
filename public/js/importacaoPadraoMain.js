@@ -38,13 +38,12 @@ $(function() {
                         if (url) {
                             $.get(url, function(content) {
                                 $("main").append(content); 
-                            });
-
-                            // Importa o conteúdo do footer após o corpo ser carregado
-                            //ta dentro da função pois preciso que o querido seja o último a ser carregado
-                            $.get("/public/components/footer.html", function(footerContent) {
-                                // Adiciona o conteúdo do footer após o corpo dentro do main
-                                $("main").append(footerContent);
+                                // Importa o conteúdo do footer após o corpo ser carregado
+                                //ta dentro da função pois preciso que o querido seja o último a ser carregado
+                                $.get("/public/components/footer.html", function(footerContent) {
+                                    // Adiciona o conteúdo do footer após o corpo dentro do main
+                                    $("main").append(footerContent);
+                                });
                             });
                         }
                 });
