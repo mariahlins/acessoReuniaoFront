@@ -1,3 +1,6 @@
+let salaSelecionadaGlobal = null;
+let dataSelecionadaGlobal;
+
 function formatarDataBr(data) {
     const dia=data.getDate().toString().padStart(2, '0');
     const mes=(data.getMonth() + 1).toString().padStart(2, '0'); 
@@ -441,78 +444,132 @@ class Controller{
         }
     }
 
-    static async selecionarSalaModalCoworking(){
-        try{
-            let salas = await this.listarSalas();
-            salas = salas.filter(sala => sala.andar === 0);
-            const container = document.getElementById('selecao-salas-modal');
+    static selecionarSalaModalCoworking() {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let salas = await this.listarSalas();
+                salas = salas.filter(sala => sala.andar === 0);
+                const container = document.getElementById('selecao-salas-modal');
     
-            container.innerHTML = '';
+                container.innerHTML = '';
     
-            let salaSelecionadaId;
-            let defaultInput = null;
-            let primeiraSalaId = null;
+                let defaultInput = null;
+                let primeiraSalaId = null;
     
-            salas.forEach((sala, index) => {
+                salas.forEach((sala, index) => {
     
-                const input = document.createElement('input');
-                input.type = 'radio';
-                input.className = 'btn-check';
-                input.name = 'roomOptions';
-                input.id = `option${index + 1}`;
-                input.autocomplete = 'off';
-                if (index === 0) {
-                    input.checked = true;
-                    defaultInput = input;
-                    primeiraSalaId = sala.id;
-                }
+                    const input = document.createElement('input');
+                    input.type = 'radio';
+                    input.className = 'btn-check';
+                    input.name = 'roomOptions';
+                    input.id = `option${index + 1}`;
+                    input.autocomplete = 'off';
+                    if (sala.id === salaSelecionadaGlobal || (salaSelecionadaGlobal === null && index === 0)) {
+                        input.checked = true;
+                        defaultInput = input;
+                        primeiraSalaId = sala.id;
+                    }
     
-                input.addEventListener('change', () => {
-                    salaSelecionadaId = sala.id;  
+                    input.addEventListener('change', () => {
+                        this.selecionarHorarioDropdownModalCoworking(sala.id, dataSelecionadaGlobal);
+                        salaSelecionadaGlobal = sala.id; 
+                        console.log(sala.id);
+                        resolve(sala.id);
+                    });
+    
+                    const label = document.createElement('label');
+                    label.className = 'btn btn-outline-primary';
+                    label.htmlFor = `option${index + 1}`;
+                    label.textContent = sala.nome;
+    
+                    container.appendChild(input);
+                    container.appendChild(label);
                 });
     
-                const label = document.createElement('label');
-                label.className = 'btn btn-outline-primary';
-                label.htmlFor = `option${index + 1}`;
-                label.textContent = sala.nome;
+                if (defaultInput) {
+                    defaultInput.dispatchEvent(new Event('change'));
+                }
     
-                container.appendChild(input);
-                container.appendChild(label);
+                resolve(primeiraSalaId);
+            } catch (error) {
+                console.error('Erro ao mostrar modal coworking:', error);
+                reject(error);
+            }
+        });
+    }
+
+    static selecionarDiaModalCoworking(){
+        return new Promise(async (resolve, reject) => {
+            const hojeInput = document.getElementById('hoje');
+            const amanhaInput = document.getElementById('amanha');
+    
+            let dataSelecionada;
+            let dataDefault = new Date();
+    
+            hojeInput.addEventListener('change', async () => {
+                dataSelecionada = new Date();
+                dataSelecionadaGlobal = dataSelecionada;
+                const salaId = await this.selecionarSalaModalCoworking();
+                this.selecionarHorarioDropdownModalCoworking(salaId, dataSelecionada);
+                resolve(dataSelecionada);
+                console.log(dataSelecionada);   
             });
     
-            if (defaultInput){
-                defaultInput.dispatchEvent(new Event('change'));
+            amanhaInput.addEventListener('change', async () => {
+                dataSelecionada = new Date();
+                dataSelecionada.setDate(dataSelecionada.getDate() + 1);
+                dataSelecionadaGlobal = dataSelecionada;
+                const salaId = await this.selecionarSalaModalCoworking();
+                this.selecionarHorarioDropdownModalCoworking(salaId, dataSelecionada);
+                resolve(dataSelecionada);
+                console.log(dataSelecionada);
+            });
+    
+            if (!hojeInput.checked && !amanhaInput.checked) {
+                hojeInput.dispatchEvent(new Event('change'));
             }
     
-            return salaSelecionadaId || primeiraSalaId;  
-        }catch(error){
-            console.error('Erro ao mostrar modal coworking:', error);
+            resolve(dataSelecionada || dataDefault);
+        });
+    }
+    
+    static async selecionarHorarioDropdownModalCoworking(salaId, data){
+        try {
+            if (!data){
+                data = new Date();
+            }
+            const reservas = await this.obterReservas();
+            const reservasSala = reservas.data.filter((reserva) => reserva.idSala === salaId);
+    
+            const horariosOcupados = reservasSala.map((reserva) => {
+                const inicio = new Date(reserva.horaInicio);
+                const fim = new Date(reserva.horaFimReserva);
+                return { inicio, fim };
+            });
+    
+            const horariosDisponiveis = [];
+    
+            for (let hora = 0; hora < 24; hora++) {
+                const horario = new Date(data.getFullYear(), data.getMonth(), data.getDate(), hora);
+                if (!horariosOcupados.some(h => h.inicio <= horario && h.fim > horario)) {
+                    horariosDisponiveis.push(horario);
+                }
+            }
+    
+            const dropdown = document.getElementById('horariosDropdown');
+            dropdown.innerHTML = ''; 
+            horariosDisponiveis.forEach(horario => {
+                const option = document.createElement('option');
+                option.value = horario.toISOString();
+                option.text = `${horario.toLocaleDateString('pt-BR')} ${String(horario.getHours()).padStart(2, '0')}:00`;
+                dropdown.add(option);
+            });
+        } catch (error) {
+            console.error('Erro ao selecionar horário:', error);
         }
     }
 
-    static async selecionarDiaModalCoworking(){
-        const hojeInput = document.getElementById('hoje');
-        const amanhaInput = document.getElementById('amanha');
-    
-        let dataSelecionada;
-        let dataDefault = new Date();
-    
-        hojeInput.addEventListener('change', () => {
-            dataSelecionada = new Date();
-        });
-    
-        amanhaInput.addEventListener('change', () => {
-            dataSelecionada = new Date();
-            dataSelecionada.setDate(dataSelecionada.getDate() + 1);
-        });
-    
-        if (!hojeInput.checked && !amanhaInput.checked) {
-            hojeInput.dispatchEvent(new Event('change'));
-        }
-    
-        return dataSelecionada || dataDefault;
-    }
-    
+   
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -542,6 +599,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (modalCoworking) {
             Controller.selecionarSalaModalCoworking();
             Controller.selecionarDiaModalCoworking();
+            Controller.selecionarHorarioDropdownModalCoworking();
         }
     });
 
