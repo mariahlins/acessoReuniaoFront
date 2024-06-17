@@ -1,7 +1,8 @@
 let salaSelecionadaGlobal = null;
 let dataSelecionadaGlobal;
 
-function formatarDataBr(data) {
+function formatarDataBr(dataEUA) {
+    const data = new Date(dataEUA);
     const dia=data.getDate().toString().padStart(2, '0');
     const mes=(data.getMonth() + 1).toString().padStart(2, '0'); 
     const ano=data.getFullYear();
@@ -14,16 +15,22 @@ function ocultarDocumento(documento) {
     const asteriscos='*'.repeat(documento.length - 5);
     return inicio + asteriscos + fim;
 }
-function formatarData(dataISO) {
-    const data = new Date(dataISO);
-    const dia = String(data.getDate()).padStart(2, '0');
-    const mes = String(data.getMonth() + 1).padStart(2, '0');
-    const ano = data.getFullYear();
-    const horas = String(data.getHours()).padStart(2, '0');
-    const minutos = String(data.getMinutes()).padStart(2, '0');
 
-    return `${dia}/${mes}/${ano} ${horas}:${minutos}`;
+function parseDate(dataReservada) {
+    const [day, month, year] = dataReservada.split('/');
+    return new Date(year, month - 1, day);
 }
+
+function ehHoje(dataReserva) {
+    const dataAtual = new Date();
+    return (
+        dataReserva.getDate() === dataAtual.getDate() &&
+        dataReserva.getMonth() === dataAtual.getMonth() &&
+        dataReserva.getFullYear() === dataAtual.getFullYear()
+    );
+}
+
+
 class Controller{
 
     static async exibirDataAtual(){
@@ -221,6 +228,7 @@ class Controller{
             console.error('Erro ao concluir reserva', error);
         }
     }
+
     static async confirmarReserva(id){
         try{
             let token = localStorage.getItem('token');
@@ -230,151 +238,95 @@ class Controller{
         }
     }
     
-    static async mostrarTodasReservas(){
+    static async formatarTabelaResresas(reservas, corpoTabela) {
+        const promessas = reservas.map(async (reserva) => {
             try {
-                const reservas = await this.listarReservas();
-                const tableBody = document.getElementById('after-login-reservas');
-                tableBody.innerHTML = '';
-                reservas.forEach(async reserva=> {
-                    try {
-                        const usuario = await this.consultarUsuarioPorId(reserva.idUsuario);
-                        const row = document.createElement('tr');
-                        const colunas = [
-                            reserva.idSala,
-                            `${usuario.nome} ${usuario.sobrenome}`,
-                            ocultarDocumento(usuario.identificador),
-                            reserva.motivoReserva,
-                            formatarData(reserva.horaInicio),
-                            formatarData(reserva.horaFimReserva),
-                        ];
-        
-                        colunas.forEach(coluna => {
-                            const td = document.createElement('td');
-                            td.textContent = coluna;
-                            row.appendChild(td);
-                        });
+                const usuario = await this.consultarUsuarioPorId(reserva.idUsuario);
+                const linha = document.createElement('tr');
+                const colunas = [
+                    reserva.idSala,
+                    `${usuario.nome} ${usuario.sobrenome}`,
+                    ocultarDocumento(usuario.identificador),
+                    reserva.motivoReserva,
+                    `${reserva.dataReservada} ${reserva.horaInicio}`,
+                    `${reserva.dataReservada} ${reserva.horaFimReserva}`,
+                ];
     
-                        const acoesCell = document.createElement('td');
-                        acoesCell.classList.add('d-flex', 'justify-content-around');
-                        switch (reserva.statusReserva) {
-                            case 'PENDENTE':
-                                var confirmarButton = document.createElement('button');       
-                                confirmarButton.textContent = 'Confirmar';
-                                confirmarButton.classList.add('btn', 'btn-confirmar', 'bg-azul', 'peso-500', 'fc-branco');
-                                confirmarButton.addEventListener('click', () => this.confirmarReserva(reserva.id));
-                                acoesCell.appendChild(confirmarButton);
-                        
-                                var cancelarButton = document.createElement('button');
-                                cancelarButton.textContent = 'Cancelar';
-                                cancelarButton.classList.add('btn','btn-cancelar', 'bg-cinza', 'peso-500', 'fc-branco'); 
-                                cancelarButton.addEventListener('click', () => this.cancelarReserva(reserva.id));
-                                acoesCell.appendChild(cancelarButton);
-                                break;
-                        
-                            case 'CONFIRMADO':
-                                var concluirButton = document.createElement('button');
-                                concluirButton.textContent = 'Concluir';
-                                concluirButton.classList.add('btn', 'bg-azul', 'btn-confirmar', 'peso-500', 'fc-branco');
-                                concluirButton.addEventListener('click', () => this.concluirReserva(reserva.id));
-                                acoesCell.appendChild(concluirButton);
-                                break;
-                        
-                            case 'CONCLUIDO':
-                                var msgConfirmado = document.createElement('h6');
-                                msgConfirmado.textContent = 'RESERVA JÁ CONCLUIDO';
-                                acoesCell.appendChild(msgConfirmado);
-                                break;
-                        
-                            default:
-                                var msgErro = document.createElement('h6');
-                                msgErro.textContent =  'Status desconhecido';
-                                acoesCell.appendChild(msgErro);
-                                break;
-                        }  
-    
-                        row.appendChild(acoesCell);
-                        tableBody.appendChild(row);
-                    } catch (userError) {
-                        console.error(`Erro ao listar usuário para a reserva ${reserva.id}:`, userError);
-                    }
+                colunas.forEach(coluna => {
+                    const td = document.createElement('td');
+                    td.textContent = coluna;
+                    linha.appendChild(td);
                 });
+    
+                const acoesCell = document.createElement('td');
+                acoesCell.classList.add('d-flex', 'justify-content-around');
+                switch (reserva.statusReserva) {
+                    case 'PENDENTE':
+                        var confirmarButton = document.createElement('button');
+                        confirmarButton.textContent = 'Confirmar';
+                        confirmarButton.classList.add('btn', 'btn-confirmar', 'bg-azul', 'peso-500', 'fc-branco');
+                        confirmarButton.addEventListener('click', () => this.confirmarReserva(reserva.id));
+                        acoesCell.appendChild(confirmarButton);
+    
+                        var cancelarButton = document.createElement('button');
+                        cancelarButton.textContent = 'Cancelar';
+                        cancelarButton.classList.add('btn', 'btn-cancelar', 'bg-cinza', 'peso-500', 'fc-branco');
+                        cancelarButton.addEventListener('click', () => this.cancelarReserva(reserva.id));
+                        acoesCell.appendChild(cancelarButton);
+                        break;
+    
+                    case 'CONFIRMADO':
+                        var concluirButton = document.createElement('button');
+                        concluirButton.textContent = 'Concluir';
+                        concluirButton.classList.add('btn', 'bg-azul', 'btn-confirmar', 'peso-500', 'fc-branco');
+                        concluirButton.addEventListener('click', () => this.concluirReserva(reserva.id));
+                        acoesCell.appendChild(concluirButton);
+                        break;
+    
+                    case 'CONCLUIDO':
+                        var msgConfirmado = document.createElement('h6');
+                        msgConfirmado.textContent = 'RESERVA JÁ CONCLUÍDA';
+                        acoesCell.appendChild(msgConfirmado);
+                        break;
+    
+                    default:
+                        var msgErro = document.createElement('h6');
+                        msgErro.textContent = 'Status desconhecido';
+                        acoesCell.appendChild(msgErro);
+                        break;
+                }
+                linha.appendChild(acoesCell);
+                corpoTabela.appendChild(linha);
             } catch (error) {
-                console.error('Erro ao mostrar reservas:', error);
+                console.error('Erro ao formatar tabela de reservas:', error);
             }
+        });
+    
+        await Promise.all(promessas);
+    }
+
+    static async mostrarTodasReservas() {
+        try {
+            const reservas = await this.listarReservas();
+            const tableBody = document.getElementById('reservas');
+            tableBody.innerHTML = '';
+            await this.formatarTabelaResresas(reservas, tableBody);
+        } catch (error) {
+            console.error('Erro ao mostrar reservas:', error);
         }
+    }
 
     static async mostrarReservasHoje(){
-        try {
+        try{
             const reservas = await this.obterReservas();
             const reservasHoje = reservas.data.filter((reserva) => {
-                const dataReserva = new Date(reserva.horaInicio);
-                const dataAtual = new Date();
-                return dataReserva.getDate() === dataAtual.getDate() &&
-                    dataReserva.getMonth() === dataAtual.getMonth() &&
-                    dataReserva.getFullYear() === dataAtual.getFullYear();
+                const dataReserva = parseDate(reserva.dataReservada);
+                return ehHoje(dataReserva);
             });
-    
-            const tabela = document.getElementById('reservas-hoje-tabela');
-            if (tabela){
-                reservasHoje.forEach(async (reserva) => {
-                    const usuario = await this.consultarUsuarioPorId(reserva.idUsuario);
-                    const linha = document.createElement('tr');
-                    const colunas = [
-                        reserva.idSala,
-                        `${usuario.nome} ${usuario.sobrenome}`,
-                        ocultarDocumento(usuario.identificador),
-                        reserva.motivoReserva,
-                        formatarData(reserva.horaInicio),
-                        formatarData(reserva.horaFimReserva),
-                    ];
-
-                    colunas.forEach(coluna=>{
-                        const td = document.createElement('td');
-                        td.textContent = coluna;
-                        linha.appendChild(td);
-                    });
-                    const acoesCell = document.createElement('td');
-                    acoesCell.classList.add('d-flex', 'justify-content-around');
-                    switch (reserva.statusReserva) {
-                        case 'PENDENTE':
-                            var confirmarButton = document.createElement('button');       
-                            confirmarButton.textContent = 'Confirmar';
-                            confirmarButton.classList.add('btn', 'btn-confirmar', 'bg-azul', 'peso-500', 'fc-branco');
-                            confirmarButton.addEventListener('click', () => this.confirmarReserva(reserva.id));
-                            acoesCell.appendChild(confirmarButton);
-                    
-                            var cancelarButton = document.createElement('button');
-                            cancelarButton.textContent = 'Cancelar';
-                            cancelarButton.classList.add('btn','btn-cancelar', 'bg-cinza', 'peso-500', 'fc-branco'); 
-                            cancelarButton.addEventListener('click', () => this.cancelarReserva(reserva.id));
-                            acoesCell.appendChild(cancelarButton);
-                            break;
-                    
-                        case 'CONFIRMADO':
-                            var concluirButton = document.createElement('button');
-                            concluirButton.textContent = 'Concluir';
-                            concluirButton.classList.add('btn', 'bg-azul', 'btn-confirmar', 'peso-500', 'fc-branco');
-                            concluirButton.addEventListener('click', () => this.concluirReserva(reserva.id));
-                            acoesCell.appendChild(concluirButton);
-                            break;
-                    
-                        case 'CONCLUIDO':
-                            var msgConfirmado = document.createElement('h6');
-                            msgConfirmado.textContent = 'RESERVA JÁ CONCLUIDO';
-                            acoesCell.appendChild(msgConfirmado);
-                            break;
-                    
-                        default:
-                            var msgErro = document.createElement('h6');
-                            msgErro.textContent =  'Status desconhecido';
-                            acoesCell.appendChild(msgErro);
-                            break;
-                    }  
-                    linha.appendChild(acoesCell);
-    
-                    tabela.appendChild(linha);
-                });
-            }
+            console.log(reservasHoje);
+            const tabela = document.getElementById('reservas');
+            tabela.innerHTML = '';
+            await this.formatarTabelaResresas(reservasHoje, tabela);
         } catch (error) {
             console.error('Erro ao mostrar reservas de hoje:', error);
         }
@@ -621,7 +573,6 @@ class Controller{
         }
     }
 
-   
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -645,7 +596,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (pesquisaFiltro) {
             Controller.mostrarReservasHoje();
             Controller.exibirDataAtual();
-            pesquisaFiltro.addEventListener('input', () => Controller.filtrarTabela('reservas-hoje-tabela'));
+            pesquisaFiltro.addEventListener('input', () => Controller.filtrarTabela('reservas'));
         }
         const modalCoworking = document.getElementById('selecao-salas-modal');
         if (modalCoworking) {
