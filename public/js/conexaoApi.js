@@ -215,12 +215,19 @@ class Controller{
     static async concluirReserva(id){
         try{
             let token = localStorage.getItem('token');
-            await axios.put(`http://localhost:3000/reserva/${id}`, { statusReserva: 'Concluída', dataModificacaoStatus: new Date()}, {headers: { 'Authorization': `Bearer ${token}`}});
+            await axios.put(`http://localhost:3000/reserva/concluir/${id}`, { statusReserva: 'Concluída', dataModificacaoStatus: new Date()}, {headers: { 'Authorization': `Bearer ${token}`}});
        }catch(error){
             console.error('Erro ao concluir reserva', error);
         }
     }
-
+    static async confirmarReserva(id){
+        try{
+            let token = localStorage.getItem('token');
+            await axios.put(`http://localhost:3000/reserva/confirmar/${id}`, { statusReserva: 'Confirmada', dataModificacaoStatus: new Date()}, {headers: { 'Authorization': `Bearer ${token}`}});
+        }catch(error){
+            console.error('Erro ao confirmar reserva', error);
+        }
+    }
     
     static async mostrarTodasReservas(){
         try {
@@ -255,10 +262,10 @@ class Controller{
     
                     const acoesCell = document.createElement('td');
     
-                    const concluirButton = document.createElement('button');
-                    concluirButton.textContent = 'Concluir';
-                    concluirButton.addEventListener('click', () => this.concluirReserva(reserva.id));
-                    acoesCell.appendChild(concluirButton);
+                    const confirmarButton = document.createElement('button');
+                    confirmarButton.textContent = 'Confirmar';
+                    confirmarButton.addEventListener('click', () => this.confirmarReserva(reserva.id));
+                    acoesCell.appendChild(confirmarButton);
     
                     const cancelarButton = document.createElement('button');
                     cancelarButton.textContent = 'Cancelar';
@@ -309,10 +316,10 @@ class Controller{
                     }
                     const acoesCell = document.createElement('td');
     
-                    const concluirButton = document.createElement('button');
-                    concluirButton.textContent = 'Concluir';
-                    concluirButton.addEventListener('click', () => this.concluirReserva(reserva.id));
-                    acoesCell.appendChild(concluirButton);
+                    const confirmarButton = document.createElement('button');
+                    confirmarButton.textContent = 'Confirmar';
+                    confirmarButton.addEventListener('click', () => this.confirmarReserva(reserva.id));
+                    acoesCell.appendChild(confirmarButton);
     
                     const cancelarButton = document.createElement('button');
                     cancelarButton.textContent = 'Cancelar';
@@ -473,7 +480,6 @@ class Controller{
                     input.addEventListener('change', () => {
                         this.selecionarHorarioDropdownModalCoworking(sala.id, dataSelecionadaGlobal);
                         salaSelecionadaGlobal = sala.id; 
-                        console.log(sala.id);
                         resolve(sala.id);
                     });
     
@@ -512,7 +518,6 @@ class Controller{
                 const salaId = await this.selecionarSalaModalCoworking();
                 this.selecionarHorarioDropdownModalCoworking(salaId, dataSelecionada);
                 resolve(dataSelecionada);
-                console.log(dataSelecionada);   
             });
     
             amanhaInput.addEventListener('change', async () => {
@@ -522,7 +527,6 @@ class Controller{
                 const salaId = await this.selecionarSalaModalCoworking();
                 this.selecionarHorarioDropdownModalCoworking(salaId, dataSelecionada);
                 resolve(dataSelecionada);
-                console.log(dataSelecionada);
             });
     
             if (!hojeInput.checked && !amanhaInput.checked) {
