@@ -69,7 +69,7 @@ class Controller{
     
         const isFiltroNumero = !isNaN(valorFiltro);
     
-        for (let i = 0; i < linhas.length; i++){
+        for (let i = 1; i < linhas.length; i++){
             const colunas = linhas[i].getElementsByTagName('td');
             let corresponde = false;
         
@@ -152,7 +152,19 @@ class Controller{
             throw error;
         }
     }
-
+    
+    static async consultarUsuarioPorId(id){
+        try {
+            const token = localStorage.getItem('token'); 
+            const response = await axios.get(`http://localhost:3000/usuario/${id}`,{headers: { 'Authorization': `Bearer ${token}` }});
+            if (response.status === 200) return response.data;
+            else throw new Error('Erro ao consultar usuário por ID');
+        } catch (error) {
+            console.error('Erro ao consultar usuário por ID:', error);
+            throw error;
+        }
+    }
+    
     static async mostrarUsuarios(){
         try{
             const usuarios=await this.listarUsuarios();
@@ -168,14 +180,29 @@ class Controller{
                     `${usuario.nome} ${usuario.sobrenome}`,
                     ocultarDocumento(usuario.identificador),
                     usuario.email,
-                    usuario.telefone,
                 ];
                 for (const coluna of colunas){
                     const td=document.createElement('td');
                     td.textContent=coluna;
                     row.appendChild(td);
                 }
+                
+                const acoesCell = document.createElement('td');
+    
+                const concluirButton = document.createElement('button');
+                concluirButton.textContent = 'Editar';
+                concluirButton.addEventListener('click', () => this.editarUsuario(usuario.id));
+                acoesCell.appendChild(concluirButton);
+    
+                const cancelarButton = document.createElement('button');
+                cancelarButton.textContent = 'Excluir';
+                cancelarButton.addEventListener('click', () => this.deletarUsuario(usuario.id));
+                acoesCell.appendChild(cancelarButton);
+    
+                row.appendChild(acoesCell);
+    
                 tableBody.appendChild(row);
+    
             }
         }catch(error){
             console.error('Erro ao mostrar usuários:', error);
@@ -191,22 +218,11 @@ class Controller{
         }
     }
 
-    static async consultarUsuarioPorId(id){
-        try {
-            const token = localStorage.getItem('token'); 
-            const response = await axios.get(`http://localhost:3000/usuario/${id}`,{headers: { 'Authorization': `Bearer ${token}` }});
-            if (response.status === 200) return response.data;
-            else throw new Error('Erro ao consultar usuário por ID');
-        } catch (error) {
-            console.error('Erro ao consultar usuário por ID:', error);
-            throw error;
-        }
-    }
     
     static async mostrarTodasReservas(){
         try {
             const reservas = await this.listarReservas();
-            const tableBody = document.getElementById('reservas-tabela');
+            const tableBody = document.getElementById('after-login-reservas');
             if (!tableBody) {
                 console.error('Elemento tbody não encontrado');
                 return;
