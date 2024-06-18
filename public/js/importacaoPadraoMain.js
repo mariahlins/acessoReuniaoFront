@@ -30,6 +30,12 @@ $(function() {
                             case "usuarios.html":
                                 url = "/public/components/corpoUsuarios.html";
                                 break;
+                            case "nivelAcesso.html":
+                                url = "/public/components/corpoNivelAcesso.html";
+                                break;
+                            case "listaNegra.html":
+                                url = "/public/components/corpoListaNegra.html";
+                                break;
                             default:
                                 console.error("Página não encontrada: " + pagina);
                                 return; 

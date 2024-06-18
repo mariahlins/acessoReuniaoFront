@@ -48,6 +48,15 @@ function converterStatusSala(statusSala){
         default: return 'informação invalida';
     }
 }
+
+
+function exibirDataAtual(){
+    const dataAtual=document.getElementById('data-hoje');
+    if(dataAtual){
+        const data=new Date();
+        dataAtual.innerText=formatarDataBr(data);
+    }
+}
 /*
 * listar = getAll
 * obter = getById
@@ -57,277 +66,196 @@ function converterStatusSala(statusSala){
 
 class Controller{
     /* Pegar todos */
+    static async listarTodos(endPoint){
+        try{
+            const token=localStorage.getItem('token');
+            const response=await axios.get(`http://localhost:3000/${endPoint}`, {headers: { 'Authorization': `Bearer ${token}` }});
+            if(response.status===200) return response.data;
+            throw new Error('Token inválido ou erro ao buscar todos');
+        }catch(error){
+            console.error(`Erro ao listar ${endPoint}:`, error);
+            throw error;
+        }
+    }
+    /* Métodos específicos utilizando obterPorId */
+
         static async listarReservas(){
-            try{
-                const token=localStorage.getItem('token');
-                const response=await axios.get('http://localhost:3000/reserva', {headers: { 'Authorization': `Bearer ${token}` }});
-                if (response.status===200) return response.data;
-                throw new Error('Token inválido ou erro ao buscar reservas');
-            }catch (error){
-                console.error('Erro ao listar reservas:', error);
-                throw error;
-            }
+            return this.listarTodos('reserva');
         }
 
         static async listarUsuarios(){
-            try{
-                const token=localStorage.getItem('token');
-                const response=await axios.get('http://localhost:3000/usuario', {headers: { 'Authorization': `Bearer ${token}` }});
-                if (response.status===200) return response.data;
-                throw new Error('Token inválido ou erro ao buscar usuários');
-            }catch (error){
-                console.error('Erro ao listar usuários:', error);
-                throw error;
-            }
+            return this.listarTodos('usuario');
         }
 
         static async listarSalas(){
-            try{
-                const response = await axios.get('http://localhost:3000/sala');
-                if (response.status === 200) return response.data;
-                throw new Error('Erro ao buscar salas');
-            }catch(error){
-                console.error('Erro ao listar salas:', error);
-                throw error;
-            }
-        }
-
-        static async listarReservasHoje(){
-            try{
-                const reservas = await this.listarReservas();
-                return reservas.filter((reserva) => {
-                    const dataReserva = parseDate(reserva.dataReservada);
-                    return ehHoje(dataReserva);
-                });
-            }catch(error){
-                console.error('Erro ao listar reservas de hoje:', error);
-                throw error;
-            }
+            return this.listarTodos('sala');
         }
 
         static async listarListaNegra(){
-            try{
-                const token=localStorage.getItem('token');
-                const response=await axios.get('http://localhost:3000/recepcionista/listaNegra', {headers: { 'Authorization': `Bearer ${token}` }});
-                if (response.status===200) return response.data;
-                throw new Error('Token inválido ou erro ao buscar lista negra');
-            }catch (error){
-                console.error('Erro ao listar lista negra:', error);
-                throw error;
-            }
+            return this.listarTodos('listaNegra');
         }
 
         static async listarReuniao(){
-            try{
-                const token=localStorage.getItem('token');
-                const response=await axios.get('http://localhost:3000/reuniao', {headers: { 'Authorization': `Bearer ${token}` }});
-                if(response.status===200) return response.data;
-                throw new Error('Token inválido ou erro ao buscar reunião');
-            }catch(error){
-                console.error('Erro ao listar reunião:', error);
-                throw error;
-            }    
+            return this.listarTodos('reuniao');  
         }
 
         static async listarNivelAcesso(){
-            try{
-                const token=localStorage.getItem('token');
-                const response=await axios.get('http://localhost:3000/nivelAcesso', {headers: { 'Authorization': `Bearer ${token}` }});
-                if(response.status===200) return response.data;
-                throw new Error('Token inválido ou erro ao buscar nivel de acesso');
-            }catch(error){
-                console.error('Erro ao listar nivel de acesso:', error);
-                throw error;
-            }
+            return this.listarTodos('nivelAcesso');
         }
-    
+
+    //Metodo não expecifico
+    static async listarReservasHoje(){
+        try{
+            const reservas = await this.listarReservas();
+            return reservas.filter((reserva) => {
+                const dataReserva = parseDate(reserva.dataReservada);
+                return ehHoje(dataReserva);
+            });
+        }catch(error){
+            console.error('Erro ao listar reservas de hoje:', error);
+            throw error;
+        }
+    }
+
     /* Pegar por ID */
-        static async obterReservaPorId(id){
-            try{
-                const token=localStorage.getItem('token');
-                const response=axios.get(`http://localhost:3000/reserva/${id}`,{heards: {'Authorization': `Bearer ${token}`}});
-                if (response.status===200) return response.data;
-                throw new Error('Token inválido ou erro ao buscar reservas');
-            }catch(error){
-                console.error('Erro ao obter reserva por id', error);
-                throw error;
-            }
+    static async obterPorId(endPoint, id){
+        try {
+            const token = localStorage.getItem('token'); 
+            const response = await axios.get(`http://localhost:3000/${endPoint}/${id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.status === 200) return response.data;
+            throw new Error(`Token inválido ou erro ao consultar ${endPoint} por ID`);
+        } catch (error) {
+            console.error(`Erro ao obter ${endPoint} por ID:`, error);
+            throw error;
         }
+    }
+    
+    /* Métodos específicos utilizando obterPorId */
+    
+    static async obterReservaPorId(id) {
+        return this.obterPorId('reserva', id);
+    }
+    
+    static async obterUsuarioPorId(id) {
+        return this.obterPorId('usuario', id);
+    }
+    
+    static async obterListaNegraPorId(id) {
+        return this.obterPorId('listaNegra', id);
+    }
+    
+    static async obterReuniaoPorId(id) {
+        return this.obterPorId('reuniao', id);
+    }
+    
+    static async obterNivelAcessoPorId(id) {
+        return this.obterPorId('nivelAcesso', id);
+    }
+    
+    static async obterRecepcionista(id) {
+        return this.obterPorId('recepcionista', id);
+    }
 
-        static async obterUsuarioPorId(id){
-            try {
-                const token = localStorage.getItem('token'); 
-                const response = await axios.get(`http://localhost:3000/usuario/${id}`,{headers: { 'Authorization': `Bearer ${token}`}});
-                if (response.status === 200) return response.data;
-                else throw new Error('Token inválido ou erro ao consultar usuário por ID');
-            } catch (error) {
-                console.error('Erro ao consultar usuário por ID:', error);
-                throw error;
-            }
-        }
-
-        static async obterSalaPorId(id){
-            try{
-                const token=localStorage.getItem('token');
-                const response=axios.get(`http://localhost:3000/sala/${id}`,{heards: {'Authorization': `Bearer ${token}`}});
-                if (response.status===200) return response.data;
-                throw new Error('Token inválido ou erro ao buscar sala');
-            }catch(error){
-                console.error('Erro ao obter sala por id', error);
-                throw error;
-            }
-        }
-
-        static async obterListaNegraPorId(id){
-            try{
-                const token=localStorage.getItem('token');
-                const response=axios.get(`http://localhost:3000/recepcionista/listaNegra/${id}`,{heards: {'Authorization': `Bearer ${token}`}});
-                if (response.status===200) return response.data;
-                throw new Error('Token inválido ou erro ao buscar lista negra');
-            }catch(error){
-                console.error('Erro ao obter lista negra por id', error);
-                throw error;
-            }
-        }
-
-        static async obterReuniaoPorId(id){
-            try{
-                const token=localStorage.getItem('token');
-                const response=axios.get(`http://localhost:3000/reuniao/${id}`,{heards: {'Authorization': `Bearer ${token}`}});
-                if (response.status===200) return response.data;
-                throw new Error('Token inválido ou erro ao buscar reunião');
-            }catch(error){
-                console.error('Erro ao obter reunião por id', error);
-                throw error;
-            }
-        }
-
-        static async obterNivelAcessoPorId(id){
-            try{
-                const token=localStorage.getItem('token');
-                const response=axios.get(`http://localhost:3000/nivelAcesso/${id}`,{heards: {'Authorization': `Bearer ${token}`}});
-                if (response.status===200) return response.data;
-                throw new Error('Token inválido ou erro ao buscar nivel de acesso');
-            }catch(error){
-                console.error('Erro ao obter nivel de acesso por id', error);
-                throw error;
-            }
-        }
-
-        static async obterRecepcionista(id){
-            try{
-                const token=localStorage.getItem('token');
-                const response=axios.get(`http://localhost:3000/recepcionista/${id}`,{heards: {'Authorization': `Bearer ${token}`}});
-                if (response.status===200) return response.data;
-                throw new Error('Token inválido ou erro ao buscar recepcionista');
-            }catch(error){
-                console.error('Erro ao obter recepcionista por id', error);
-                throw error;
-            }
-        }
+    static async obterSalaPorId(id){
+        return this.obterPorId('sala', id);
+    }
         
     /*Mostrar */
-        static async mostrarUsuarios(){
-            try{
+        static async mostrarUsuarios() {
+            try {
                 const usuarios=await this.listarUsuarios();
                 const tableBody=document.getElementById('after-login-usuarios');
-                if (!tableBody){
-                    console.error('Elemento tbody não encontrado');
-                    return;
-                }
-                tableBody.innerHTML='';
-                for (const usuario of usuarios){
-                    const row=document.createElement('tr');
-                    const colunas=[
-                        `${usuario.nome} ${usuario.sobrenome}`,
-                        ocultarDocumento(usuario.identificador),
-                        usuario.email,
-                    ];
-                    colunas.forEach(coluna=>{
-                        const td=document.createElement('td');
-                        td.textContent=coluna;
-                        row.appendChild(td);
-                    });
-                    
-                    const acoesCell = document.createElement('td');
-                    acoesCell.classList.add('d-flex', 'justify-content-around');
-
-                    var editrButton = document.createElement('button');
-                    editrButton.textContent = 'Editar';
-                    editrButton.classList.add('btn', 'btn-confirmar', 'bg-azul', 'peso-500', 'fc-branco');
-                    editrButton.addEventListener('click', () => this.editarUsuario(reserva.id));
-                    acoesCell.appendChild(editrButton);
-
-                    var excluirButton = document.createElement('button');
-                    excluirButton.textContent = 'Excluir';
-                    excluirButton.classList.add('btn', 'btn-cancelar', 'bg-cinza', 'peso-500', 'fc-branco');
-                    excluirButton.addEventListener('click', () => this.excluirUsuario(reserva.id));
-                    acoesCell.appendChild(excluirButton);
-
-                    row.appendChild(acoesCell);
-
-                    tableBody.appendChild(row);
-
-                }
-            }catch(error){
-                console.error('Erro ao mostrar usuários:', error);
+                this.preencherTabela(usuarios, tableBody, (item) => [
+                        `${item.nome} ${item.sobrenome}`,
+                        ocultarDocumento(item.identificador),
+                        item.email,
+                ], 'editarUsuario', 'excluirUsuario');
+            } catch (error) {
+                console.error('Erro ao mostrar Usuarios:', error);
+                throw error;
             }
         }
 
-        static async mostrarSalas(){
-            try{
+        static async mostrarSalas() {
+            try {
                 const salas = await this.listarSalas();
-                const tableBody = document.getElementById('after-login-salas'); // Mudado para 'after-login-salas'
-                if (!tableBody){
-                    console.error('Elemento tbody não encontrado');
-                    return;
-                }
-                tableBody.innerHTML = '';
-                salas.forEach(sala=>{
-                    const row = document.createElement('tr');
-                    const colunas = [
-                        sala.nome,
-                        converterAndar(sala.andar),
-                        converterStatusSala(sala.situacao),
-                        sala.capMax,
-                    ];
-                    colunas.forEach(coluna=>{
-                        const td = document.createElement('td');
-                        td.textContent = coluna;
-                        row.appendChild(td);
-                    });
-        
-                    const acoesCell = document.createElement('td');
-                    acoesCell.classList.add('d-flex', 'justify-content-around');
-        
-                    var editrButton = document.createElement('button');
-                    editrButton.textContent = 'Editar';
-                    editrButton.classList.add('btn', 'btn-confirmar', 'bg-azul', 'peso-500', 'fc-branco');
-                    editrButton.addEventListener('click', () => this.editarSala(reserva.id));
-                    acoesCell.appendChild(editrButton);
-
-                    var excluirButton = document.createElement('button');
-                    excluirButton.textContent = 'Excluir';
-                    excluirButton.classList.add('btn', 'btn-cancelar', 'bg-cinza', 'peso-500', 'fc-branco');
-                    excluirButton.addEventListener('click', () => this.excluirSala(reserva.id));
-                    acoesCell.appendChild(excluirButton);
-        
-                    row.appendChild(acoesCell);
-        
-                    tableBody.appendChild(row);
-        
-                });
-            }catch(error){
-                console.error('Erro ao mostrar salas:', error);
+                const tableBody = document.getElementById('after-login-salas');
+                this.preencherTabela(salas, tableBody, (item) => [
+                    item.nome,
+                    converterAndar(item.andar),
+                    converterStatusSala(item.situacao),
+                    item.capMax,
+                ], 'editarSala', 'excluirSala');
+            } catch (error) {
+                console.error('Erro ao mostrar Salas:', error);
+                throw error;
             }
         }
+
+        static async mostrarListaNegra() {
+            try {
+                const listasNegra = await this.listarListaNegra();
+                const listaNegraComDetalhes = await Promise.all(listasNegra.map(async (listaNegra) => {
+                    return await this.listaNegraComDetalhes([listaNegra]);
+                }));
+                const tableBody = document.getElementById('after-login-listaNegra');
+                listaNegraComDetalhes.forEach(items => {
+                    this.preencherTabela(items, tableBody, (item) => [
+                        item.codBloqueio,
+                        `${item.reservaMotivo.reservista.nome} ${item.reservaMotivo.reservista.sobrenome}`, // ajustado para acessar reservista dentro de reservaMotivo
+                        ocultarDocumento(item.reservaMotivo.reservista.identificador), // ajustado para acessar identificador de reservista dentro de reservaMotivo
+                        `${item.reservaMotivo.dataReservada} ${item.reservaMotivo.horaInicio} - ${item.reservaMotivo.horaFimReserva}`,
+                        item.reservaMotivo.salaReserva.nome, // ajustado para acessar nome de salaReserva dentro de reservaMotivo
+                        item.motivo,
+                    ], 'editarListaNegra', 'excluirListaNegra');
+                });	
+            } catch (error) {
+                console.error('Erro ao mostrar lista negra:', error);
+                throw error;
+            }
+        }
+        
+
+        static async mostrarReuniao() {
+            try {
+                const reunioes = await this.listarReuniao();
+                const tableBody = document.getElementById('reuniao');
+                this.preencherTabela(reunioes, tableBody, (item) => [
+                    item.nome,
+                    item.data,
+                    item.horaInicio,
+                    item.horaFim
+                ], 'editarReuniao', 'excluirReuniao');
+            } catch (error) {
+                console.error('Erro ao mostrar reuniões:', error);
+                throw error;
+            }
+        }
+        
+        static async mostrarNivelAcesso(){
+            try{
+                const nivelAcesso = await this.listarNivelAcesso();
+                const tableBody = document.getElementById('after-login-nivelAcesso');
+                this.preencherTabela(nivelAcesso, tableBody, (item) => [
+                    item.id,
+                    item.nivelAcesso,
+                    item.glossarioNivel,
+                ], 'editarNivelAcesso', 'excluirNivelAcesso');
+            }catch(error){
+                console.error('Erro ao mostrar nivel de acesso:', error);
+                throw error;
+            }
+        }              
+        //Mostrar com opções de cancelar e confirmar
 
         static async mostrarTodasReservas() {
             try {
                 const reservas = await this.listarReservas();
                 const tableBody = document.getElementById('reservas');
                 tableBody.innerHTML = '';
-                await this.formatarTabelaResresas(reservas, tableBody);
+                await this.preencherTabelaReserva(reservas, tableBody);
             } catch (error) {
                 console.error('Erro ao mostrar reservas:', error);
             }
@@ -336,102 +264,170 @@ class Controller{
         static async mostrarReservasHoje(){
             try{
                 const reservasHoje = await this.listarReservasHoje();           
-                const tabela = document.getElementById('reservas');
+                const tabela = document.getElementById('reservas-tabela');
                 tabela.innerHTML = '';
-                await this.formatarTabelaResresas(reservasHoje, tabela);
+                await this.preencherTabelaReserva(reservasHoje, tabela);
             } catch (error) {
                 console.error('Erro ao mostrar reservas de hoje:', error);
             }
         }
 
-        static async mostrarListaNegra(){
-            try{
-                const listaNegra = await this.listarListaNegra();
-                const tableBody = document.getElementById('lista-negra');
-                if (!tableBody){
-                    console.error('Elemento tbody não encontrado');
-                    return;
-                }
-                tableBody.innerHTML = '';
-                listaNegra.forEach((item) => {
-                    const row = document.createElement('tr');
+        //Formatar tabelas
+        //->Tabela cancelar e concluir
+        static async preencherTabelaReserva(reservas, corpoTabela) {
+            const promessas = reservas.map(async (reserva) => {
+                try {
+                    const usuario = await this.obterUsuarioPorId(reserva.idUsuario);
+                    const linha = document.createElement('tr');
                     const colunas = [
-                        item.nome,
-                        ocultarDocumento(item.identificador),
-                        item.motivo,
+                        reserva.idSala,
+                        `${usuario.nome} ${usuario.sobrenome}`,
+                        ocultarDocumento(usuario.identificador),
+                        reserva.motivoReserva,
+                        `${reserva.dataReservada} ${reserva.horaInicio}`,
+                        `${reserva.dataReservada} ${reserva.horaFimReserva}`,
                     ];
-                    colunas.forEach((coluna) => {
+        
+                    colunas.forEach(coluna => {
                         const td = document.createElement('td');
                         td.textContent = coluna;
-                        row.appendChild(td);
+                        linha.appendChild(td);
                     });
         
                     const acoesCell = document.createElement('td');
                     acoesCell.classList.add('d-flex', 'justify-content-around');
+                    switch (reserva.statusReserva) {
+                        case 'PENDENTE':
+                            var confirmarButton = document.createElement('button');
+                            confirmarButton.textContent = 'Confirmar';
+                            confirmarButton.classList.add('btn', 'btn-confirmar', 'bg-azul', 'peso-500', 'fc-branco');
+                            confirmarButton.addEventListener('click', () => this.confirmarReserva(reserva.id));
+                            acoesCell.appendChild(confirmarButton);
         
-                    const excluirButton = document.createElement('button');
-                    excluirButton.textContent = 'Excluir';
-                    excluirButton.addEventListener('click', () => this.deletarListaNegra(item.id));
-                    acoesCell.appendChild(excluirButton);
+                            var cancelarButton = document.createElement('button');
+                            cancelarButton.textContent = 'Cancelar';
+                            cancelarButton.classList.add('btn', 'btn-cancelar', 'bg-cinza', 'peso-500', 'fc-branco');
+                            cancelarButton.addEventListener('click', () => this.cancelarReserva(reserva.id));
+                            acoesCell.appendChild(cancelarButton);
+                            break;
         
-                    row.appendChild(acoesCell);
+                        case 'CONFIRMADO':
+                            var concluirButton = document.createElement('button');
+                            concluirButton.textContent = 'Concluir';
+                            concluirButton.classList.add('btn', 'bg-azul', 'btn-confirmar', 'peso-500', 'fc-branco');
+                            concluirButton.addEventListener('click', () => this.concluirReserva(reserva.id));
+                            acoesCell.appendChild(concluirButton);
+                            break;
         
-                    tableBody.appendChild(row);
-                });
-            }catch(error){
-                console.error('Erro ao mostrar lista negra:', error);
-            }
+                        case 'CONCLUIDO':
+                            var msgConfirmado = document.createElement('h6');
+                            msgConfirmado.textContent = 'RESERVA JÁ CONCLUÍDA';
+                            acoesCell.appendChild(msgConfirmado);
+                            break;
+        
+                        default:
+                            var msgErro = document.createElement('h6');
+                            msgErro.textContent = 'Status desconhecido';
+                            acoesCell.appendChild(msgErro);
+                            break;
+                    }
+                    linha.appendChild(acoesCell);
+                    corpoTabela.appendChild(linha);
+                } catch (error) {
+                    console.error('Erro ao formatar tabela de reservas:', error);
+                }
+            });
+        
+            await Promise.all(promessas);
         }
-
-        static async mostrarReuniao(){
-            try{
-                const reuniao = await this.listarReuniao();
-                const tableBody = document.getElementById('reuniao');
-                if (!tableBody){
+        //->Tabela excluir e editar
+        static preencherTabela(items, tableBody, colunasDefinicao, metodoEditar, metodoExcluir) {
+            try {
+                if (!tableBody) {
                     console.error('Elemento tbody não encontrado');
                     return;
                 }
                 tableBody.innerHTML = '';
-                reuniao.forEach((item) => {
+                items.forEach(item => {
                     const row = document.createElement('tr');
-                    const colunas = [
-                        item.nome,
-                        item.data,
-                        item.horaInicio,
-                        item.horaFim,
-                    ];
-                    colunas.forEach((coluna) => {
+                    colunasDefinicao(item).forEach(coluna => {
                         const td = document.createElement('td');
                         td.textContent = coluna;
                         row.appendChild(td);
                     });
+    
                     const acoesCell = document.createElement('td');
                     acoesCell.classList.add('d-flex', 'justify-content-around');
-        
+    
+                    const editarButton = document.createElement('button');
+                    editarButton.textContent = 'Editar';
+                    editarButton.classList.add('btn', 'btn-confirmar', 'bg-azul', 'peso-500', 'fc-branco');
+                    editarButton.addEventListener('click', () => this[metodoEditar](item.id));
+                    acoesCell.appendChild(editarButton);
+    
                     const excluirButton = document.createElement('button');
                     excluirButton.textContent = 'Excluir';
-                    excluirButton.addEventListener('click', () => this.deletarListaNegra(item.id));
+                    excluirButton.classList.add('btn', 'btn-cancelar', 'bg-cinza', 'peso-500', 'fc-branco');
+                    excluirButton.addEventListener('click', () => this[metodoExcluir](item.id));
                     acoesCell.appendChild(excluirButton);
-        
+    
                     row.appendChild(acoesCell);
-        
                     tableBody.appendChild(row);
                 });
-            }catch(error){
-                console.error('Erro ao mostrar lista negra:', error);
+            } catch (error) {
+                console.error(`Erro ao preencher tabela:`, error);
             }
         }
 
-
-////////////////////////
-
-    static async exibirDataAtual(){
-        const dataAtual=document.getElementById('data-hoje');
-        if(dataAtual){
-            const data=new Date();
-            dataAtual.innerText=formatarDataBr(data);
+        /* Estados de uma reservas */
+        static async cancelarReserva(id){
+            try{
+                let token = localStorage.getItem('token');
+                await axios.put(`http://localhost:3000/reserva/${id}`, { statusReserva: 'Cancelada', dataModificacaoStatus: new Date()}, {headers: { 'Authorization': `Bearer ${token}`}});
+            }catch(error){
+                console.error('Erro ao cancelar reserva', error);
+            }
         }
-    }
+
+        static async concluirReserva(id){
+            try{
+                let token = localStorage.getItem('token');
+                await axios.put(`http://localhost:3000/reserva/concluir/${id}`, { statusReserva: 'Concluída', dataModificacaoStatus: new Date()}, {headers: { 'Authorization': `Bearer ${token}`}});
+        }catch(error){
+                console.error('Erro ao concluir reserva', error);
+            }
+        }
+
+        static async confirmarReserva(id){
+            try{
+                let token = localStorage.getItem('token');
+                await axios.put(`http://localhost:3000/reserva/confirmar/${id}`, { statusReserva: 'Confirmada', dataModificacaoStatus: new Date()}, {headers: { 'Authorization': `Bearer ${token}`}});
+            }catch(error){
+                console.error('Erro ao confirmar reserva', error);
+            }
+        }
+
+        //estilização de lista negra
+        
+        static async listaNegraComDetalhes(listaNegra) {
+            const resultados = await Promise.all(listaNegra.map(async (item) => {
+                const [reservista, reservaMotivo] = await Promise.all([
+                    this.obterUsuarioPorId(item.idResponsavel),
+                    this.obterReservaPorId(item.idReservaMotivo),
+                ]);
+                const salaReserva = await this.obterSalaPorId(reservaMotivo.idSala);
+                return { 
+                    ...item,
+                    reservista,
+                    reservaMotivo: {
+                        ...reservaMotivo,
+                        salaReserva
+                    }
+                };
+            }));
+            return resultados[0];
+        }
+        ////////////////////////
 
     static async fazerLogin(){
         const loginForm=document.getElementById('login-form');
@@ -505,101 +501,6 @@ class Controller{
             }
         }
     }
-
-    static async cancelarReserva(id){
-        try{
-            let token = localStorage.getItem('token');
-            await axios.put(`http://localhost:3000/reserva/${id}`, { statusReserva: 'Cancelada', dataModificacaoStatus: new Date()}, {headers: { 'Authorization': `Bearer ${token}`}});
-        }catch(error){
-            console.error('Erro ao cancelar reserva', error);
-        }
-    }
-
-    static async concluirReserva(id){
-        try{
-            let token = localStorage.getItem('token');
-            await axios.put(`http://localhost:3000/reserva/concluir/${id}`, { statusReserva: 'Concluída', dataModificacaoStatus: new Date()}, {headers: { 'Authorization': `Bearer ${token}`}});
-       }catch(error){
-            console.error('Erro ao concluir reserva', error);
-        }
-    }
-
-    static async confirmarReserva(id){
-        try{
-            let token = localStorage.getItem('token');
-            await axios.put(`http://localhost:3000/reserva/confirmar/${id}`, { statusReserva: 'Confirmada', dataModificacaoStatus: new Date()}, {headers: { 'Authorization': `Bearer ${token}`}});
-        }catch(error){
-            console.error('Erro ao confirmar reserva', error);
-        }
-    }
-    
-    static async formatarTabelaResresas(reservas, corpoTabela) {
-        const promessas = reservas.map(async (reserva) => {
-            try {
-                const usuario = await this.obterUsuarioPorId(reserva.idUsuario);
-                const linha = document.createElement('tr');
-                const colunas = [
-                    reserva.idSala,
-                    `${usuario.nome} ${usuario.sobrenome}`,
-                    ocultarDocumento(usuario.identificador),
-                    reserva.motivoReserva,
-                    `${reserva.dataReservada} ${reserva.horaInicio}`,
-                    `${reserva.dataReservada} ${reserva.horaFimReserva}`,
-                ];
-    
-                colunas.forEach(coluna => {
-                    const td = document.createElement('td');
-                    td.textContent = coluna;
-                    linha.appendChild(td);
-                });
-    
-                const acoesCell = document.createElement('td');
-                acoesCell.classList.add('d-flex', 'justify-content-around');
-                switch (reserva.statusReserva) {
-                    case 'PENDENTE':
-                        var confirmarButton = document.createElement('button');
-                        confirmarButton.textContent = 'Confirmar';
-                        confirmarButton.classList.add('btn', 'btn-confirmar', 'bg-azul', 'peso-500', 'fc-branco');
-                        confirmarButton.addEventListener('click', () => this.confirmarReserva(reserva.id));
-                        acoesCell.appendChild(confirmarButton);
-    
-                        var cancelarButton = document.createElement('button');
-                        cancelarButton.textContent = 'Cancelar';
-                        cancelarButton.classList.add('btn', 'btn-cancelar', 'bg-cinza', 'peso-500', 'fc-branco');
-                        cancelarButton.addEventListener('click', () => this.cancelarReserva(reserva.id));
-                        acoesCell.appendChild(cancelarButton);
-                        break;
-    
-                    case 'CONFIRMADO':
-                        var concluirButton = document.createElement('button');
-                        concluirButton.textContent = 'Concluir';
-                        concluirButton.classList.add('btn', 'bg-azul', 'btn-confirmar', 'peso-500', 'fc-branco');
-                        concluirButton.addEventListener('click', () => this.concluirReserva(reserva.id));
-                        acoesCell.appendChild(concluirButton);
-                        break;
-    
-                    case 'CONCLUIDO':
-                        var msgConfirmado = document.createElement('h6');
-                        msgConfirmado.textContent = 'RESERVA JÁ CONCLUÍDA';
-                        acoesCell.appendChild(msgConfirmado);
-                        break;
-    
-                    default:
-                        var msgErro = document.createElement('h6');
-                        msgErro.textContent = 'Status desconhecido';
-                        acoesCell.appendChild(msgErro);
-                        break;
-                }
-                linha.appendChild(acoesCell);
-                corpoTabela.appendChild(linha);
-            } catch (error) {
-                console.error('Erro ao formatar tabela de reservas:', error);
-            }
-        });
-    
-        await Promise.all(promessas);
-    }
-    
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -614,7 +515,7 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(document, { childList: true, subtree: true });
     };
 
-    observeElement('login-component', () => {
+    observeElement('login-form', () => {
         Controller.fazerLogin();
     });
 
@@ -622,8 +523,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const pesquisaFiltro = document.getElementById('pesquisa-filtro');
         if (pesquisaFiltro) {
             Controller.mostrarReservasHoje();
-            Controller.exibirDataAtual();
-            pesquisaFiltro.addEventListener('input', () => Controller.filtrarTabela('reservas'));
+            this.exibirDataAtual();
+            pesquisaFiltro.addEventListener('input', () => Controller.filtrarTabela('reservas-tabela'));
         }
          
     });
@@ -651,4 +552,29 @@ document.addEventListener('DOMContentLoaded', () => {
             pesquisaFiltro.addEventListener('input', () => Controller.filtrarTabela('usuarios-tabela'));
         }
     });
+
+    observeElement('after-login-listaNegra', () => {
+        const pesquisaFiltro = document.getElementById('pesquisa-filtro');
+        if (pesquisaFiltro) {
+            Controller.mostrarListaNegra();
+            pesquisaFiltro.addEventListener('input', () => Controller.filtrarTabela('listaNegra-tabela'));
+        }
+    });
+    
+    observeElement('reuniao', () => {
+        const pesquisaFiltro = document.getElementById('pesquisa-filtro');
+        if (pesquisaFiltro) {
+            Controller.mostrarReuniao();
+            pesquisaFiltro.addEventListener('input', () => Controller.filtrarTabela('reuniao-tabela'));
+        }
+    });
+
+    observeElement('after-login-nivelAcesso', () => {
+        const pesquisaFiltro = document.getElementById('pesquisa-filtro');
+        if (pesquisaFiltro) {
+            Controller.mostrarNivelAcesso();
+            pesquisaFiltro.addEventListener('input', () => Controller.filtrarTabela('nivelAcesso-tabela'));
+        }
+    });
+
 });
