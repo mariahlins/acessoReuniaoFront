@@ -10,10 +10,10 @@ function formatarDataBr(dataEUA) {
 }
 
 function ocultarDocumento(documento) {
-    const inicio=documento.slice(0, 3);
-    const fim=documento.slice(-2);
-    const asteriscos='*'.repeat(documento.length - 5);
-    return inicio + asteriscos + fim;
+    const inicio = documento.slice(0, 3);
+    const meio = '***.***';
+    const fim = documento.slice(-2);    
+    return `${inicio}.${meio}-${fim}`;
 }
 
 function parseDate(dataReservada) {
@@ -29,9 +29,401 @@ function ehHoje(dataReserva) {
         dataReserva.getFullYear() === dataAtual.getFullYear()
     );
 }
+function converterAndar(andar) {
+    switch (andar) {
+        case 0: return 'Térreo';
+        case 1: return 'Primeiro andar';
+        case 2: return 'Segundo andar';
+        case 3: return 'Terceiro andar';
+        case 4: return 'Quarto andar';
+        default: return 'informação invalida';
+    }
+}
 
+function converterStatusSala(statusSala){
+    switch (statusSala){
+        case 'D': return 'Disponivel';
+        case 'I': return 'Indisponível';
+        case 'M' : return 'Manutenção';
+        default: return 'informação invalida';
+    }
+}
+/*
+* listar = getAll
+* obter = getById
+* mostrar = retorno formato para HTML
+* 
+*/
 
 class Controller{
+    /* Pegar todos */
+        static async listarReservas(){
+            try{
+                const token=localStorage.getItem('token');
+                const response=await axios.get('http://localhost:3000/reserva', {headers: { 'Authorization': `Bearer ${token}` }});
+                if (response.status===200) return response.data;
+                throw new Error('Token inválido ou erro ao buscar reservas');
+            }catch (error){
+                console.error('Erro ao listar reservas:', error);
+                throw error;
+            }
+        }
+
+        static async listarUsuarios(){
+            try{
+                const token=localStorage.getItem('token');
+                const response=await axios.get('http://localhost:3000/usuario', {headers: { 'Authorization': `Bearer ${token}` }});
+                if (response.status===200) return response.data;
+                throw new Error('Token inválido ou erro ao buscar usuários');
+            }catch (error){
+                console.error('Erro ao listar usuários:', error);
+                throw error;
+            }
+        }
+
+        static async listarSalas(){
+            try{
+                const response = await axios.get('http://localhost:3000/sala');
+                if (response.status === 200) return response.data;
+                throw new Error('Erro ao buscar salas');
+            }catch(error){
+                console.error('Erro ao listar salas:', error);
+                throw error;
+            }
+        }
+
+        static async listarReservasHoje(){
+            try{
+                const reservas = await this.listarReservas();
+                return reservas.filter((reserva) => {
+                    const dataReserva = parseDate(reserva.dataReservada);
+                    return ehHoje(dataReserva);
+                });
+            }catch(error){
+                console.error('Erro ao listar reservas de hoje:', error);
+                throw error;
+            }
+        }
+
+        static async listarListaNegra(){
+            try{
+                const token=localStorage.getItem('token');
+                const response=await axios.get('http://localhost:3000/recepcionista/listaNegra', {headers: { 'Authorization': `Bearer ${token}` }});
+                if (response.status===200) return response.data;
+                throw new Error('Token inválido ou erro ao buscar lista negra');
+            }catch (error){
+                console.error('Erro ao listar lista negra:', error);
+                throw error;
+            }
+        }
+
+        static async listarReuniao(){
+            try{
+                const token=localStorage.getItem('token');
+                const response=await axios.get('http://localhost:3000/reuniao', {headers: { 'Authorization': `Bearer ${token}` }});
+                if(response.status===200) return response.data;
+                throw new Error('Token inválido ou erro ao buscar reunião');
+            }catch(error){
+                console.error('Erro ao listar reunião:', error);
+                throw error;
+            }    
+        }
+
+        static async listarNivelAcesso(){
+            try{
+                const token=localStorage.getItem('token');
+                const response=await axios.get('http://localhost:3000/nivelAcesso', {headers: { 'Authorization': `Bearer ${token}` }});
+                if(response.status===200) return response.data;
+                throw new Error('Token inválido ou erro ao buscar nivel de acesso');
+            }catch(error){
+                console.error('Erro ao listar nivel de acesso:', error);
+                throw error;
+            }
+        }
+    
+    /* Pegar por ID */
+        static async obterReservaPorId(id){
+            try{
+                const token=localStorage.getItem('token');
+                const response=axios.get(`http://localhost:3000/reserva/${id}`,{heards: {'Authorization': `Bearer ${token}`}});
+                if (response.status===200) return response.data;
+                throw new Error('Token inválido ou erro ao buscar reservas');
+            }catch(error){
+                console.error('Erro ao obter reserva por id', error);
+                throw error;
+            }
+        }
+
+        static async obterUsuarioPorId(id){
+            try {
+                const token = localStorage.getItem('token'); 
+                const response = await axios.get(`http://localhost:3000/usuario/${id}`,{headers: { 'Authorization': `Bearer ${token}`}});
+                if (response.status === 200) return response.data;
+                else throw new Error('Token inválido ou erro ao consultar usuário por ID');
+            } catch (error) {
+                console.error('Erro ao consultar usuário por ID:', error);
+                throw error;
+            }
+        }
+
+        static async obterSalaPorId(id){
+            try{
+                const token=localStorage.getItem('token');
+                const response=axios.get(`http://localhost:3000/sala/${id}`,{heards: {'Authorization': `Bearer ${token}`}});
+                if (response.status===200) return response.data;
+                throw new Error('Token inválido ou erro ao buscar sala');
+            }catch(error){
+                console.error('Erro ao obter sala por id', error);
+                throw error;
+            }
+        }
+
+        static async obterListaNegraPorId(id){
+            try{
+                const token=localStorage.getItem('token');
+                const response=axios.get(`http://localhost:3000/recepcionista/listaNegra/${id}`,{heards: {'Authorization': `Bearer ${token}`}});
+                if (response.status===200) return response.data;
+                throw new Error('Token inválido ou erro ao buscar lista negra');
+            }catch(error){
+                console.error('Erro ao obter lista negra por id', error);
+                throw error;
+            }
+        }
+
+        static async obterReuniaoPorId(id){
+            try{
+                const token=localStorage.getItem('token');
+                const response=axios.get(`http://localhost:3000/reuniao/${id}`,{heards: {'Authorization': `Bearer ${token}`}});
+                if (response.status===200) return response.data;
+                throw new Error('Token inválido ou erro ao buscar reunião');
+            }catch(error){
+                console.error('Erro ao obter reunião por id', error);
+                throw error;
+            }
+        }
+
+        static async obterNivelAcessoPorId(id){
+            try{
+                const token=localStorage.getItem('token');
+                const response=axios.get(`http://localhost:3000/nivelAcesso/${id}`,{heards: {'Authorization': `Bearer ${token}`}});
+                if (response.status===200) return response.data;
+                throw new Error('Token inválido ou erro ao buscar nivel de acesso');
+            }catch(error){
+                console.error('Erro ao obter nivel de acesso por id', error);
+                throw error;
+            }
+        }
+
+        static async obterRecepcionista(id){
+            try{
+                const token=localStorage.getItem('token');
+                const response=axios.get(`http://localhost:3000/recepcionista/${id}`,{heards: {'Authorization': `Bearer ${token}`}});
+                if (response.status===200) return response.data;
+                throw new Error('Token inválido ou erro ao buscar recepcionista');
+            }catch(error){
+                console.error('Erro ao obter recepcionista por id', error);
+                throw error;
+            }
+        }
+        
+    /*Mostrar */
+        static async mostrarUsuarios(){
+            try{
+                const usuarios=await this.listarUsuarios();
+                const tableBody=document.getElementById('after-login-usuarios');
+                if (!tableBody){
+                    console.error('Elemento tbody não encontrado');
+                    return;
+                }
+                tableBody.innerHTML='';
+                for (const usuario of usuarios){
+                    const row=document.createElement('tr');
+                    const colunas=[
+                        `${usuario.nome} ${usuario.sobrenome}`,
+                        ocultarDocumento(usuario.identificador),
+                        usuario.email,
+                    ];
+                    colunas.forEach(coluna=>{
+                        const td=document.createElement('td');
+                        td.textContent=coluna;
+                        row.appendChild(td);
+                    });
+                    
+                    const acoesCell = document.createElement('td');
+                    acoesCell.classList.add('d-flex', 'justify-content-around');
+
+                    var editrButton = document.createElement('button');
+                    editrButton.textContent = 'Editar';
+                    editrButton.classList.add('btn', 'btn-confirmar', 'bg-azul', 'peso-500', 'fc-branco');
+                    editrButton.addEventListener('click', () => this.editarUsuario(reserva.id));
+                    acoesCell.appendChild(editrButton);
+
+                    var excluirButton = document.createElement('button');
+                    excluirButton.textContent = 'Excluir';
+                    excluirButton.classList.add('btn', 'btn-cancelar', 'bg-cinza', 'peso-500', 'fc-branco');
+                    excluirButton.addEventListener('click', () => this.excluirUsuario(reserva.id));
+                    acoesCell.appendChild(excluirButton);
+
+                    row.appendChild(acoesCell);
+
+                    tableBody.appendChild(row);
+
+                }
+            }catch(error){
+                console.error('Erro ao mostrar usuários:', error);
+            }
+        }
+
+        static async mostrarSalas(){
+            try{
+                const salas = await this.listarSalas();
+                const tableBody = document.getElementById('after-login-salas'); // Mudado para 'after-login-salas'
+                if (!tableBody){
+                    console.error('Elemento tbody não encontrado');
+                    return;
+                }
+                tableBody.innerHTML = '';
+                salas.forEach(sala=>{
+                    const row = document.createElement('tr');
+                    const colunas = [
+                        sala.nome,
+                        converterAndar(sala.andar),
+                        converterStatusSala(sala.situacao),
+                        sala.capMax,
+                    ];
+                    colunas.forEach(coluna=>{
+                        const td = document.createElement('td');
+                        td.textContent = coluna;
+                        row.appendChild(td);
+                    });
+        
+                    const acoesCell = document.createElement('td');
+                    acoesCell.classList.add('d-flex', 'justify-content-around');
+        
+                    var editrButton = document.createElement('button');
+                    editrButton.textContent = 'Editar';
+                    editrButton.classList.add('btn', 'btn-confirmar', 'bg-azul', 'peso-500', 'fc-branco');
+                    editrButton.addEventListener('click', () => this.editarSala(reserva.id));
+                    acoesCell.appendChild(editrButton);
+
+                    var excluirButton = document.createElement('button');
+                    excluirButton.textContent = 'Excluir';
+                    excluirButton.classList.add('btn', 'btn-cancelar', 'bg-cinza', 'peso-500', 'fc-branco');
+                    excluirButton.addEventListener('click', () => this.excluirSala(reserva.id));
+                    acoesCell.appendChild(excluirButton);
+        
+                    row.appendChild(acoesCell);
+        
+                    tableBody.appendChild(row);
+        
+                });
+            }catch(error){
+                console.error('Erro ao mostrar salas:', error);
+            }
+        }
+
+        static async mostrarTodasReservas() {
+            try {
+                const reservas = await this.listarReservas();
+                const tableBody = document.getElementById('reservas');
+                tableBody.innerHTML = '';
+                await this.formatarTabelaResresas(reservas, tableBody);
+            } catch (error) {
+                console.error('Erro ao mostrar reservas:', error);
+            }
+        }
+
+        static async mostrarReservasHoje(){
+            try{
+                const reservasHoje = await this.listarReservasHoje();           
+                const tabela = document.getElementById('reservas');
+                tabela.innerHTML = '';
+                await this.formatarTabelaResresas(reservasHoje, tabela);
+            } catch (error) {
+                console.error('Erro ao mostrar reservas de hoje:', error);
+            }
+        }
+
+        static async mostrarListaNegra(){
+            try{
+                const listaNegra = await this.listarListaNegra();
+                const tableBody = document.getElementById('lista-negra');
+                if (!tableBody){
+                    console.error('Elemento tbody não encontrado');
+                    return;
+                }
+                tableBody.innerHTML = '';
+                listaNegra.forEach((item) => {
+                    const row = document.createElement('tr');
+                    const colunas = [
+                        item.nome,
+                        ocultarDocumento(item.identificador),
+                        item.motivo,
+                    ];
+                    colunas.forEach((coluna) => {
+                        const td = document.createElement('td');
+                        td.textContent = coluna;
+                        row.appendChild(td);
+                    });
+        
+                    const acoesCell = document.createElement('td');
+                    acoesCell.classList.add('d-flex', 'justify-content-around');
+        
+                    const excluirButton = document.createElement('button');
+                    excluirButton.textContent = 'Excluir';
+                    excluirButton.addEventListener('click', () => this.deletarListaNegra(item.id));
+                    acoesCell.appendChild(excluirButton);
+        
+                    row.appendChild(acoesCell);
+        
+                    tableBody.appendChild(row);
+                });
+            }catch(error){
+                console.error('Erro ao mostrar lista negra:', error);
+            }
+        }
+
+        static async mostrarReuniao(){
+            try{
+                const reuniao = await this.listarReuniao();
+                const tableBody = document.getElementById('reuniao');
+                if (!tableBody){
+                    console.error('Elemento tbody não encontrado');
+                    return;
+                }
+                tableBody.innerHTML = '';
+                reuniao.forEach((item) => {
+                    const row = document.createElement('tr');
+                    const colunas = [
+                        item.nome,
+                        item.data,
+                        item.horaInicio,
+                        item.horaFim,
+                    ];
+                    colunas.forEach((coluna) => {
+                        const td = document.createElement('td');
+                        td.textContent = coluna;
+                        row.appendChild(td);
+                    });
+                    const acoesCell = document.createElement('td');
+                    acoesCell.classList.add('d-flex', 'justify-content-around');
+        
+                    const excluirButton = document.createElement('button');
+                    excluirButton.textContent = 'Excluir';
+                    excluirButton.addEventListener('click', () => this.deletarListaNegra(item.id));
+                    acoesCell.appendChild(excluirButton);
+        
+                    row.appendChild(acoesCell);
+        
+                    tableBody.appendChild(row);
+                });
+            }catch(error){
+                console.error('Erro ao mostrar lista negra:', error);
+            }
+        }
+
+
+////////////////////////
 
     static async exibirDataAtual(){
         const dataAtual=document.getElementById('data-hoje');
@@ -114,109 +506,12 @@ class Controller{
         }
     }
 
-    static async obterReservas(){
-        try{
-            return await axios.get(`http://localhost:3000/reserva`);
-        }catch(error){
-            console.error('Erro ao obter reservas', error);
-        }
-    }
-
-    static async obterReservaPorId(id){
-        try{
-            return await axios.get(`http://localhost:3000/reserva/${id}`);
-        }catch(error){
-            console.error('Erro ao obter reserva por id', error);
-        }
-    }
-
     static async cancelarReserva(id){
         try{
             let token = localStorage.getItem('token');
             await axios.put(`http://localhost:3000/reserva/${id}`, { statusReserva: 'Cancelada', dataModificacaoStatus: new Date()}, {headers: { 'Authorization': `Bearer ${token}`}});
         }catch(error){
             console.error('Erro ao cancelar reserva', error);
-        }
-    }
-
-    static async listarReservas(){
-        try{
-            const token=localStorage.getItem('token');
-            const response=await axios.get('http://localhost:3000/reserva', {headers: { 'Authorization': `Bearer ${token}` }});
-            if (response.status===200) return response.data;
-            throw new Error('Token inválido ou erro ao buscar reservas');
-        }catch (error){
-            console.error('Erro ao listar reservas:', error);
-            throw error;
-        }
-    }
-
-    static async listarUsuarios(){
-        try{
-            const token=localStorage.getItem('token');
-            const response=await axios.get('http://localhost:3000/usuario', {headers: { 'Authorization': `Bearer ${token}` }});
-            if (response.status===200) return response.data;
-            throw new Error('Token inválido ou erro ao buscar usuários');
-        }catch (error){
-            console.error('Erro ao listar usuários:', error);
-            throw error;
-        }
-    }
-    
-    static async consultarUsuarioPorId(id){
-        try {
-            const token = localStorage.getItem('token'); 
-            const response = await axios.get(`http://localhost:3000/usuario/${id}`,{headers: { 'Authorization': `Bearer ${token}` }});
-            if (response.status === 200) return response.data;
-            else throw new Error('Erro ao consultar usuário por ID');
-        } catch (error) {
-            console.error('Erro ao consultar usuário por ID:', error);
-            throw error;
-        }
-    }
-    
-    static async mostrarUsuarios(){
-        try{
-            const usuarios=await this.listarUsuarios();
-            const tableBody=document.getElementById('after-login-usuarios');
-            if (!tableBody){
-                console.error('Elemento tbody não encontrado');
-                return;
-            }
-            tableBody.innerHTML='';
-            for (const usuario of usuarios){
-                const row=document.createElement('tr');
-                const colunas=[
-                    `${usuario.nome} ${usuario.sobrenome}`,
-                    ocultarDocumento(usuario.identificador),
-                    usuario.email,
-                ];
-                for (const coluna of colunas){
-                    const td=document.createElement('td');
-                    td.textContent=coluna;
-                    row.appendChild(td);
-                }
-                
-                const acoesCell = document.createElement('td');
-                acoesCell.classList.add('d-flex', 'justify-content-around');
-
-                const editarButton = document.createElement('button');
-                editarButton.textContent = 'Editar';
-                editarButton.addEventListener('click', () => this.editarUsuario(usuario.id));
-                acoesCell.appendChild(editarButton);
-    
-                const excluirButton = document.createElement('button');
-                excluirButton.textContent = 'Excluir';
-                excluirButton.addEventListener('click', () => this.deletarUsuario(usuario.id));
-                acoesCell.appendChild(excluirButton);
-    
-                row.appendChild(acoesCell);
-    
-                tableBody.appendChild(row);
-    
-            }
-        }catch(error){
-            console.error('Erro ao mostrar usuários:', error);
         }
     }
 
@@ -241,7 +536,7 @@ class Controller{
     static async formatarTabelaResresas(reservas, corpoTabela) {
         const promessas = reservas.map(async (reserva) => {
             try {
-                const usuario = await this.consultarUsuarioPorId(reserva.idUsuario);
+                const usuario = await this.obterUsuarioPorId(reserva.idUsuario);
                 const linha = document.createElement('tr');
                 const colunas = [
                     reserva.idSala,
@@ -304,94 +599,6 @@ class Controller{
     
         await Promise.all(promessas);
     }
-
-    static async mostrarTodasReservas() {
-        try {
-            const reservas = await this.listarReservas();
-            const tableBody = document.getElementById('reservas');
-            tableBody.innerHTML = '';
-            await this.formatarTabelaResresas(reservas, tableBody);
-        } catch (error) {
-            console.error('Erro ao mostrar reservas:', error);
-        }
-    }
-
-    static async mostrarReservasHoje(){
-        try{
-            const reservas = await this.obterReservas();
-            const reservasHoje = reservas.data.filter((reserva) => {
-                const dataReserva = parseDate(reserva.dataReservada);
-                return ehHoje(dataReserva);
-            });
-            const tabela = document.getElementById('reservas');
-            tabela.innerHTML = '';
-            await this.formatarTabelaResresas(reservasHoje, tabela);
-        } catch (error) {
-            console.error('Erro ao mostrar reservas de hoje:', error);
-        }
-    }
-
-    static async listarSalas(){
-        try{
-            const response = await axios.get('http://localhost:3000/sala');
-            if (response.status === 200) return response.data;
-            throw new Error('Erro ao buscar salas');
-        }catch(error){
-            console.error('Erro ao listar salas:', error);
-            throw error;
-        }
-    }
-
-    static async mostrarSalas(){
-        try{
-            const salas = await this.listarSalas();
-            const tableBody = document.getElementById('after-login-salas'); // Mudado para 'after-login-salas'
-            if (!tableBody){
-                console.error('Elemento tbody não encontrado');
-                return;
-            }
-            tableBody.innerHTML = '';
-            salas.forEach(sala=>{
-
-            });
-            for (const sala of salas){
-                const row = document.createElement('tr');
-                const colunas = [
-                    sala.nome,
-                    sala.andar,
-                    sala.situacao,
-                    sala.capMax,
-                ];
-                for (const coluna of colunas){
-                    const td = document.createElement('td');
-                    td.textContent = coluna;
-                    row.appendChild(td);
-                }
-    
-                const acoesCell = document.createElement('td');
-                acoesCell.classList.add('d-flex', 'justify-content-around');
-    
-                const editarButton = document.createElement('button');
-                editarButton.textContent = 'Editar';
-                editarButton.addEventListener('click', () => this.editarSala(sala.id));
-                acoesCell.appendChild(editarButton);
-    
-                const excluirButton = document.createElement('button');
-                excluirButton.textContent = 'Excluir';
-                excluirButton.addEventListener('click', () => this.excluirSala(sala.id));
-                acoesCell.appendChild(excluirButton);
-    
-                row.appendChild(acoesCell);
-    
-                tableBody.appendChild(row);
-            }
-        }catch(error){
-            console.error('Erro ao mostrar salas:', error);
-        }
-    }
-
-     
-
     
 }
 
