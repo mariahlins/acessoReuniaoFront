@@ -65,6 +65,32 @@ function exibirDataAtual(){
 */
 
 class Controller{
+
+    /*Login*/
+    static async fazerLogin(){
+        const loginForm=document.getElementById('login-form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', async (event) => {
+                event.preventDefault(); 
+                const formData=new FormData(loginForm);
+                const data={
+                    login: formData.get('login'),
+                    senha: formData.get('senha'),
+                };
+                try {
+                    const response=await axios.post('http://localhost:3000/recepcionista/login', data);
+                    if (response.status === 200) {
+                        localStorage.setItem('token', response.data);
+                        window.location.href='./public/views/afterLogin/home.html';
+                    }
+                } catch (error) {
+                    const errorMsg=document.getElementById('error-msg');
+                    if (errorMsg) errorMsg.textContent='Login ou senha inválidos.';
+                }
+            });
+        }
+    }
+
     /* Pegar todos */
     static async listarTodos(endPoint){
         try{
@@ -77,8 +103,8 @@ class Controller{
             throw error;
         }
     }
-    /* Métodos específicos utilizando obterPorId */
 
+    /* Métodos específicos utilizando obterPorId */
         static async listarReservas(){
             return this.listarTodos('reserva');
         }
@@ -133,7 +159,6 @@ class Controller{
     }
     
     /* Métodos específicos utilizando obterPorId */
-    
     static async obterReservaPorId(id) {
         return this.obterPorId('reserva', id);
     }
@@ -224,8 +249,8 @@ class Controller{
                 throw error;
             }
         }              
-        //Mostrar com opções de cancelar e confirmar
 
+        //Mostrar com opções de cancelar e confirmar
         static async mostrarTodasReservas() {
             try {
                 const reservas = await this.listarReservas();
@@ -441,9 +466,7 @@ class Controller{
             }
         }
 
-
         //estilização de lista negra
-        
         static async listaNegraComDetalhes(listaNegra) {
             const listaPromises = listaNegra.map(async (item) => {
                 const [reservista, reservaMotivo] = await Promise.all([
@@ -462,80 +485,91 @@ class Controller{
             });
             return Promise.all(listaPromises);
         }
-        ////////////////////////
 
-    static async fazerLogin(){
-        const loginForm=document.getElementById('login-form');
-        if (loginForm) {
-            loginForm.addEventListener('submit', async (event) => {
-                event.preventDefault(); 
-                const formData=new FormData(loginForm);
-                const data={
-                    login: formData.get('login'),
-                    senha: formData.get('senha'),
-                };
-                try {
-                    const response=await axios.post('http://localhost:3000/recepcionista/login', data);
-                    if (response.status === 200) {
-                        localStorage.setItem('token', response.data);
-                        window.location.href='./public/views/afterLogin/home.html';
-                    }
-                } catch (error) {
-                    const errorMsg=document.getElementById('error-msg');
-                    if (errorMsg) errorMsg.textContent='Login ou senha inválidos.';
-                }
-            });
-        }
-    }
-
-    static async filtrarTabela(idTabela){
-        const valorFiltro = document.getElementById('pesquisa-filtro').value;
-        const tabela = document.getElementById(idTabela);
-        
-        if (!tabela) {
-            console.error(`Tabela com id "${idTabela}" não encontrada`);
-            return;
-        }
-    
-        const linhas = tabela.getElementsByTagName('tr');
-        const idColunaAcao = 'coluna-acao'; 
-    
-        const isFiltroNumero = !isNaN(valorFiltro);
-    
-        for (let i = 1; i < linhas.length; i++){
-            const colunas = linhas[i].getElementsByTagName('td');
-            let corresponde = false;
-        
-            if(valorFiltro === ''){
-                linhas[i].style.display = "";
-                continue;
+        /*Filtrar tabelas*/
+        static async filtrarTabela(idTabela){
+            const valorFiltro = document.getElementById('pesquisa-filtro').value;
+            const tabela = document.getElementById(idTabela);
+            
+            if (!tabela) {
+                console.error(`Tabela com id "${idTabela}" não encontrada`);
+                return;
             }
-
-            for (let j = 0; j < colunas.length; j++){
-                if (colunas[j].id === idColunaAcao) continue;
         
-                const coluna = colunas[j];
-                if(coluna){
-                    if(isFiltroNumero){
-                        if(coluna.textContent === valorFiltro){
+            const linhas = tabela.getElementsByTagName('tr');
+            const idColunaAcao = 'coluna-acao'; 
+        
+            const isFiltroNumero = !isNaN(valorFiltro);
+        
+            for (let i = 1; i < linhas.length; i++){
+                const colunas = linhas[i].getElementsByTagName('td');
+                let corresponde = false;
+            
+                if(valorFiltro === ''){
+                    linhas[i].style.display = "";
+                    continue;
+                }
+
+                for (let j = 0; j < colunas.length; j++){
+                    if (colunas[j].id === idColunaAcao) continue;
+            
+                    const coluna = colunas[j];
+                    if(coluna){
+                        if(isFiltroNumero){
+                            if(coluna.textContent === valorFiltro){
+                                corresponde = true;
+                                break;
+                            }
+                        }
+                        else if(coluna.textContent.toLowerCase().includes(valorFiltro.toLowerCase())){
                             corresponde = true;
                             break;
                         }
                     }
-                    else if(coluna.textContent.toLowerCase().includes(valorFiltro.toLowerCase())){
-                        corresponde = true;
-                        break;
-                    }
+                }
+                if(corresponde){
+                    linhas[i].style.display = "";
+                }
+                else{
+                    linhas[i].style.display = "none";
                 }
             }
-            if(corresponde){
-                linhas[i].style.display = "";
-            }
-            else{
-                linhas[i].style.display = "none";
+        }
+
+        /*Excluir*/
+        static async excluirEntidade(endPoint, id){
+            try{
+                const token = localStorage.getItem('token');
+                await axios.delete(`http://localhost:3000/${endPoint}/${id}`,{headers: { 'Authorization': `Bearer ${token}`}});
+                window.location.reload();
+            }catch(error){
+                console.error(`Erro ao excluir ${endPoint}`, error);
             }
         }
-    }
+
+        static async excluirUsuario(id){
+            return this.excluirEntidade('usuario', id);
+        }
+
+        static async excluirSala(id){
+            return this.excluirEntidade('sala', id);
+        }
+
+        static async excluirListaNegra(id){
+            return this.excluirEntidade('listaNegra', id);
+        }
+
+        static async excluirReuniao(id){
+            return this.excluirEntidade('reuniao', id);
+        }
+
+        static async excluirNivelAcesso(id){
+            return this.excluirEntidade('nivelAcesso', id);
+        }
+
+        
+
+
 }
 
 document.addEventListener('DOMContentLoaded', () => {
