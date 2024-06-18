@@ -194,30 +194,6 @@ class Controller{
             }
         }
 
-        static async mostrarListaNegra() {
-            try {
-                const listasNegra = await this.listarListaNegra();
-                const listaNegraComDetalhes = await Promise.all(listasNegra.map(async (listaNegra) => {
-                    return await this.listaNegraComDetalhes([listaNegra]);
-                }));
-                const tableBody = document.getElementById('after-login-listaNegra');
-                listaNegraComDetalhes.forEach(items => {
-                    this.preencherTabela(items, tableBody, (item) => [
-                        item.codBloqueio,
-                        `${item.reservaMotivo.reservista.nome} ${item.reservaMotivo.reservista.sobrenome}`, // ajustado para acessar reservista dentro de reservaMotivo
-                        ocultarDocumento(item.reservaMotivo.reservista.identificador), // ajustado para acessar identificador de reservista dentro de reservaMotivo
-                        `${item.reservaMotivo.dataReservada} ${item.reservaMotivo.horaInicio} - ${item.reservaMotivo.horaFimReserva}`,
-                        item.reservaMotivo.salaReserva.nome, // ajustado para acessar nome de salaReserva dentro de reservaMotivo
-                        item.motivo,
-                    ], 'editarListaNegra', 'excluirListaNegra');
-                });	
-            } catch (error) {
-                console.error('Erro ao mostrar lista negra:', error);
-                throw error;
-            }
-        }
-        
-
         static async mostrarReuniao() {
             try {
                 const reunioes = await this.listarReuniao();
@@ -272,6 +248,57 @@ class Controller{
             }
         }
 
+        static async mostrarListaNegra() {
+            try {
+                const listasNegra = await this.listarListaNegra();
+                const listaPromises = await this.listaNegraComDetalhes(listasNegra);
+        
+                const tableBody = document.getElementById('after-login-listaNegra');
+                tableBody.innerHTML = ''; // Clear existing content
+        
+                listaPromises.forEach(item => {
+                    const colunasDefinicao = [
+                        item.codBloqueio,
+                        `${item.reservista.nome} ${item.reservista.sobrenome}`,
+                        ocultarDocumento(item.reservista.identificador),
+                        `${item.reservaMotivo.dataReservada} ${item.reservaMotivo.horaInicio} - ${item.reservaMotivo.horaFimReserva}`,
+                        item.reservaMotivo.salaReserva.nome,
+                        item.motivo,
+                    ];
+        
+                    const row = document.createElement('tr');
+                    colunasDefinicao.forEach(coluna => {
+                        const td = document.createElement('td');
+                        td.textContent = coluna;
+                        row.appendChild(td);
+                    });
+        
+                    // Add Editar and Excluir buttons
+                    const acoesCell = document.createElement('td');
+                    acoesCell.classList.add('d-flex', 'justify-content-around');
+        
+                    const editarButton = document.createElement('button');
+                    editarButton.textContent = 'Editar';
+                    editarButton.classList.add('btn', 'btn-confirmar', 'bg-azul', 'peso-500', 'fc-branco');
+                    editarButton.addEventListener('click', () => this.editarListaNegra(item.id));
+                    acoesCell.appendChild(editarButton);
+        
+                    const excluirButton = document.createElement('button');
+                    excluirButton.textContent = 'Excluir';
+                    excluirButton.classList.add('btn', 'btn-cancelar', 'bg-cinza', 'peso-500', 'fc-branco');
+                    excluirButton.addEventListener('click', () => this.excluirListaNegra(item.id));
+                    acoesCell.appendChild(excluirButton);
+        
+                    row.appendChild(acoesCell);
+                    tableBody.appendChild(row);
+                });
+        
+            } catch (error) {
+                console.error('Erro ao mostrar lista negra:', error);
+                throw error;
+            }
+        }
+        
         //Formatar tabelas
         //->Tabela cancelar e concluir
         static async preencherTabelaReserva(reservas, corpoTabela) {
@@ -321,10 +348,16 @@ class Controller{
         
                         case 'CONCLUIDO':
                             var msgConfirmado = document.createElement('h6');
-                            msgConfirmado.textContent = 'RESERVA JÁ CONCLUÍDA';
+                            msgConfirmado.textContent = 'Reserva já concluida';
                             acoesCell.appendChild(msgConfirmado);
                             break;
         
+                        case 'CANCELADO':
+                            var msgConfirmado = document.createElement('h6');
+                            msgConfirmado.textContent = 'Reserva cancelada';
+                            acoesCell.appendChild(msgConfirmado);
+                            break;
+    
                         default:
                             var msgErro = document.createElement('h6');
                             msgErro.textContent = 'Status desconhecido';
@@ -380,42 +413,44 @@ class Controller{
         }
 
         /* Estados de uma reservas */
-        static async cancelarReserva(id){
-            try{
-                let token = localStorage.getItem('token');
-                await axios.put(`http://localhost:3000/reserva/${id}`, { statusReserva: 'Cancelada', dataModificacaoStatus: new Date()}, {headers: { 'Authorization': `Bearer ${token}`}});
-            }catch(error){
-                console.error('Erro ao cancelar reserva', error);
+        static async estadoReserva(endPoint, id) {
+            try {
+                const token = localStorage.getItem('token');
+                await axios.put(`http://localhost:3000/${endPoint}/${id}`, {},{ headers: { Authorization: `Bearer ${token}`}});
+                window.location.reload();
+            } catch (error) {
+                console.error(`Erro ao alterar estado da reserva`, error);
             }
         }
-
+        
+        static async cancelarReserva(id) {
+            return this.estadoReserva('reserva/cancelar', id);
+        }
+        
+        static async confirmarReserva(id) {
+            return this.estadoReserva('reserva/confirmar', id);
+        }
+        
         static async concluirReserva(id){
             try{
                 let token = localStorage.getItem('token');
-                await axios.put(`http://localhost:3000/reserva/concluir/${id}`, { statusReserva: 'Concluída', dataModificacaoStatus: new Date()}, {headers: { 'Authorization': `Bearer ${token}`}});
-        }catch(error){
+                await axios.put(`http://localhost:3000/reserva/concluir/${id}`, {infracao:false}, {headers: { 'Authorization': `Bearer ${token}`}});
+                window.location.reload();
+            }catch(error){
                 console.error('Erro ao concluir reserva', error);
             }
         }
 
-        static async confirmarReserva(id){
-            try{
-                let token = localStorage.getItem('token');
-                await axios.put(`http://localhost:3000/reserva/confirmar/${id}`, { statusReserva: 'Confirmada', dataModificacaoStatus: new Date()}, {headers: { 'Authorization': `Bearer ${token}`}});
-            }catch(error){
-                console.error('Erro ao confirmar reserva', error);
-            }
-        }
 
         //estilização de lista negra
         
         static async listaNegraComDetalhes(listaNegra) {
-            const resultados = await Promise.all(listaNegra.map(async (item) => {
+            const listaPromises = listaNegra.map(async (item) => {
                 const [reservista, reservaMotivo] = await Promise.all([
                     this.obterUsuarioPorId(item.idResponsavel),
                     this.obterReservaPorId(item.idReservaMotivo),
                 ]);
-                const salaReserva = await this.obterSalaPorId(reservaMotivo.idSala);
+                let salaReserva = await this.obterSalaPorId(reservaMotivo.idSala);
                 return { 
                     ...item,
                     reservista,
@@ -424,8 +459,8 @@ class Controller{
                         salaReserva
                     }
                 };
-            }));
-            return resultados[0];
+            });
+            return Promise.all(listaPromises);
         }
         ////////////////////////
 
