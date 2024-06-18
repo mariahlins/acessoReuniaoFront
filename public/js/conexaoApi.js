@@ -91,6 +91,20 @@ class Controller{
         }
     }
 
+    static async fazerLogout() {
+        const logoutLink = document.getElementById('logout');
+        logoutLink.addEventListener('click', async (event) => {
+            event.preventDefault(); 
+            try {
+                localStorage.removeItem('token'); 
+                window.location.href = '/';
+            } catch (error) {
+                console.error('Erro ao fazer logout:', error);
+                throw error;
+            }
+        });
+    }
+    
     /* Pegar todos */
     static async listarTodos(endPoint){
         try{
@@ -566,10 +580,6 @@ class Controller{
         static async excluirNivelAcesso(id){
             return this.excluirEntidade('nivelAcesso', id);
         }
-
-        
-
-
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -586,6 +596,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     observeElement('login-form', () => {
         Controller.fazerLogin();
+    });
+
+    observeElement('logout', () => {
+        Controller.fazerLogout();        
     });
 
     observeElement('after-login-home', () => {
