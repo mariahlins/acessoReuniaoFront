@@ -81,6 +81,7 @@ class Controller{
                     const response=await axios.post('http://localhost:3000/recepcionista/login', data);
                     if (response.status === 200) {
                         localStorage.setItem('token', response.data);
+                        if(response.nivelAcesso === 1)
                         window.location.href='./public/views/afterLogin/home.html';
                     }
                 } catch (error) {
@@ -293,7 +294,6 @@ class Controller{
                 const listaPromises = await this.listaNegraComDetalhes(listasNegra);
         
                 const tableBody = document.getElementById('after-login-listaNegra');
-                tableBody.innerHTML = ''; // Clear existing content
         
                 listaPromises.forEach(item => {
                     const colunasDefinicao = [
