@@ -158,6 +158,7 @@ input[type="text"]:focus {
     color:#F2F6FA;
     border: 2px solid transparent;
     transition: all 0.25s ease;
+    font-size: 2.5vh;
 }
 
 .btn.btn-primary:hover{
@@ -165,6 +166,7 @@ input[type="text"]:focus {
     color: #4973E8;
     border-color: #4973E8;
 }
+
 .btn-confirmar:hover{
     background-color: #F2F6FA !important;
     color: #4973E8 !important;
@@ -178,6 +180,7 @@ input[type="text"]:focus {
 }
 
 .btn.btn-secondary{
+    background-color: #0624AA;
     color:#F2F6FA;
     border: 2px solid transparent;
     transition: all 0.25s ease;
@@ -356,4 +359,9 @@ dt{
 .info-responsavel, .info-reserva {
     flex: 1; 
     min-width: 200px; 
+}
+
+.menu{
+    margin-right: 12vh;
+    color: #00047E;
 }
