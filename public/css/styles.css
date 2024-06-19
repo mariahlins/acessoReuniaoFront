@@ -61,7 +61,17 @@ h6{
     width: fit-content;
     font-family: 'Inter', sans-serif;
 }
+.tabelas{
+    padding-right: 4rem; 
+    padding-left:0 !important;
+    max-width:unset;
+}
 
+.botoesUtils{
+    width: fit-content;
+    margin-left: auto;
+    margin-right: 7vw;
+}
 table{
     max-width: 100%;
     margin-bottom: 0px !important;

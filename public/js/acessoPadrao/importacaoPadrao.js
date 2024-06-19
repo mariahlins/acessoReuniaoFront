@@ -1,12 +1,11 @@
 $(function() {
-    function loadPageComponents(title,subtitle){
+    function loadPageComponents(title){
         const pagina = window.location.pathname.split("/").pop();
         // Importa o conteúdo do cabeçalho
         $.get("/public/components/cabecalho/cabecalho.html", function(cabecalhoContent) {
             $("main").prepend(cabecalhoContent); 
             //atualiza referenciando o id no titulo
             $("#main-title").text(title);
-            $("#sub-title").text(subtitle);
 
             //importa o conteudo do modal do cpf
             $.get("/public/components/botoes/modalcpf.html", function(modalcpfContent){
@@ -53,5 +52,5 @@ $(function() {
             });
         });
     }
-    loadPageComponents(window.pageTitle, window.pageSubtitle);
+    loadPageComponents(window.pageTitle);
 });

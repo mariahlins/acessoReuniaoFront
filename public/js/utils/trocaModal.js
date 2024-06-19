@@ -54,6 +54,9 @@ $('#modalDeEmpresas').on('show.bs.modal', function () {
   resetModal('modalDeEmpresas');
 });
 
+$('#modalDeCadastrarSalas').on('show.bs.modal', function () {
+  resetModal('modalDeSalas');
+});
 
 
 //botoes
