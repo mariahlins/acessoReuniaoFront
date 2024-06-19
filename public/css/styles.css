@@ -201,6 +201,16 @@ input[type="text"]:focus {
     background-color: #6ea8fe;
 }
 
+.btn.btn-outline-primary{
+    border-color: #0624AA;
+    color: #0624AA;
+}
+
+.btn.btn-outline-primary:hover{
+    background-color: #0624AA;
+    color: #F2F6FA;
+}
+
 .btn.btn-outline-secondary{
     width: 12rem;
     height: 3rem; 
