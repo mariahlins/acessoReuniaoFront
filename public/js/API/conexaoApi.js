@@ -367,8 +367,53 @@ class Controller{
                 console.error('Erro ao mostrar reservas de hoje:', error);
             }
         }   
+        static async preencherSelectComAPI() {
+            const selectElement = document.getElementById('nivelAcesso');
+            try {
+                const response = await this.listarNivelAcesso();
+                const data = await response;
 
-        //Formatar tabelas
+                data.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.id;
+                    option.textContent = item.glossarioNivel;
+                    selectElement.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Erro ao buscar dados da API:', error);
+            }
+        }
+        
+        static async createRecepcionista() {
+                const nome = document.getElementById('confirmNome').textContent;
+                const sobrenome = document.getElementById('confirmSobrenome').textContent;
+                const login = document.getElementById('confirmLogin').textContent;
+                const nivelAcesso = document.getElementById('confirmNivelAcesso').textContent === 'recepcionista' ? 1 : 2;
+              
+                const formData = {
+                  nome: nome,
+                  sobrenome: sobrenome,
+                  login: login,
+                  nivelAcesso: nivelAcesso,
+                  ativo: true,
+                };
+              
+                console.log('Dados do formulário:', formData);
+              
+                try {
+                  const token = localStorage.getItem('token');
+                  const response = await axios.post('http://localhost:3000/recepcionista', formData, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                  });
+                  if (response.status === 200) nextStep('modalCadastrarRecepcionista',3);
+                } catch (error) {
+                  console.error('Erro ao criar recepcionista:', error);
+                  alert('Erro ao criar recepcionista. Por favor, tente novamente.');
+                }
+              };
+              
+        
+       //Formatar tabelas
         //->Tabela cancelar e concluir
         static async preencherTabelaReserva(reservas, corpoTabela) {
             const promessas = reservas.map(async (reserva) => {
@@ -636,25 +681,6 @@ class Controller{
         static async editarUsuario(id){
             return this.atualizarEntidade('usuario', id, data);
         }
-
-        /*
-                //editar
-        static async editarUsuario(id){
-            try{
-                const usuario = await this.obterUsuario(id);
-                const form = document.getElementById('form-usuario');
-                form.nome.value = usuario.nome;
-                form.sobrenome.value = usuario.sobrenome;
-                form.identificador.value = usuario.identificador;
-                form.email.value = usuario.email;
-                form.senha.value = usuario.senha;
-                form.id.value = usuario.id;
-            }catch(error){
-                console.error('Erro ao editar usuario:', error);
-                throw error;
-            }
-        }
-        */
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -675,6 +701,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     observeElement('logout', () => {
         Controller.fazerLogout();        
+    });
+
+    observeElement('nivelAcesso', ()=>{
+        Controller.preencherSelectComAPI();
+    });
+
+    observeElement('step3', ()=>{
+        const confirmarButton = document.getElementById('confirmarRecepcionista');
+        if(confirmarButton) confirmarButton.addEventListener('click', ()=>{ Controller.createRecepcionista();});
     });
 
     observeElement('after-login-home', () => {
