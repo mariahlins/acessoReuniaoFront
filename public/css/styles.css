@@ -109,6 +109,7 @@ table{
 }
 th, td{
     font-size: 1vw !important;
+    padding: .2vw 1vw !important;
 }
 .nav-link {
     display: flex;

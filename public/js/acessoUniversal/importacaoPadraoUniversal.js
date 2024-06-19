@@ -26,6 +26,12 @@ $(function() {
                         loadModalsAndBody(pagina);
                     });
                     break;
+                case "recepcionista.html":
+                    $.get("/public/components/botoes/modalCadastrarRecepcionista.html", function(modalCadastroRecepcionistaContent) {
+                        $("main").append(modalCadastroRecepcionistaContent);
+                        loadModalsAndBody(pagina);
+                    });
+                    break;
                 default:
                     loadModalsAndBody(pagina);
                     break;
@@ -50,7 +56,7 @@ $(function() {
                         url = "/public/components/body/corpoReservas.html";
                         break;
                     case "salasUniversal.html":
-                        url = "/public/components/body/corpoSalas.html";
+                        url = "/public/components/body/corpoSalasUniversal.html";
                         break;
                     case "usuariosUniversal.html":
                         url = "/public/components/body/corpoUsuarios.html";

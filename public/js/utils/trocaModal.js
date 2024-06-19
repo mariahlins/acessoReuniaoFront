@@ -54,11 +54,14 @@ $('#modalDeEmpresas').on('show.bs.modal', function () {
   resetModal('modalDeEmpresas');
 });
 
-$('#modalDeCadastrarSalas').on('show.bs.modal', function () {
-  resetModal('modalDeSalas');
+$('#modalDeCadastrarSala').on('show.bs.modal', function () {
+  resetModal('modalDeCadastrarSala');
 });
 
 
+$('#modalCadastrarRecepcionista').on('show.bs.modal', function () {
+  resetModal('modalCadastrarRecepcionista');
+});
 //botoes
 function selectButton(button, group) {
   const buttons = document.querySelectorAll(`.h5-item button`);
