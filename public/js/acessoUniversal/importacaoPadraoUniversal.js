@@ -64,12 +64,6 @@ $(function() {
                     case "cadastroUsuarios.html":
                         url = "/public/components/body/corpoCadastroUsuarios.html";
                         break;
-                    case "cadastroSalas.html":
-                        url = "/public/components/body/corpoCadastroSalas.html";
-                        break;
-                    case "edicaoSalas.html":
-                        url = "/public/components/body/corpoEditarSalas.html";
-                        break;
                     case "listaNegra.html":
                         url = "/public/components/body/corpoListaNegra.html";
                         break;

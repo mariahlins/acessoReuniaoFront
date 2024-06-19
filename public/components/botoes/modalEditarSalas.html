@@ -28,10 +28,10 @@
 
                 <div class="step active" id="step2" data-header="Informações da Sala">
                     <input type="text" id="nomeSala" class="form-control mb-2 custom-input" placeholder="Nome da sala">
-                    <input type="number" id="andar" class="form-control mb-2 custom-input" placeholder="Qual andar a sala se encontra">
-                    <input type="text" id="area" class="form-control mb-2 custom-input" placeholder="Onde a sala se encontra">
+                    <input type="number" id="andar" class="form-control mb-2 custom-input" placeholder="Andar">
+                    <input type="text" id="area" class="form-control mb-2 custom-input" placeholder="Área">
                     <input type="number" id="capMax" class="form-control mb-2 custom-input" placeholder="Capacidade máxima">
-                    <input type="text" id="situacao" class="form-control mb-2 custom-input" placeholder="Situação da sala">
+                    <input type="text" id="situacao" class="form-control mb-2 custom-input" placeholder="Situação">
                     <div class="d-flex justify-content-between">
                         <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeEditarSala', 2)">Voltar</button>
                         <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeEditarSala', 2)">Confirmar</button>
@@ -39,8 +39,8 @@
                 </div>
               
                 <div class="step" id="step3" data-header="Confirmação">
-                    <h4 class="mx-auto text-center">As informações estão correta?</h4>
-                    <p class="mx-auto text-center">Mudanças que foram feitas</p>
+                    <h4 class="mx-auto text-center">As informações estão corretas?</h4>
+                    <p class="mx-auto text-center">Mudanças que foram feitas:</p>
                     <div class="modal-footer-custom d-flex justify-content-between">
                         <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeEditarSala', 3)">Voltar</button>
                         <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeEditarSala', 3)">Confirmar</button>
