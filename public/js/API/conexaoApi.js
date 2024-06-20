@@ -440,7 +440,6 @@ class Controller{
                         `${item.usuario.nome} ${item.usuario.nome}`,
                         ocultarDocumento(item.usuario.identificador),
                         item.motivoReserva,
-                        item.dataReservada,
                         `${item.dataReservada} ${item.horaInicio}`,
                         `${item.dataReservada} ${item.horaFimReserva}`,
                     ],
@@ -476,68 +475,59 @@ class Controller{
 
     /* Preencher Tabelas */
         
-        static async preencherTabela(items, tableBody, colunasDefinicao, metodoUm, metodoDois) {
-            try {
-                if (!tableBody) {
-                    console.error('Elemento tbody não encontrado');
-                    return;
-                }
-                tableBody.innerHTML = '';
-                items.forEach(item => {
-                    const linha = this.enviarInfoParaTabela(colunasDefinicao(item));
-                    
-                    const acoesCell = document.createElement('td');
-                    acoesCell.classList.add('d-flex', 'justify-content-around');
-                    
-                    if (metodoUm(item).texto) {
-                        const buttonPrimario = document.createElement('button');
-                        if (typeof metodoUm(item) === 'object' && metodoUm(item).funcao) {
-                            buttonPrimario.textContent = metodoUm(item).texto;
-                            buttonPrimario.classList.add('btn-confirmar', 'bg-azul', 'peso-500', 'fc-branco');
-                            buttonPrimario.addEventListener('click', () => this[metodoUm(item).funcao](item.id));
-                        } else {
-                            buttonPrimario.textContent = metodoUm(item).texto;
-                        }
-                        acoesCell.appendChild(buttonPrimario);
-                    }
-                    
-                    if (metodoDois(item).texto){
-                        const buttonSecundario = document.createElement('button');
-                        if (typeof metodoDois(item) === 'object' && metodoDois(item).funcao) {
-                            buttonSecundario.textContent = metodoDois(item).texto;
-                            buttonSecundario.classList.add('btn-cancelar', 'bg-cinza', 'peso-500', 'fc-branco');
-                            buttonSecundario.addEventListener('click', () => this[metodoDois(item).funcao](item.id));
-                        } else {
-                            buttonSecundario.textContent = metodoDois(item).texto;
-                        }
-                        acoesCell.appendChild(buttonSecundario);
-                    }
-                    
-                    linha.appendChild(acoesCell);
-                    tableBody.appendChild(linha);
-                });
-            } catch (error) {
-                console.error(`Erro ao preencher tabela:`, error);
+    static async preencherTabela(items, tableBody, colunasDefinicao, metodoUm, metodoDois) {
+        try {
+            if (!tableBody) {
+                console.error('Elemento tbody não encontrado');
+                return;
             }
-        }
-        
-        static enviarInfoParaTabela(colunasDefinicao) {
-            const row = document.createElement('tr');
-            colunasDefinicao.forEach(coluna => {
-                const td = document.createElement('td');
-                td.textContent = coluna;
-                row.appendChild(td);
+            tableBody.innerHTML = '';
+            items.forEach(item => {
+                const linha = this.enviarInfoParaTabela(colunasDefinicao(item));
+                const acoesCell = document.createElement('td');
+                acoesCell.classList.add('d-flex', 'justify-content-around');
+                if (metodoUm(item).texto) {
+                    const buttonPrimario = this.criarBotao(metodoUm(item), 'btn-confirmar bg-azul peso-500 fc-branco', item.id);
+                    acoesCell.appendChild(buttonPrimario);
+                }
+                if (metodoDois(item).texto) {
+                    const buttonSecundario = this.criarBotao(metodoDois(item), 'btn-cancelar bg-cinza peso-500 fc-branco', item.id);
+                    acoesCell.appendChild(buttonSecundario);
+                }
+                linha.appendChild(acoesCell);
+                tableBody.appendChild(linha);
             });
-            return row;
+        } catch (error) {
+            console.error(`Erro ao preencher tabela:`, error);
         }
+    }
     
-        static criarBotao(texto, classes, onClick) {
+    static enviarInfoParaTabela(colunasDefinicao) {
+        const row = document.createElement('tr');
+        colunasDefinicao.forEach(coluna => {
+            const td = document.createElement('td');
+            td.textContent = coluna;
+            row.appendChild(td);
+        });
+        return row;
+    }
+    
+    static criarBotao(metodo, classes, id) {
+        let elemento;
+        if (typeof metodo === 'object' && metodo.funcao) {
             const botao = document.createElement('button');
-            botao.textContent = texto;
-            botao.className = classes;
-            botao.addEventListener('click', onClick);
-            return botao;
+            botao.textContent = metodo.texto;
+            botao.classList.add(...classes.split(' ')); 
+            botao.addEventListener('click', () => this[metodo.funcao](id));
+            elemento = botao;
+        } else {
+            const elementoPadrao = document.createElement('span');
+            elementoPadrao.textContent = metodo.texto;
+            elemento = elementoPadrao;
         }
+        return elemento;
+    }
+        
 
     /* Preencher Tabelas */
 
