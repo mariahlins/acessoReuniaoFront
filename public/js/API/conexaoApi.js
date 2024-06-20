@@ -399,7 +399,7 @@ class Controller{
                 ],
                 (item) => {
                     if(item.estadoBloqueio) return { texto: 'Desbloquear', funcao: 'desbloquearListaNegra' };
-                    return { texto: 'Recorer', funcao: 'recorerListaNegra' };
+                    return { texto: 'Recorrer', funcao: 'recorerListaNegra' };
                 },
                 (item) => {
                     if (!item.estadoBloqueio) return { texto: 'Excluir', funcao: 'excluirListaNegra' };
