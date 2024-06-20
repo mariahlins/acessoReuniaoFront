@@ -390,32 +390,20 @@ class Controller{
                 const listaNegraComDetalhes = await this.listaNegraComDetalhes(listaNegra);
                 const tableBody = document.getElementById('after-login-listaNegra');
                 this.preencherTabela(listaNegraComDetalhes, tableBody, (item) => [
+                    item.codBloqueio,
                     `${item.reservista.nome} ${item.reservista.sobrenome}`,
                     ocultarDocumento(item.reservista.identificador),
+                    `${item.reservaMotivo.dataReservada} - ${item.reservaMotivo.horaInicio} - ${item.reservaMotivo.horaFimReserva}`,
                     item.reservaMotivo.salaReserva.nome,
-                    item.reservaMotivo.dataReservada,
-                    item.reservaMotivo.horaInicio,
-                    item.reservaMotivo.horaFimReserva,
+                    item.reservaMotivo.motivoReserva,
                 ],
                 (item) => {
-                    switch (item.estadoBloqueio) {
-                        case true:
-                            return { texto: 'Desbloquear', funcao: 'desbloquearListaNegra' };
-                        case false:
-                            return { texto: 'Recorer', funcao: 'recorerListaNegra' };
-                        default:
-                            return [];
-                    }
+                    if(item.estadoBloqueio) return { texto: 'Desbloquear', funcao: 'desbloquearListaNegra' };
+                    return { texto: 'Recorer', funcao: 'recorerListaNegra' };
                 },
                 (item) => {
-                    switch (item.estadoBloqueio) {
-                        case true:
-                            return null;
-                        case false:
-                            return { texto: 'Excluir', funcao: 'excluirListaNegra' };
-                        default:
-                            return [];
-                    }
+                    if (!item.estadoBloqueio) return { texto: 'Excluir', funcao: 'excluirListaNegra' };
+                    return [];
                 }
                 );
             } catch (error) {
