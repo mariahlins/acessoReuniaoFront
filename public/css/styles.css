@@ -55,6 +55,11 @@ h6{
     font-weight: 500;
 }
 
+.text-secondary-emphasis{
+    color: #0624AA;
+    font-family: "Lexend", sans-serif;
+}
+
 .titulo{
     color: #0624AA;
     font-weight:800;
@@ -174,20 +179,32 @@ input[type="text"]:focus {
 
 .btn.btn-primary:hover{
     background-color: #F2F6FA;
-    color: #4973E8;
-    border-color: #4973E8;
+    color: #0624AA;
+    border-color: #0624AA;
+}
+
+.btn-confirmar{
+    background-color: #fff !important;
+    color: #0624AA !important;
+    border-color: #0624AA !important;
 }
 
 .btn-confirmar:hover{
-    background-color: #F2F6FA !important;
-    color: #4973E8 !important;
-    border-color: #4973E8 !important;
+    background-color: #0624AA !important;
+    color: #fff !important;
+    border-color: #fff !important;
+}
+
+.btn-cancelar{
+    background-color: #ffffff !important;
+    color:  #a8aeba !important;
+    border-color:  #d4d7dd !important;
 }
 
 .btn-cancelar:hover{
-    background-color: #F2F6FA !important;
-    color:  #565D6D !important;
-    border-color:  #565D6D !important;
+    background-color: #9095A1 !important;
+    color:  #f0f0f0!important;
+    border-color:  #f0f0f0 !important;
 }
 
 .btn.btn-secondary{
@@ -216,6 +233,14 @@ input[type="text"]:focus {
     height: 3rem; 
     font-size: 1vw; 
     padding: 10px 20px; 
+    color: #0624AA;
+    background-color: #fff;
+    border-color: #0624AA;
+}
+
+.btn.btn-outline-secondary:hover{
+    color: #fff;
+    background-color: #0624AA;
 }
 
 .btn.btn-final{
@@ -253,6 +278,11 @@ table {
     margin-top: 1rem !important;
     border-collapse: separate;
     width: 100%;
+}
+
+.confirm-info {
+    margin: 0 auto;
+    padding-left: 15vw;
 }
 
 .input-container {
