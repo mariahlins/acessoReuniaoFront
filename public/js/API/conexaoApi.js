@@ -399,7 +399,7 @@ class Controller{
                 ],
                 (item) => {
                     if(item.estadoBloqueio) return { texto: 'Desbloquear', funcao: 'desbloquearListaNegra' };
-                    return { texto: 'Recorer', funcao: 'recorerListaNegra' };
+                    return { texto: 'Recorrer', funcao: 'recorerListaNegra' };
                 },
                 (item) => {
                     if (!item.estadoBloqueio) return { texto: 'Excluir', funcao: 'excluirListaNegra' };
@@ -475,11 +475,11 @@ class Controller{
                 const acoesCell = document.createElement('td');
                 acoesCell.classList.add('d-flex', 'justify-content-around');
                 if (metodoUm(item).texto) {
-                    const buttonPrimario = this.criarBotao(metodoUm(item), 'btn-confirmar bg-azul peso-500 fc-branco', item.id);
+                    const buttonPrimario = this.criarBotao(metodoUm(item), 'btn btn-confirmar bg-azul peso-500 fc-branco', item.id);
                     acoesCell.appendChild(buttonPrimario);
                 }
                 if (metodoDois(item).texto) {
-                    const buttonSecundario = this.criarBotao(metodoDois(item), 'btn-cancelar bg-cinza peso-500 fc-branco', item.id);
+                    const buttonSecundario = this.criarBotao(metodoDois(item), 'btn btn-cancelar bg-cinza peso-500 fc-branco', item.id);
                     acoesCell.appendChild(buttonSecundario);
                 }
                 linha.appendChild(acoesCell);
