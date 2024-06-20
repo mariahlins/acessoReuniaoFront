@@ -14,7 +14,6 @@
                     <input type="text" id="sobrenome" class="form-control mb-2 custom-input" placeholder="Sobrenome" autocomplete="off">
                     <input type="text" id="login" class="form-control mb-2 custom-input" placeholder="Login" autocomplete="off">
                     <input type="password" id="senha" class="form-control mb-2 custom-input" placeholder="Senha" autocomplete="off">
-                    <input type="hidden" id="hiddenSenha">
                     <div class="d-flex justify-content-between">
                         <button class="btn btn-invisible"></button>
                         <button type="button" class="btn btn-secondary" onclick="nextStep('modalCadastrarRecepcionista',1)">Continuar</button>
@@ -24,12 +23,11 @@
                 <div class="step" id="step2" data-header="Nível de acesso">
                     <h4 class="mx-auto text-center mb-3 mt-1">Qual nível de acesso o usuário terá?</h4>
                     <select id="nivelAcesso" class="form-control mb-2 custom-input">
-                        <option value="1">Recepcionista</option>
                         <option value="2">Outro Nível</option>
                     </select>
                     <div class="d-flex justify-content-between">
                         <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalCadastrarRecepcionista',2)">Voltar</button>
-                        <button type="button" class="btn btn-secondary" onclick="nextStep('modalCadastrarRecepcionista',2)">Confirmar</button>
+                        <button type="button" class="btn btn-secondary" onclick="fillConfirmationRecepcionista('modalCadastrarRecepcionista',2)">Confirmar</button>
                     </div>
                 </div>
 
@@ -40,11 +38,11 @@
                         <p>Sobrenome: <strong><span id="confirmSobrenome"></span></strong></p>
                         <p>Login: <strong><span id="confirmLogin"></span></strong></p>
                         <p>Nível de acesso: <strong><span id="confirmNivelAcesso"></span></strong></span></p>
-                        <p style="display:hidden"><span id="confirmIdNivelAcesso"></span></p>
+                        <p style="display:hidden"><span id="hiddenSenha"></span></p>
                     </div>
                     <div class="modal-footer-custom d-flex justify-content-between">
                         <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalCadastrarRecepcionista', 3)">Voltar</button>
-                        <button type="button" class="btn btn-secondary" id="confirmarRecepcionista" onclick="createEntity('recepcionista')">Confirmar</button>
+                        <button type="button" class="btn btn-secondary" id="confirmarRecepcionista" onclick="createEntity('recepcionista',3)">Cadastrar</button>
                     </div>
                 </div>
                 

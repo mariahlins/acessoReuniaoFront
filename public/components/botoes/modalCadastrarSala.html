@@ -1,12 +1,12 @@
-<div class="modal fade" id="modalDeCadastrarSala" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<div class="modal fade" id="modalCadastrarSala" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered custom-modal-size" role="document">
-      <div class="modal-content">
-          <div class="modal-header">
-              <h6 class="modal-title text-center w-100" id="modalHeader">Informações da Sala</h6>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-              </button>
-          </div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title text-center w-100" id="modalHeader">Informações da Sala</h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
 
             <div class="modal-body custom-modal-body">
                 <div class="step active" id="step1" data-header="Informações da Sala">
@@ -14,42 +14,39 @@
                     <input type="number" id="andar" class="form-control mb-2 custom-input" placeholder="Andar">
                     <input type="text" id="area" class="form-control mb-2 custom-input" placeholder="Área">
                     <input type="number" id="capMax" class="form-control mb-2 custom-input" placeholder="Capacidade máxima">
-                    <input type="text" id="situacao" class="form-control mb-2 custom-input" placeholder="Situação">
                     <div class="d-flex justify-content-between">
                         <button class="btn btn-invisible"></button>
-                        <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeCadastrarSala', 1)">Cadastrar</button>
+                        <button type="button" class="btn btn-secondary" onclick="fillConfirmationSala('modalCadastrarSala', 1)">Confirmar</button>
                     </div>
                 </div>
-              
+
                 <div class="step" id="step2" data-header="Confirmação">
                     <h4 class="mx-auto text-center">As informações estão corretas?</h4>
                     <div class="confirm-info">
-                    <p>Nome da sala:</p>
-                    <p>Andar:</p>
-                    <p>Área:</p>
-                    <p>Capacidade Máxima:</p>
-                    <p>Situação:</p>
+                        <p>Nome da sala: <strong><span id="confirmNomeSala"></span></strong></p>
+                        <p>Andar: <strong><span id="confirmAndar"></span></strong></p>
+                        <p>Área: <strong><span id="confirmArea"></span></strong></p>
+                        <p>Capacidade Máxima: <strong><span id="confirmCapMax"></span></strong></p>
                     </div>
                     <div class="modal-footer-custom d-flex justify-content-between">
-                        <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCadastrarSala', 2)">Voltar</button>
-                        <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeCadastrarSala', 2)">Confirmar</button>
+                        <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalCadastrarSala', 2)">Voltar</button>
+                        <button type="button" class="btn btn-secondary" onclick="createEntity('sala', 2)">Cadastrar</button>
                     </div>
                 </div>
 
                 <div class="step" id="step3" data-header="">
                     <h4 class="tsucesso mx-auto text-center mt-4">Sala criada com sucesso!</h4>
                     <svg xmlns="http://www.w3.org/2000/svg" width="7rem" height="7rem" fill="#3D9200" class="bi bi-check2-circle mx-auto d-block mt-4" viewBox="0 0 16 16">
-                      <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0"/>
-                      <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
+                        <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0"/>
+                        <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
                     </svg>
                     <p class="subTitulo2 mx-auto text-center">A sala já pode ser visualizada na lista de salas.</p>
                     <div class="modal-footer-custom d-flex justify-content-center">
-                      <button type="button" class="btn btn-final2" onclick="prevStep('modalDeCadastrarSala', 3)">Fazer outra reserva</button>
-                      <button type="button" class="btn btn-final" onclick="finish('modalDeCadastrarSala')">Voltar para tela inicial</button>
+                        <button type="button" class="btn btn-final2" onclick="prevStep('modalCadastrarSala', 3)">Cadastrar outra sala</button>
+                        <button type="button" class="btn btn-final" onclick="finish('modalCadastrarSala')">Voltar para tela inicial</button>
                     </div>
-                  </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
-<script src="/public/js/utils/trocaModal.js"></script>

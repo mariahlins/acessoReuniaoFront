@@ -1,97 +1,67 @@
-async function createEntity(entityType) {
-  const formData = getFormData();
-  try {
-    const token = localStorage.getItem('token');
-    const response = await axios.post(`http://localhost:3000/${entityType}`, formData, {headers: { 'Authorization': `Bearer ${token}`}});
-    if (response.status === 200) nextStep(`modalCadastrar${capitalizeFirstLetter(entityType)}`, 3);
-  } catch (error) {
-    console.error(`Erro ao criar ${entityType}:`, error);
-    alert(`Erro ao criar ${entityType}. Por favor, tente novamente.`);
-  }
-}
-
-// Função para obter dados do formulário
-function getFormData(){
-  const nome = document.getElementById('confirmNome').textContent;
-  const sobrenome = document.getElementById('confirmSobrenome').textContent;
-  const login = document.getElementById('confirmLogin').textContent;
-  const senha = document.getElementById('hiddenSenha').value; // Use hidden input for senha
-  const nivelAcesso = document.getElementById('confirmNivelAcesso').textContent === 'recepcionista' ? 1 : 2;
-
-  return {
-    nome,
-    sobrenome,
-    login,
-    senha,
-    nivelAcesso,
-    ativo: true,
-  };
-}
-
-// Função para preencher os dados na tela de confirmação
-function fillConfirmation() {
-  const nome = document.getElementById('nome').value;
-  const sobrenome = document.getElementById('sobrenome').value;
-  const login = document.getElementById('login').value;
-  const senha = document.getElementById('senha').value;
-  const nivelAcesso = document.getElementById('nivelAcesso').options[document.getElementById('nivelAcesso').selectedIndex].text;
-
-  document.getElementById('confirmNome').textContent = nome;
-  document.getElementById('confirmSobrenome').textContent = sobrenome;
-  document.getElementById('confirmLogin').textContent = login;
-  document.getElementById('confirmNivelAcesso').textContent = nivelAcesso;
-  document.getElementById('hiddenSenha').value = senha; // Store senha in hidden input
-}
-
-// Função para capitalizar a primeira letra de uma string
+// Utilidades
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-// Funções de controle do modal
-$('.modal').on('show.bs.modal', function () {
-  const modalId = this.id;
-  resetModal(modalId);
-});
+function converterAndar(andar) {
+  switch (andar) {
+      case 0: return 'Térreo';
+      case 1: return 'Primeiro andar';
+      case 2: return 'Segundo andar';
+      case 3: return 'Terceiro andar';
+      case 4: return 'Quarto andar';
+      default: return 'informação invalida';
+  }
+}
 
-$('.modal').on('hidden.bs.modal', function () {
-  const modalId = this.id;
-  resetModal(modalId);
-});
+function getElementValueById(id) {
+  return document.getElementById(id).value;
+}
 
+function setElementTextContentById(id, text) {
+  document.getElementById(id).textContent = text;
+}
+
+// Função Sala
+function createSala(nome, andar, area, capacidadeMaxima) {
+  return {
+    nome: nome,
+    andar: andar,
+    area: area,
+    capMax:capacidadeMaxima
+  };
+}
+
+// Função Recepcionista
+function createRecepcionista(nome, sobrenome, login, senha, nivelAcesso) {
+  return {
+    nome: nome,
+    sobrenome: sobrenome,
+    login: login,
+    senha: senha,
+    nivelAcesso: nivelAcesso
+  };
+}
+
+// Gestão do modal
 function updateModalContent(modalId, step) {
-  const currentStep = document.getElementById(modalId).querySelector('#step' + step);
+  const currentStep = document.querySelector(`#${modalId} #step${step}`);
   const newHeader = currentStep.getAttribute('data-header');
-  document.getElementById(modalId).querySelector('.modal-title').textContent = newHeader;
+  document.querySelector(`#${modalId} .modal-title`).textContent = newHeader;
 }
 
 function nextStep(modalId, currentStep) {
   const modalElement = document.getElementById(modalId);
-  modalElement.querySelector('#step' + currentStep).classList.remove('active');
-  modalElement.querySelector('#step' + (currentStep + 1)).classList.add('active');
-  if (currentStep === 2) fillConfirmation();
+  modalElement.querySelector(`#step${currentStep}`).classList.remove('active');
+  modalElement.querySelector(`#step${currentStep + 1}`).classList.add('active');
   updateModalContent(modalId, currentStep + 1);
 }
 
 function prevStep(modalId, currentStep) {
   const modalElement = document.getElementById(modalId);
-  modalElement.querySelector('#step' + currentStep).classList.remove('active');
-  modalElement.querySelector('#step' + (currentStep - 1)).classList.add('active');
+  modalElement.querySelector(`#step${currentStep}`).classList.remove('active');
+  modalElement.querySelector(`#step${currentStep - 1}`).classList.add('active');
   updateModalContent(modalId, currentStep - 1);
-}
-
-function finish(modalId) {
-  $('#' + modalId).modal('hide');
-  resetModal(modalId);
-  window.location.reload();
-}
-
-function selectButton(button, group) {
-  const buttons = document.querySelectorAll(`.h5-item button`);
-  buttons.forEach(btn => {
-    if (btn !== button && btn.dataset.group === group) btn.classList.remove('btn-selected');
-  });
-  button.classList.add('btn-selected');
 }
 
 function resetModal(modalId) {
@@ -101,6 +71,79 @@ function resetModal(modalId) {
   updateModalContent(modalId, 1);
 }
 
-$('.modal-resetable').on('show.bs.modal', function () {
-  resetModal(this.id);
-});
+function finish(modalId) {
+  $(`#${modalId}`).modal('hide');
+  resetModal(modalId);
+  window.location.reload();
+}
+
+// CRUD
+async function createEntity(entityType, stepAtual) {
+  try {
+    const entityData = getFormData(entityType);
+    console.log(entityData);
+
+    const token = localStorage.getItem('token');
+    const response = await axios.post(`http://localhost:3000/${entityType}`, entityData, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    console.log(response.status);
+
+    const modalId = `modalCadastrar${capitalizeFirstLetter(entityType)}`;
+    console.log(modalId==='modalCadastrarSala');
+    if (response.status === 200) {
+      return nextStep(modalId, stepAtual); // Corrigido para retornar a chamada de nextStep
+    } else {
+      throw new Error(`Erro ao criar ${entityType}. Status: ${response.status}`);
+    }
+  } catch (error) {
+    console.error(`Erro ao criar ${entityType}:`, error);
+    alert(`Erro ao criar ${entityType}. Por favor, tente novamente.`);
+  }
+}
+
+
+// Get - pegar os dados
+function getFormData(entityType) {
+  switch(entityType) {
+    case 'sala':
+      const nomeSala = document.getElementById('confirmNomeSala').textContent;
+      const andar = Number(getElementValueById('andar'));
+      const area = document.getElementById('confirmArea').textContent;
+      const capMax = Number(getElementValueById('capMax'));
+      return createSala(nomeSala, andar, area, capMax);
+    
+    case 'recepcionista':
+      const nome = document.getElementById('confirmNome').textContent;
+      const sobrenome = document.getElementById('confirmSobrenome').textContent;
+      const login = document.getElementById('confirmLogin').textContent;
+      const senha = document.getElementById('senha').value;
+      const nivelAcesso = Number(document.getElementById('nivelAcesso').value);
+      return createRecepcionista(nome, sobrenome, login, senha, nivelAcesso);    
+  }
+}
+
+// Confirmar - para Salas
+function fillConfirmationSala(modalId, currentStep) {
+  nextStep(modalId, currentStep);
+
+  setElementTextContentById('confirmNomeSala', getElementValueById('nomeSala'));
+  setElementTextContentById('confirmAndar', converterAndar(Number(getElementValueById('andar'))));
+  setElementTextContentById('confirmArea', getElementValueById('area'));
+  setElementTextContentById('confirmCapMax', getElementValueById('capMax'));
+}
+
+// Confirmar - para Usuários
+function fillConfirmationRecepcionista(modalId, currentStep) {
+  nextStep(modalId, currentStep);
+
+  setElementTextContentById('confirmNome',capitalizeFirstLetter(getElementValueById('nome')));
+  setElementTextContentById('confirmSobrenome', capitalizeFirstLetter(getElementValueById('sobrenome')));
+  setElementTextContentById('confirmLogin', getElementValueById('login'));
+  
+  // Corrigindo a linha para obter o texto da opção selecionada
+  const nivelAcessoElement = document.getElementById('nivelAcesso');
+  const selectedOptionText = nivelAcessoElement.options[nivelAcessoElement.selectedIndex].text;
+  setElementTextContentById('confirmNivelAcesso', capitalizeFirstLetter(selectedOptionText));
+}

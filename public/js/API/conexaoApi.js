@@ -475,11 +475,11 @@ class Controller{
                 const acoesCell = document.createElement('td');
                 acoesCell.classList.add('d-flex', 'justify-content-around');
                 if (metodoUm(item).texto) {
-                    const buttonPrimario = this.criarBotao(metodoUm(item), 'btn-confirmar bg-azul peso-500 fc-branco', item.id);
+                    const buttonPrimario = this.criarBotao(metodoUm(item), 'btn btn-confirmar bg-azul peso-500 fc-branco', item.id);
                     acoesCell.appendChild(buttonPrimario);
                 }
                 if (metodoDois(item).texto) {
-                    const buttonSecundario = this.criarBotao(metodoDois(item), 'btn-cancelar bg-cinza peso-500 fc-branco', item.id);
+                    const buttonSecundario = this.criarBotao(metodoDois(item), 'btn btn-cancelar bg-cinza peso-500 fc-branco', item.id);
                     acoesCell.appendChild(buttonSecundario);
                 }
                 linha.appendChild(acoesCell);
@@ -721,23 +721,50 @@ class Controller{
         /*Atualizar*/
 
         /*Complemento modal */        
-            static async preencherSelectComAPI() {
-                //Adicionar sala, nivelDeAcesso, HorarioLivre
-                const selectElement = document.getElementById('nivelAcesso');
-                try {
-                    const response = await this.listarNivelAcesso();
-                    const data = await response;
-
-                    data.forEach(item => {
-                        const option = document.createElement('option');
-                        option.value = item.id;
-                        option.textContent = item.glossarioNivel;
-                        selectElement.appendChild(option);
-                    });
-                } catch (error) {
-                    console.error('Erro ao buscar dados da API:', error);
+        static async preencherSelectComAPI() {
+            const selectElement = document.getElementById('nivelAcesso'); // Ajuste conforme necessário para pegar o ID correto
+            let data;
+        
+            try {
+                switch (selectElement.id) {
+                    case 'nivelAcesso':
+                        data = await this.listarNivelAcesso();
+                        break;
+                    case 'salas':
+                        data = await this.listarSalas();
+                        break;
+                    case 'horarioLivre':
+                        data = await this.listarHorarioLivre();
+                        break;
+                    default:
+                        throw new Error('ID do elemento select não suportado');
                 }
+        
+                data.forEach(item => {
+                    const option = document.createElement('option');
+                    switch (selectElement.id) {
+                        case 'nivelAcesso':
+                            option.value = item.id;
+                            option.textContent = item.glossarioNivel;
+                            break;
+                        case 'salas':
+                            option.value = item.id;
+                            option.textContent = `${item.nome} - ${converterAndar(item.andar)}`;
+                            break;
+                        case 'horarioLivre':
+                            option.value = item.horarioLivre;
+                            option.textContent = item.horarioLivre;
+                            break;
+                        default:
+                            throw new Error('ID do elemento select não suportado');
+                    }
+                    selectElement.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Erro ao buscar dados da API:', error);
             }
+        }
+        
         /*Complemento modal */
 
 }
