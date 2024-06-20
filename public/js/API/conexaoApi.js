@@ -395,7 +395,7 @@ class Controller{
                     ocultarDocumento(item.reservista.identificador),
                     `${item.reservaMotivo.dataReservada} - ${item.reservaMotivo.horaInicio} - ${item.reservaMotivo.horaFimReserva}`,
                     item.reservaMotivo.salaReserva.nome,
-                    item.reservaMotivo.motivoReserva,
+                    item.motivo,
                 ],
                 (item) => {
                     if(item.estadoBloqueio) return { texto: 'Desbloquear', funcao: 'desbloquearListaNegra' };
