@@ -39,12 +39,11 @@ function createSala(nome, andar, area, capacidadeMaxima) {
 }
 
 // Função Recepcionista
-function createRecepcionista(nome, sobrenome, login, senha, nivelAcesso) {
+function createRecepcionista(nome, sobrenome, login, nivelAcesso) {
   return {
     nome: nome,
     sobrenome: sobrenome,
     login: login,
-    senha: senha,
     nivelAcesso: nivelAcesso
   };
 }
@@ -112,7 +111,7 @@ async function updateEntity(entityType,stepAtual) {
     const token = localStorage.getItem('token');
     let id=getId();
     if(entityType=='salaEdit') entityType='sala';
-    else if(entityData==='recepcionistaEdit') entityType='recepcionista';
+    else if(entityType==='recepcionistaEdit') entityType='recepcionista';
     const response = await axios.put(`http://localhost:3000/${entityType}/${id}`, entityData, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
@@ -155,6 +154,13 @@ function getFormData(entityType) {
       const areaEdit = document.getElementById('confirmAreaEdit').textContent;
       const capMaxEdit = Number(getElementValueById('editCapMax'));
       return createSala(nomeSalaEdit, andarEdit, areaEdit, capMaxEdit);
+
+    case 'recepcionistaEdit':
+      const nomeEdit = document.getElementById('confirmNomeEdit').textContent;
+      const sobrenomeEdit = document.getElementById('confirmSobrenomeEdit').textContent;
+      const loginEdit = document.getElementById('confirmLoginEdit').textContent;
+      const nivelAcessoEdit = Number(document.getElementById('editNivelAcesso').value);
+      return createRecepcionista(nomeEdit, sobrenomeEdit, loginEdit, nivelAcessoEdit);
   }
 }
 

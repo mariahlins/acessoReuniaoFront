@@ -809,7 +809,7 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(document, { childList: true, subtree: true });
     };
 
-    if(!localStorage.getItem('token')) {
+    if(!localStorage.getItem('token') && window.location.pathname !== '/') {
         window.location.href = '/';
     }
 
