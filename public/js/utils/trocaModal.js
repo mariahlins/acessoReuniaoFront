@@ -7,10 +7,21 @@ function formatCPF() {
   cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
   cpfInput.value = cpf;
 }
+function chamaFormataCPF(cpf){
+  return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})$/, '$1.$2.$3-$4');
+}
 
 function removerPontosCPF(cpf){
   cpf = cpf.replace(/\D/g, '');
   return cpf;
+}
+
+function formatarDataBr(dataEUA){
+  const data = new Date(dataEUA);
+  const dia=data.getDate().toString().padStart(2, '0');
+  const mes=(data.getMonth() + 1).toString().padStart(2, '0'); 
+  const ano=data.getFullYear();
+  return `${dia}/${mes}/${ano}`;
 }
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -224,8 +235,8 @@ function fillConfirmationUsuario(response, modalId, currentStep) {
   nextStep(modalId, currentStep);
   //Caso tenha
   //São imutaveis
-  setElementTextContentById('confirmCPFWithCpf', response.identificador);
-  setElementTextContentById('confirmDataNascimentoWithCpf', response.dataNascimento);
+  setElementTextContentById('confirmCPFWithCpf', chamaFormataCPF(response.identificador));
+  setElementTextContentById('confirmDataNascimentoWithCpf', formatarDataBr(response.dataNascimento));
   setElementTextContentById('confirmNomeWithCpf', capitalizeFirstLetter(response.nome)+" "+capitalizeFirstLetter(response.sobrenome));
   //Pode atualizar
   setElementInputValueById('emailWithCpf', response.email);

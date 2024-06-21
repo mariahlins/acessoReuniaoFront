@@ -19,6 +19,7 @@ function ocultarDocumento(documento) {
 function setId(id){
     localStorage.setItem('id', id);
 }
+
 function parseDate(dataReservada) {
     const [day, month, year] = dataReservada.split('/');
     return new Date(year, month - 1, day);
@@ -32,6 +33,7 @@ function ehHoje(dataReserva) {
         dataReserva.getFullYear() === dataAtual.getFullYear()
     );
 }
+
 function converterAndar(andar) {
     switch (andar) {
         case 0: return 'Térreo';
@@ -242,7 +244,7 @@ class Controller{
                         item.email
                     ],
                     (item) => {
-                        return { texto: '...', funcao: 'editarUsuario'};
+                        return { texto: 'Editar', funcao: 'editarUsuario'};
                     },
                     (item) => {
                         return { texto: 'Excluir', funcao: 'excluirUsuario' };
