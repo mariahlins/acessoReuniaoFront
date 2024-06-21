@@ -1,27 +1,35 @@
 $(function() {
-    function loadPageComponents(title){
+    function loadPageComponents(title) {
         const pagina = window.location.pathname.split("/").pop();
+
         // Importa o conteúdo do cabeçalho
         $.get("/public/components/cabecalho/cabecalho.html", function(cabecalhoContent) {
             $("main").prepend(cabecalhoContent); 
-            //atualiza referenciando o id no titulo
+            // Atualiza referenciando o id no título
             $("#main-title").text(title);
-            // Importa o conteúdo do cabeçalho específico para a página
+
+            // Importa o conteúdo específico para cada página
             switch (pagina) {
                 case "salasUniversal.html":
                     $.get("/public/components/botoes/modalCadastrarSala.html", function(modalCadastroSalaContent) {
                         $("main").append(modalCadastroSalaContent);
-                        loadModalsAndBody(pagina);
+                        $.get("/public/components/botoes/modalEditarSala.html", function(modalEditarSalaContent) {
+                            $("main").append(modalEditarSalaContent);
+                            loadModalsAndBody(pagina);
+                        });
                     });
                     break;
                 case "usuariosUniversal.html":
-                    $.get("/public/components/botoes/botoaListaNegra.html", function(universalContent) {
+                    $.get("/public/components/botoes/botaoListaNegra.html", function(universalContent) {
                         $("main").append(universalContent);
-                        loadModalsAndBody(pagina);
+                        $.get("/public/components/botoes/modalEditarUsuario.html", function(modalEditarUsuarioContent) {
+                            $("main").append(modalEditarUsuarioContent);
+                            loadModalsAndBody(pagina);
+                        });
                     });
                     break;
                 case "listaNegra.html":
-                    $.get("/public/components/botoes/botoaUsuario.html", function(universalContent) {
+                    $.get("/public/components/botoes/botaoUsuario.html", function(universalContent) {
                         $("main").append(universalContent);
                         loadModalsAndBody(pagina);
                     });
@@ -29,7 +37,10 @@ $(function() {
                 case "recepcionista.html":
                     $.get("/public/components/botoes/modalCadastrarRecepcionista.html", function(modalCadastroRecepcionistaContent) {
                         $("main").append(modalCadastroRecepcionistaContent);
-                        loadModalsAndBody(pagina);
+                        $.get("/public/components/botoes/modalEditarRecepcionista.html", function(modalEditarRecepcionistaContent) {
+                            $("main").append(modalEditarRecepcionistaContent);
+                            loadModalsAndBody(pagina);
+                        });
                     });
                     break;
                 default:
@@ -88,5 +99,6 @@ $(function() {
             });
         });
     }
-   loadPageComponents(window.pageTitle);
+
+    loadPageComponents(window.pageTitle);
 });

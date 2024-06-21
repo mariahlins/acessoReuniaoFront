@@ -416,3 +416,40 @@ dt{
     margin-right: 12vh;
     color: #00047E;
 }
+
+.custom-modal-size {
+    max-width: 600px;
+}
+.custom-modal-body {
+    padding: 2rem;
+}
+.custom-input {
+    margin-bottom: 1rem;
+}
+.btn-invisible {
+    visibility: hidden;
+}
+.steps-container {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 1rem;
+}
+.step-indicator {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    line-height: 2rem;
+    border-radius: 50%;
+    background-color: #ccc;
+    color: #fff;
+    text-align: center;
+}
+.step-indicator.active {
+    background-color: #007bff;
+}
+.step {
+    display: none;
+}
+.step.active {
+    display: block;
+}

@@ -1,4 +1,4 @@
-// Utilidades
+// Utilidades 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
@@ -46,8 +46,10 @@ function createRecepcionista(nome, sobrenome, login, senha, nivelAcesso) {
 // Gestão do modal
 function updateModalContent(modalId, step) {
   const currentStep = document.querySelector(`#${modalId} #step${step}`);
+  if (!currentStep) return;
   const newHeader = currentStep.getAttribute('data-header');
   document.querySelector(`#${modalId} .modal-title`).textContent = newHeader;
+
 }
 
 function nextStep(modalId, currentStep) {
@@ -81,19 +83,13 @@ function finish(modalId) {
 async function createEntity(entityType, stepAtual) {
   try {
     const entityData = getFormData(entityType);
-    console.log(entityData);
-
     const token = localStorage.getItem('token');
     const response = await axios.post(`http://localhost:3000/${entityType}`, entityData, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-
-    console.log(response.status);
-
     const modalId = `modalCadastrar${capitalizeFirstLetter(entityType)}`;
-    console.log(modalId==='modalCadastrarSala');
     if (response.status === 200) {
-      return nextStep(modalId, stepAtual); // Corrigido para retornar a chamada de nextStep
+      return nextStep(modalId, stepAtual);
     } else {
       throw new Error(`Erro ao criar ${entityType}. Status: ${response.status}`);
     }
@@ -102,17 +98,41 @@ async function createEntity(entityType, stepAtual) {
     alert(`Erro ao criar ${entityType}. Por favor, tente novamente.`);
   }
 }
+/*
+async function updateEntity(entityType, stepAtual) {
+  try {
+    const entityData = getFormData(entityType);
+    console.log(entityData);
 
+    const token = localStorage.getItem('token');
+    const response = await axios.put(`http://localhost:3000/${entityType}`, entityData, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
 
+    console.log(response.status);
+
+    const modalId = `modalEditar${capitalizeFirstLetter(entityType)}`;
+    if (response.status === 200) {
+      return nextStep(modalId, stepAtual); 
+    } else {
+      throw new Error(`Erro ao atualizar ${entityType}. Status: ${response.status}`);
+    }
+  } catch (error) {
+    console.error(`Erro ao atualizar ${entityType}:`, error);
+    alert(`Erro ao atualizar ${entityType}. Por favor, tente novamente.`);
+  }
+}
+*/
 // Get - pegar os dados
 function getFormData(entityType) {
+  const id = Number(document.getElementById('id').value);
   switch(entityType) {
     case 'sala':
       const nomeSala = document.getElementById('confirmNomeSala').textContent;
       const andar = Number(getElementValueById('andar'));
       const area = document.getElementById('confirmArea').textContent;
       const capMax = Number(getElementValueById('capMax'));
-      return createSala(nomeSala, andar, area, capMax);
+      return createSala(id, nomeSala, andar, area, capMax);
     
     case 'recepcionista':
       const nome = document.getElementById('confirmNome').textContent;
@@ -120,7 +140,7 @@ function getFormData(entityType) {
       const login = document.getElementById('confirmLogin').textContent;
       const senha = document.getElementById('senha').value;
       const nivelAcesso = Number(document.getElementById('nivelAcesso').value);
-      return createRecepcionista(nome, sobrenome, login, senha, nivelAcesso);    
+      return createRecepcionista(id,nome, sobrenome, login, senha, nivelAcesso);    
   }
 }
 

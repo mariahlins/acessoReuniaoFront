@@ -235,7 +235,7 @@ class Controller{
                         item.email
                     ],
                     (item) => {
-                        return { texto: 'Editar', funcao: 'editarUsuario' };
+                        return { texto: '...', funcao: 'editarUsuario'};
                     },
                     (item) => {
                         return { texto: 'Excluir', funcao: 'excluirUsuario' };
@@ -273,7 +273,7 @@ class Controller{
                 (item) => {
                     switch (item.situacao) {
                         case 'D':
-                            return { texto: 'Editar', funcao: 'editarSala' };
+                            return { texto: 'Editar', funcao: 'editarSala', modal: 'modal', modalFuncao: '#modalEditarSala', funcao: 'editarSala',};
                         case 'I':
                             return { texto: 'Desinterditar', funcao: 'desinterditarSala' };
                         case 'M':
@@ -370,7 +370,7 @@ class Controller{
                     (item) => {
                         switch (item.ativo) {
                             case true:
-                                return { texto: 'Editar', funcao: 'editarRecepcionista' };
+                                return { texto: 'Editar', funcao: 'editarRecepcionista', modal: 'modal', modalFuncao: '#modalEditarRecepcionista', id: item.id};
                             case false:
                                 return { texto: 'Excluir', funcao: 'excluirRecepcionista' };
                             default:
@@ -499,23 +499,29 @@ class Controller{
         });
         return row;
     }
-    
     static criarBotao(metodo, classes, id) {
         let elemento;
+    
         if (typeof metodo === 'object' && metodo.funcao) {
             const botao = document.createElement('button');
             botao.textContent = metodo.texto;
-            botao.classList.add(...classes.split(' ')); 
+            botao.classList.add(...classes.split(' '));
             botao.addEventListener('click', () => this[metodo.funcao](id));
+            if (metodo.texto === 'Editar') {
+                botao.setAttribute('data-toggle', metodo.modal);
+                botao.setAttribute('data-target', metodo.modalFuncao);
+            }
             elemento = botao;
         } else {
             const elementoPadrao = document.createElement('span');
             elementoPadrao.textContent = metodo.texto;
             elemento = elementoPadrao;
         }
+    
         return elemento;
     }
-        
+    
+     
 
     /* Preencher Tabelas */
 
@@ -719,56 +725,7 @@ class Controller{
                 }
             }
         /*Atualizar*/
-
-        /*Complemento modal */        
-        static async preencherSelectComAPI() {
-            const selectElement = document.getElementById('nivelAcesso'); // Ajuste conforme necessário para pegar o ID correto
-            let data;
-        
-            try {
-                switch (selectElement.id) {
-                    case 'nivelAcesso':
-                        data = await this.listarNivelAcesso();
-                        break;
-                    case 'salas':
-                        data = await this.listarSalas();
-                        break;
-                    case 'horarioLivre':
-                        data = await this.listarHorarioLivre();
-                        break;
-                    default:
-                        throw new Error('ID do elemento select não suportado');
-                }
-        
-                data.forEach(item => {
-                    const option = document.createElement('option');
-                    switch (selectElement.id) {
-                        case 'nivelAcesso':
-                            option.value = item.id;
-                            option.textContent = item.glossarioNivel;
-                            break;
-                        case 'salas':
-                            option.value = item.id;
-                            option.textContent = `${item.nome} - ${converterAndar(item.andar)}`;
-                            break;
-                        case 'horarioLivre':
-                            option.value = item.horarioLivre;
-                            option.textContent = item.horarioLivre;
-                            break;
-                        default:
-                            throw new Error('ID do elemento select não suportado');
-                    }
-                    selectElement.appendChild(option);
-                });
-            } catch (error) {
-                console.error('Erro ao buscar dados da API:', error);
-            }
-        }
-        
-        /*Complemento modal */
-
-}
-
+} 
 document.addEventListener('DOMContentLoaded', () => {
     const observeElement = (elementId, callback) => {
         const observer = new MutationObserver((_, observer) => {
@@ -793,6 +750,9 @@ document.addEventListener('DOMContentLoaded', () => {
         Controller.preencherSelectComAPI();
     });
 
+    observeElement('formEditarRecepcionista',()=>{
+        Controller.preencherInputSala(idSala);
+    });
     observeElement('after-login-home', () => {
         const pesquisaFiltro = document.getElementById('pesquisa-filtro');
         if (pesquisaFiltro) {
