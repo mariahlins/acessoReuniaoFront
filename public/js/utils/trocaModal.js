@@ -1,4 +1,7 @@
 // Utilidades 
+
+let cpfExists=false;
+
 function formatCPF() {
   let cpf = cpfInput.value;
   cpf = cpf.replace(/\D/g, '');
@@ -75,14 +78,31 @@ function updateModalContent(modalId, step) {
 function nextStep(modalId, currentStep) {
   const modalElement = document.getElementById(modalId);
   modalElement.querySelector(`#step${currentStep}`).classList.remove('active');
-  modalElement.querySelector(`#step${currentStep + 1}`).classList.add('active');
+
+  let nextStepNumber = currentStep+1;
+
+  if(currentStep == 1 && cpfExists){
+    nextStepNumber=2;
+  }else if(currentStep==1 && !cpfExists){
+    nextStepNumber=3;
+  }
+
+  if(currentStep==2 && cpfExists){
+    nextStepNumber=4;
+  }
+
+  modalElement.querySelector(`#step${nextStepNumber}`).classList.add('active');
   updateModalContent(modalId, currentStep + 1);
 }
 
 function prevStep(modalId, currentStep) {
   const modalElement = document.getElementById(modalId);
   modalElement.querySelector(`#step${currentStep}`).classList.remove('active');
-  modalElement.querySelector(`#step${currentStep - 1}`).classList.add('active');
+  let prevStep = currentStep - 1;
+  if (currentStep === 2 || currentStep === 3) {
+    prevStep = 1;
+  }
+  modalElement.querySelector(`#step${prevStep}`).classList.add('active');
   updateModalContent(modalId, currentStep - 1);
 }
 
@@ -262,8 +282,13 @@ async function usuarioExiste(modalId, currentStep) {
     console.error(`Erro ao consultar usuário ${modalId}:`, error);
     alert(`Erro ao consultar usuário ${modalId}. Por favor, tente novamente.`);
   }
-  if (response) fillConfirmationUsuario(response, modalId, currentStep);
-  else criarUsuario(entityData, modalId, 2);
+  if (response) {
+    cpfExists = true;
+    fillConfirmationUsuario(response, modalId, currentStep);
+  } else {
+    cpfExists = false;
+    criarUsuario(entityData, modalId, 1);
+  }
 }
 
 
