@@ -242,7 +242,7 @@ class Controller{
                         item.email
                     ],
                     (item) => {
-                        return { texto: '...', funcao: 'editarUsuario'};
+                        return { texto: 'Editar', funcao: 'editarUsuario'};
                     },
                     (item) => {
                         return { texto: 'Excluir', funcao: 'excluirUsuario' };
@@ -253,10 +253,10 @@ class Controller{
                 throw error;
             }
         }
-
+        
         static async mostrarSalas() {
+            const salas = await this.listarSalas();
             try {
-                const salas = await this.listarSalas();
                 const tableBody = document.getElementById('after-login-salas');
                 this.preencherTabela(salas, tableBody, (item) => [
                     item.nome,

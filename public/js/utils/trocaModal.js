@@ -1,4 +1,5 @@
 // Utilidades 
+//Formatar para inputs (formatação em tempo real)
 function formatCPF() {
   let cpf = cpfInput.value;
   cpf = cpf.replace(/\D/g, '');
@@ -7,12 +8,36 @@ function formatCPF() {
   cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
   cpfInput.value = cpf;
 }
-
-function removerPontosCPF(cpf){
-  cpf = cpf.replace(/\D/g, '');
-  return cpf;
+function formatNumTel() {
+  let numTel = numTelInput.value;
+  numTel = numTel.replace(/\D/g, '');
+  numTel = numTel.replace(/(\d{2})(\d)/, '($1) $2'); 
+  numTel = numTel.replace(/(\d{5})(\d{4})/, '$1-$2');
+  return numTelInput.value = numTel;
 }
-function capitalizeFirstLetter(string) {
+
+//Formatar para campos de textos
+function converterNumTel(numTel){
+  return numTel.replace(/\D/g, '').replace(/(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+}
+
+function converterCPF(cpf){
+  return cpf.replace(/\D/g, '').replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})$/, '$1.$2.$3-$4');
+}
+
+function converterData(dataEUA){
+  const data = new Date(dataEUA);
+  const dia=data.getDate().toString().padStart(2, '0');
+  const mes=(data.getMonth() + 1).toString().padStart(2, '0'); 
+  const ano=data.getFullYear();
+  return `${dia}/${mes}/${ano}`;
+}
+
+function removerPontos(data){
+  return data.replace(/\D/g, '');
+}
+
+function converterPrimeiraLetraMaiuscula(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
@@ -27,6 +52,15 @@ function converterAndar(andar) {
   }
 }
 
+function converterDateType(args) {
+  let dataFormat = {};
+  Object.keys(args).forEach(key => {
+    dataFormat[key] = args[key];
+  });
+  return dataFormat;
+}
+//Formatar para campos de textos
+//GETs
 function getElementValueById(id) {
   return document.getElementById(id).value;
 }
@@ -34,7 +68,8 @@ function getElementValueById(id) {
 function getId(){
   return Number(localStorage.getItem('id'));
 }
-
+//GETs
+//SETs
 function setElementTextContentById(id, text) {
   document.getElementById(id).textContent = text;
 }
@@ -42,15 +77,7 @@ function setElementTextContentById(id, text) {
 function setElementInputValueById(id, value) {
   document.getElementById(id).value=value;
 }
-
-// Função de formartar para data
-function create(args) {
-  let dataFormat = {};
-  Object.keys(args).forEach(key => {
-    dataFormat[key] = args[key];
-  });
-  return dataFormat;
-}
+//SETs
 
 // Gestão do modal
 function updateModalContent(modalId, step) {
@@ -87,16 +114,17 @@ function finish(modalId) {
   resetModal(modalId);
   window.location.reload();
 }
+//Gestão de modal
 
 // CRUD
-async function createEntity(entityType, stepAtual) {
+async function creatEntity(entityType, stepAtual) {
   try {
     const entityData = getFormData(entityType);
     const token = localStorage.getItem('token');
     const response = await axios.post(`http://localhost:3000/${entityType}`, entityData, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    const modalId = `modalCadastrar${capitalizeFirstLetter(entityType)}`;
+    const modalId = `modalCadastrar${converterPrimeiraLetraMaiuscula(entityType)}`;
     if (response.status === 200) {
       return nextStep(modalId, stepAtual);
     } else {
@@ -119,7 +147,7 @@ async function updateEntity(entityType, stepAtual) {
     const response = await axios.put(`http://localhost:3000/${entityType}/${id}`, entityData, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    const modalId = `modalEditar${capitalizeFirstLetter(entityType)}`;
+    const modalId = `modalEditar${converterPrimeiraLetraMaiuscula(entityType)}`;
     if (response.status === 200) {
       return nextStep(modalId, stepAtual); 
     } else {
@@ -140,7 +168,7 @@ function getFormData(entityType) {
       const andar = Number(getElementValueById('andar'));
       const area = document.getElementById('confirmArea').textContent;
       const capMax = Number(getElementValueById('capMax'));
-      return create({nomeSala, andar, area, capMax});
+      return converterDateType({nomeSala, andar, area, capMax});
     
     case 'recepcionista':
       const nome = document.getElementById('confirmNome').textContent;
@@ -148,26 +176,26 @@ function getFormData(entityType) {
       const login = document.getElementById('confirmLogin').textContent;
       const senha = document.getElementById('senha').value;
       const nivelAcesso = Number(document.getElementById('nivelAcesso').value);
-      return create({nome, sobrenome, login, senha, nivelAcesso});
+      return converterDateType({nome, sobrenome, login, senha, nivelAcesso});
       
     case 'salaEdit':
       const nomeSalaEdit = document.getElementById('confirmNomeSalaEdit').textContent;
       const andarEdit = Number(getElementValueById('editAndar'));
       const areaEdit = document.getElementById('confirmAreaEdit').textContent;
       const capMaxEdit = Number(getElementValueById('editCapMax'));
-      return create({nomeSalaEdit, andarEdit, areaEdit, capMaxEdit});
+      return converterDateType({nomeSalaEdit, andarEdit, areaEdit, capMaxEdit});
 
     case 'recepcionistaEdit':
       const nomeEdit = document.getElementById('confirmNomeEdit').textContent;
       const sobrenomeEdit = document.getElementById('confirmSobrenomeEdit').textContent;
       const loginEdit = document.getElementById('confirmLoginEdit').textContent;
       const nivelAcessoEdit = Number(document.getElementById('editNivelAcesso').value);
-      return create({nomeEdit, sobrenomeEdit, loginEdit, nivelAcessoEdit});
+      return converterDateType({nomeEdit, sobrenomeEdit, loginEdit, nivelAcessoEdit});
     //get inputs
     case 'usuario':
-      const cpf = removerPontosCPF(document.getElementById('cpfWithCpf').value);
+      const cpf = removerPontos(document.getElementById('cpfWithCpf').value);
       const dataNascimento = document.getElementById('dataNascimentoWithCpf').value;
-      return create({cpf, dataNascimento});
+      return converterDateType({cpf, dataNascimento});
   }
 }
 
@@ -175,9 +203,9 @@ function getFormData(entityType) {
 function fillConfirmationSala(modalId, currentStep) {
   nextStep(modalId, currentStep);
 
-  setElementTextContentById('confirmNomeSala', getElementValueById('nomeSala'));
+  setElementTextContentById('confirmNomeSala', converterPrimeiraLetraMaiuscula(getElementValueById('nomeSala')));
   setElementTextContentById('confirmAndar', converterAndar(Number(getElementValueById('andar'))));
-  setElementTextContentById('confirmArea', getElementValueById('area'));
+  setElementTextContentById('confirmArea', converterPrimeiraLetraMaiuscula(getElementValueById('area')));
   setElementTextContentById('confirmCapMax', getElementValueById('capMax'));
 }
 
@@ -185,21 +213,20 @@ function fillConfirmationSala(modalId, currentStep) {
 function fillConfirmationRecepcionista(modalId, currentStep) {
   nextStep(modalId, currentStep);
 
-  setElementTextContentById('confirmNome',capitalizeFirstLetter(getElementValueById('nome')));
-  setElementTextContentById('confirmSobrenome', capitalizeFirstLetter(getElementValueById('sobrenome')));
+  setElementTextContentById('confirmNome',converterPrimeiraLetraMaiuscula(getElementValueById('nome')));
+  setElementTextContentById('confirmSobrenome', converterPrimeiraLetraMaiuscula(getElementValueById('sobrenome')));
   setElementTextContentById('confirmLogin', getElementValueById('login'));
   
   // Corrigindo a linha para obter o texto da opção selecionada
   const nivelAcessoElement = document.getElementById('nivelAcesso');
-  const selectedOptionText = nivelAcessoElement.options[nivelAcessoElement.selectedIndex].text;
-  setElementTextContentById('confirmNivelAcesso', capitalizeFirstLetter(selectedOptionText));
+  setElementTextContentById('confirmNivelAcesso', converterPrimeiraLetraMaiuscula(nivelAcessoElement.options[nivelAcessoElement.selectedIndex].text));
 }
 
 //Trazer dados do banco para o modal de edição// modal.js
 function fillConfirmationSalaEdit(modalId, currentStep) {
   nextStep(modalId, currentStep);
 
-  setElementTextContentById('confirmNomeSalaEdit',capitalizeFirstLetter(getElementValueById('editNomeSala')));
+  setElementTextContentById('confirmNomeSalaEdit',converterPrimeiraLetraMaiuscula(getElementValueById('editNomeSala')));
   setElementTextContentById('confirmAndarEdit',  converterAndar(Number(getElementValueById('editAndar'))));
   setElementTextContentById('confirmAreaEdit', getElementValueById('editArea'));
   setElementTextContentById('confirmCapMaxEdit', getElementValueById('editCapMax'));
@@ -209,34 +236,33 @@ function fillConfirmationSalaEdit(modalId, currentStep) {
 function fillConfirmationRecepcionistaEdit(modalId, currentStep) {
   nextStep(modalId, currentStep);
 
-  setElementTextContentById('confirmNomeEdit',capitalizeFirstLetter(getElementValueById('editNome')));
-  setElementTextContentById('confirmSobrenomeEdit', capitalizeFirstLetter(getElementValueById('editSobrenome')));
+  setElementTextContentById('confirmNomeEdit',converterPrimeiraLetraMaiuscula(getElementValueById('editNome')));
+  setElementTextContentById('confirmSobrenomeEdit', converterPrimeiraLetraMaiuscula(getElementValueById('editSobrenome')));
   setElementTextContentById('confirmLoginEdit', getElementValueById('editLogin'));
   
   // Corrigindo a linha para obter o texto da opção selecionada
   const nivelAcessoElement = document.getElementById('editNivelAcesso');
-  const selectedOptionText = nivelAcessoElement.options[nivelAcessoElement.selectedIndex].text;
-  setElementTextContentById('confirmNivelAcessoEdit', capitalizeFirstLetter(selectedOptionText));
+  setElementTextContentById('confirmNivelAcessoEdit', converterPrimeiraLetraMaiuscula(nivelAcessoElement.options[nivelAcessoElement.selectedIndex].text));
 }
 
 // Confirmar - para Usuários
 function fillConfirmationUsuario(response, modalId, currentStep) {
   nextStep(modalId, currentStep);
-  //Caso tenha
   //São imutaveis
-  setElementTextContentById('confirmCPFWithCpf', response.identificador);
-  setElementTextContentById('confirmDataNascimentoWithCpf', response.dataNascimento);
-  setElementTextContentById('confirmNomeWithCpf', capitalizeFirstLetter(response.nome)+" "+capitalizeFirstLetter(response.sobrenome));
+  setElementTextContentById('confirmCPFWithCpf', converterCPF(response.identificador));
+  setElementTextContentById('confirmDataNascimentoWithCpf', converterData(response.dataNascimento));
+  setElementTextContentById('confirmNomeWithCpf', converterPrimeiraLetraMaiuscula(response.nome)+" "+converterPrimeiraLetraMaiuscula(response.sobrenome));
   //Pode atualizar
   setElementInputValueById('emailWithCpf', response.email);
-  setElementInputValueById('telefoneWithCpf', response.numTelefone);
+  setElementInputValueById('telefoneWithCpf', converterNumTel(response.numTelefone));
 }
-//Cria Usuario
+//Post
 function criarUsuario(entityData, modalId, currentStep) {
   nextStep(modalId, currentStep);
-  setElementTextContentById('confirmCPFWithCpfCreat', entityData.cpf);
-  setElementTextContentById('confirmDataNascimentoWithCpfCreat', entityData.dataNascimento);
+  setElementTextContentById('confirmCPFWithCpfCreat', converterCPF(entityData.cpf));
+  setElementTextContentById('confirmDataNascimentoWithCpfCreat', converterData(entityData.dataNascimento));
 }
+
 //Trazer dados do banco para o modal de criacao ou edição de usuario
 async function usuarioExiste(modalId, currentStep) {
   const entityData = getFormData('usuario'); 
