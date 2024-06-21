@@ -71,6 +71,22 @@ function formataAtivo(ativo){
 function setElementInputValueById(id, value) {
     document.getElementById(id).value=value;
 }
+//...data permite que haja uma flexibilizaçã na quantidade de argumentos
+function vetorizacao(...args) {
+    const data = args[0]; 
+    const qtnTela = args[1] || 6;
+    const vetor = [];
+
+    for (let i = 0; i < data.length; i += qtnTela) {
+        const chunk = data.slice(i, i + qtnTela);
+        vetor.push(chunk);
+    }
+    const numeroPaginas = vetor.length;
+    localStorage.setItem('numeroPaginas', numeroPaginas);
+    return vetor;
+}
+
+
 
 //...data permite que haja uma flexibilizaçã na quantidade de argumentos
 function vetorizacao(...args) {
@@ -135,6 +151,13 @@ class Controller{
             }
 
     /*Acesso */
+
+    /*Formatação de listagem*/
+        static async formatarListagem(dataEntity){
+            const listaFormatada = vetorizacao(dataEntity);
+            return listaFormatada;
+        }
+    /*Formatação de listagem*/
     
     /* Pegar todos */
 
@@ -193,6 +216,18 @@ class Controller{
         }
         
         
+            static async listarReservasHoje(){
+                try{
+                    return reservas.filter((reserva) => {
+                        const dataReserva = parseDate(reserva.dataReservada);
+                        return ehHoje(dataReserva);
+                    });
+                }catch(error){
+                    console.error('Erro ao listar reservas de hoje:', error);
+                    throw error;
+                }
+            }
+            
     /* Pegar todos */
         
     /* consular por ID*/
@@ -244,11 +279,15 @@ class Controller{
     /* consular por ID*/
         
     /*Mostrar */
+        // lembrar de trocar [0] por localStorage.get('idPaginagem')
         static async mostrarUsuarios() {
-            const usuarios = await this.listarUsuarios();
-            const tableBody = document.getElementById('after-login-usuarios');
+            const response = await this.listarUsuarios();
+            const usuarios = await this.formatarListagem(response);
+            localStorage.setItem('usuario', entidade);
+
             try {
-                this.preencherTabela(usuarios, tableBody, 
+                const tableBody = document.getElementById('after-login-usuarios');
+                this.preencherTabela(usuarios[0], tableBody, 
                     (item) => [
                         `${item.nome} ${item.sobrenome}`,
                         ocultarDocumento(item.identificador),
@@ -267,12 +306,13 @@ class Controller{
                 throw error;
             }
         }
-
+        // lembrar de trocar [0] por localStorage.get('idPaginagem')
         static async mostrarSalas() {
-            const salas = await this.listarSalas();
-            const tableBody = document.getElementById('after-login-salas');
+            const response = await this.listarSalas();
+            const salas = await this.formatarListagem(response);
             try {
-                    this.preencherTabela(salas, tableBody, (item) => [
+                const tableBody = document.getElementById('after-login-salas');
+                this.preencherTabela(salas[0], tableBody, (item) => [
                     item.nome,
                     converterAndar(item.andar),
                     converterStatusSala(item.situacao),
@@ -310,11 +350,13 @@ class Controller{
             }
         }
 
+        // lembrar de trocar [0] por localStorage.get('idPaginagem')
         static async mostrarReuniao() {
-            const reunioes = await this.listarReuniao();
-            const tableBody = document.getElementById('reuniao');
+            const response = await this.listarReuniao();
+            const reunioes = await this.formatarListagem(response);
             try {
-                this.preencherTabela(reunioes, tableBody, (item) => [
+                const tableBody = document.getElementById('reuniao');
+                this.preencherTabela(reunioes[0], tableBody, (item) => [
                     item.nome,
                     item.data,
                     item.horaInicio,
@@ -326,11 +368,13 @@ class Controller{
             }
         }
 
+        // lembrar de trocar [0] por localStorage.get('idPaginagem')
         static async mostrarNivelAcesso() {
-            const nivelAcesso = await this.listarNivelAcesso();
-            const tableBody = document.getElementById('after-login-nivelAcesso');
+            const response = await this.listarNivelAcesso();
+            const nivelAcesso = await this.formatarListagem(response);
             try {
-                this.preencherTabela(nivelAcesso, tableBody, (item) => [
+                const tableBody = document.getElementById('after-login-nivelAcesso');
+                this.preencherTabela(nivelAcesso[0], tableBody, (item) => [
                     item.id,
                     item.nivelAcesso,
                     item.glossarioNivel,
@@ -365,11 +409,14 @@ class Controller{
             }
         }
 
+        // lembrar de trocar [0] por localStorage.get('idPaginagem')
         static async mostrarRecepcionista() {
-            const recepcionistas = await this.listarRecepcionista();
-            const tableBody = document.getElementById('after-login-recepcionista');
+            const response = await this.listarRecepcionista();
+            const recepcionistas = await this.formatarListagem(response);
             try {
-                this.preencherTabela(recepcionistas, tableBody, 
+                const tableBody = document.getElementById('after-login-recepcionista');
+                
+                this.preencherTabela(recepcionistas[0], tableBody, 
                     (item) => [
                         item.id,
                         `${item.nome} ${item.sobrenome}`,
@@ -403,12 +450,13 @@ class Controller{
                 throw error;
             }
         }
-
+        // lembrar de trocar [0] por localStorage.get('idPaginagem')
         static async mostrarListaNegra(){
-            const listaNegra = await this.listarListaNegra();
-            const listaNegraComDetalhes = await this.listaNegraComDetalhes(listaNegra);
-            const tableBody = document.getElementById('after-login-listaNegra');
             try{
+                const listaNegra = await this.listarListaNegra();
+                const listaNegraFormatada = await this.formatarListagem(listaNegra);
+                const listaNegraComDetalhes = await this.listaNegraComDetalhes(listaNegraFormatada[0]);
+                const tableBody = document.getElementById('after-login-listaNegra');
                 this.preencherTabela(listaNegraComDetalhes, tableBody, (item) => [
                     item.codBloqueio,
                     `${item.reservista.nome} ${item.reservista.sobrenome}`,
@@ -432,21 +480,24 @@ class Controller{
         }
 
         static async mostrarTodasReservas(){
-            return this.mostrarReservas(await this.listarReservas());
+            const response = await this.listarReservas();
+            const formatacao = await this.formatarListagem(response);
+            return this.mostrarReservas(formatacao);
         }
         
         static async mostrarReservasHoje(){
-            return this.mostrarReservas(await this.listarReservasHoje());
+            const response= await this.listarReservasHoje();
+            const formatacao = await this.formatarListagem(response, 2);
+            return this.mostrarReservas(formatacao);
         }
 
         static async mostrarReservas(reservas) {
-            const reservasComDetalhes = await this.reservaComDetalhes(reservas);
-            const tabela = document.getElementById('reservas-tabela');
             try {
-                this.preencherTabela(
-                    reservasComDetalhes,
-                    tabela,
-                    (item) => [
+                // req = reservas[0]
+                const req=reservas[localStorage.getElementById('indexPaginacao')];
+                const reservasComDetalhes= await this.reservaComDetalhes(req);
+                const tabela = document.getElementById('reservas-tabela');
+                this.preencherTabela(reservasComDetalhes, tabela, (item) => [
                         item.sala.nome,
                         `${item.usuario.nome} ${item.usuario.sobrenome}`,  // Corrigido para pegar nome e sobrenome
                         ocultarDocumento(item.usuario.identificador),
@@ -500,11 +551,13 @@ class Controller{
                     acoesCell.appendChild(buttonPrimario);
                 }
                 if (metodoDois(item).texto) {
+                    //Object.key({nomeVar}[0])
                     const buttonSecundario = this.criarBotao(metodoDois(item), 'btn btn-cancelar bg-cinza peso-500 fc-branco', item.id);
                     acoesCell.appendChild(buttonSecundario);
                 }
                 linha.appendChild(acoesCell);
                 tableBody.appendChild(linha);
+
             });
         } catch (error) {
             console.error(`Erro ao preencher tabela:`, error);
@@ -523,8 +576,8 @@ class Controller{
 
     static criarBotao(metodo, classes, id) {
         let elemento;
-    
-        if (typeof metodo==='object' && metodo.funcao) {
+    //metodo = {texto: index, funcao: 'funcao no code recarregar a pagina e atualizar o id no local store'}, page-item disabled, index
+        if (typeof metodo === 'object' && metodo.funcao) {
             const botao = document.createElement('button');
             botao.textContent = metodo.texto;
             botao.classList.add(...classes.split(' '));
