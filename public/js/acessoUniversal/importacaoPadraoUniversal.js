@@ -11,9 +11,9 @@ $(function() {
             // Importa o conteúdo específico para cada página
             switch (pagina) {
                 case "salasUniversal.html":
-                    $.get("/public/components/botoes/modalCadastrarSala.html", function(modalCadastroSalaContent) {
+                    $.get("/public/components/modais/modalCadastrarSala.html", function(modalCadastroSalaContent) {
                         $("main").append(modalCadastroSalaContent);
-                        $.get("/public/components/botoes/modalEditarSala.html", function(modalEditarSalaContent) {
+                        $.get("/public/components/modais/modalEditarSala.html", function(modalEditarSalaContent) {
                             $("main").append(modalEditarSalaContent);
                             loadModalsAndBody(pagina);
                         });
@@ -22,7 +22,7 @@ $(function() {
                 case "usuariosUniversal.html":
                     $.get("/public/components/botoes/botaoListaNegra.html", function(universalContent) {
                         $("main").append(universalContent);
-                        $.get("/public/components/botoes/modalEditarUsuario.html", function(modalEditarUsuarioContent) {
+                        $.get("/public/components/modais/modalEditarUsuario.html", function(modalEditarUsuarioContent) {
                             $("main").append(modalEditarUsuarioContent);
                             loadModalsAndBody(pagina);
                         });
@@ -35,9 +35,9 @@ $(function() {
                     });
                     break;
                 case "recepcionista.html":
-                    $.get("/public/components/botoes/modalCadastrarRecepcionista.html", function(modalCadastroRecepcionistaContent) {
+                    $.get("/public/components/modais/modalCadastrarRecepcionista.html", function(modalCadastroRecepcionistaContent) {
                         $("main").append(modalCadastroRecepcionistaContent);
-                        $.get("/public/components/botoes/modalEditarRecepcionista.html", function(modalEditarRecepcionistaContent) {
+                        $.get("/public/components/modais/modalEditarRecepcionista.html", function(modalEditarRecepcionistaContent) {
                             $("main").append(modalEditarRecepcionistaContent);
                             loadModalsAndBody(pagina);
                         });
@@ -52,10 +52,10 @@ $(function() {
 
     function loadModalsAndBody(pagina) {
         // Importa o conteúdo do modal do CPF
-        $.get("/public/components/botoes/modalcpf.html", function(modalcpfContent) {
+        $.get("/public/components/modais/modalcpf.html", function(modalcpfContent) {
             $("main").append(modalcpfContent);
             // Importa o conteúdo do modal para reserva de empresas
-            $.get("/public/components/botoes/modalcnpj.html", function(modalcnpjContent) {
+            $.get("/public/components/modais/modalcnpj.html", function(modalcnpjContent) {
                 $("main").append(modalcnpjContent);
 
                 let url;
@@ -71,9 +71,6 @@ $(function() {
                         break;
                     case "usuariosUniversal.html":
                         url = "/public/components/body/corpoUsuarios.html";
-                        break;
-                    case "cadastroUsuarios.html":
-                        url = "/public/components/body/corpoCadastroUsuarios.html";
                         break;
                     case "listaNegra.html":
                         url = "/public/components/body/corpoListaNegra.html";

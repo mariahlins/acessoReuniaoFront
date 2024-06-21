@@ -8,11 +8,11 @@ $(function() {
             $("#main-title").text(title);
 
             //importa o conteudo do modal do cpf
-            $.get("/public/components/botoes/modalcpf.html", function(modalcpfContent){
+            $.get("/public/components/modais/modalcpf.html", function(modalcpfContent){
                 $("main").append(modalcpfContent);
 
                 //importa o conteudo do modal para reserva de empresas
-                $.get("/public/components/botoes/modalcnpj.html",function(modalcnpjContent){
+                $.get("/public/components/modais/modalcnpj.html",function(modalcnpjContent){
                     $("main").append(modalcnpjContent);
 
                     let url;
