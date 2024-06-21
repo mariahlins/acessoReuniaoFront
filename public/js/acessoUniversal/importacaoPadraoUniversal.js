@@ -29,7 +29,7 @@ $(function() {
                     });
                     break;
                 case "listaNegra.html":
-                    $.get("/public/components/botoes/botaoUsuario.html", function(universalContent) {
+                    $.get("/public/components/botoes/botoaUsuario.html", function(universalContent) {
                         $("main").append(universalContent);
                         loadModalsAndBody(pagina);
                     });
