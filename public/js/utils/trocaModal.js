@@ -1,4 +1,5 @@
 // Utilidades 
+//Formatar para inputs (formatação em tempo real)
 function formatCPF() {
   let cpf = cpfInput.value;
   cpf = cpf.replace(/\D/g, '');
@@ -7,12 +8,36 @@ function formatCPF() {
   cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
   cpfInput.value = cpf;
 }
-
-function removerPontosCPF(cpf){
-  cpf = cpf.replace(/\D/g, '');
-  return cpf;
+function formatNumTel() {
+  let numTel = numTelInput.value;
+  numTel = numTel.replace(/\D/g, '');
+  numTel = numTel.replace(/(\d{2})(\d)/, '($1) $2'); 
+  numTel = numTel.replace(/(\d{5})(\d{4})/, '$1-$2');
+  return numTelInput.value = numTel;
 }
-function capitalizeFirstLetter(string) {
+
+//Formatar para campos de textos
+function converterNumTel(numTel){
+  return numTel.replace(/\D/g, '').replace(/(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+}
+
+function converterCPF(cpf){
+  return cpf.replace(/\D/g, '').replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})$/, '$1.$2.$3-$4');
+}
+
+function converterData(dataEUA){
+  const data = new Date(dataEUA);
+  const dia=data.getDate().toString().padStart(2, '0');
+  const mes=(data.getMonth() + 1).toString().padStart(2, '0'); 
+  const ano=data.getFullYear();
+  return `${dia}/${mes}/${ano}`;
+}
+
+function removerPontos(data){
+  return data.replace(/\D/g, '');
+}
+
+function converterPrimeiraLetraMaiuscula(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
@@ -34,6 +59,7 @@ function converterDateType(args) {
   });
   return dataFormat;
 }
+
 //Formatar para campos de textos
 //GETs
 function getElementValueById(id) {
@@ -243,7 +269,7 @@ function fillConfirmationUsuario(response, modalId, currentStep) {
   //São imutaveis
   setElementTextContentById('confirmCPFWithCpf', response.identificador);
   setElementTextContentById('confirmDataNascimentoWithCpf', response.dataNascimento);
-  setElementTextContentById('confirmNomeWithCpf', capitalizeFirstLetter(response.nome)+" "+capitalizeFirstLetter(response.sobrenome));
+  setElementTextContentById('confirmNomeWithCpf', converterPrimeiraLetraMaiuscula(response.nome)+" "+converterPrimeiraLetraMaiuscula(response.sobrenome));
   //Pode atualizar
   setElementInputValueById('emailWithCpf', response.email);
   setElementInputValueById('telefoneWithCpf', converterNumTel(response.numTelefone));
@@ -267,7 +293,6 @@ async function usuarioExiste(modalId, currentStep) {
     response = req.data;
   } catch (error) {
     console.error(`Erro ao consultar usuário ${modalId}:`, error);
-    alert(`Erro ao consultar usuário ${modalId}. Por favor, tente novamente.`);
   }
   if (response) {
     cpfExists = true;
