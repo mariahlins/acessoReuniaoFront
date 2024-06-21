@@ -1,4 +1,4 @@
-<div class="modal fade" id="modalCadastrarSala" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<div class="modal fade" id="modalEditarSala" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered custom-modal-size" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -9,28 +9,29 @@
             </div>
 
             <div class="modal-body custom-modal-body">
-                <div class="step active" id="step1" data-header="Informações da Sala">
-                    <input type="text" id="nomeSala" class="form-control mb-2 custom-input" placeholder="Nome da sala">
-                    <input type="number" id="andar" class="form-control mb-2 custom-input" placeholder="Andar">
-                    <input type="text" id="area" class="form-control mb-2 custom-input" placeholder="Área">
-                    <input type="number" id="capMax" class="form-control mb-2 custom-input" placeholder="Capacidade máxima">
+                <div class="step active" id="step1" data-header="Informações da Sala" data-id="1">
+                    <input type="text" id="editNomeSala" class="form-control mb-2 custom-input" placeholder="Nome da sala">
+                    <input type="number" id="editAndar" class="form-control mb-2 custom-input" placeholder="Andar">
+                    <input type="text" id="editArea" class="form-control mb-2 custom-input" placeholder="Área">
+                    <input type="number" id="editCapMax" class="form-control mb-2 custom-input" placeholder="Capacidade máxima">
                     <div class="d-flex justify-content-between">
-                        <button class="btn btn-invisible"></button>
-                        <button type="button" class="btn btn-secondary" onclick="fillConfirmationSala('modalCadastrarSala', 1)">Confirmar</button>
+                      <button class="btn btn-invisible"></button>
+                      <button type="button" class="btn btn-secondary" onclick="fillConfirmationSalaEdit('modalEditarSala', 1)">Confirmar</button>
                     </div>
-                </div>
+                  </div>
 
                 <div class="step" id="step2" data-header="Confirmação">
                     <h4 class="mx-auto text-center">As informações estão corretas?</h4>
                     <div class="confirm-info">
-                        <p>Nome da sala: <strong><span id="confirmNomeSala"></span></strong></p>
-                        <p>Andar: <strong><span id="confirmAndar"></span></strong></p>
-                        <p>Área: <strong><span id="confirmArea"></span></strong></p>
-                        <p>Capacidade Máxima: <strong><span id="confirmCapMax"></span></strong></p>
+
+                        <p>Nome da sala: <strong><span id="confirmNomeSalaEdit"></span></strong></p>
+                        <p>Andar: <strong><span id="confirmAndarEdit"></span></strong></p>
+                        <p>Área: <strong><span id="confirmAreaEdit"></span></strong></p>
+                        <p>Capacidade Máxima: <strong><span id="confirmCapMaxEdit"></span></strong></p>
                     </div>
                     <div class="modal-footer-custom d-flex justify-content-between">
-                        <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalCadastrarSala', 2)">Voltar</button>
-                        <button type="button" class="btn btn-secondary" onclick="createEntity('sala', 2)">Cadastrar</button>
+                        <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalEditarSala', 2)">Voltar</button>
+                        <button type="button" class="btn btn-secondary" onclick="updateEntity('salaEdit', 2)">Atualizar</button>
                     </div>
                 </div>
 
@@ -42,11 +43,12 @@
                     </svg>
                     <p class="subTitulo2 mx-auto text-center">A sala já pode ser visualizada na lista de salas.</p>
                     <div class="modal-footer-custom d-flex justify-content-center">
-                        <button type="button" class="btn btn-final2" onclick="prevStep('modalCadastrarSala', 3)">Cadastrar outra sala</button>
-                        <button type="button" class="btn btn-final" onclick="finish('modalCadastrarSala')">Voltar para tela inicial</button>
+                        <button type="button" class="btn btn-final2" onclick="prevStep('modalEditarSala', 3)">Cadastrar outra sala</button>
+                        <button type="button" class="btn btn-final" onclick="finish('modalEditarSala')">Voltar para tela inicial</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<script src="/public/js/utils/trocaModal.js"></script>

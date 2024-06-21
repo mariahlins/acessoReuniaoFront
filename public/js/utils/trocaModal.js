@@ -17,9 +17,15 @@ function converterAndar(andar) {
 function getElementValueById(id) {
   return document.getElementById(id).value;
 }
-
+function getId(){
+  return Number(localStorage.getItem('id'));
+}
 function setElementTextContentById(id, text) {
   document.getElementById(id).textContent = text;
+}
+
+function setElementInputValueById(id, value) {
+  document.getElementById(id).value=value;
 }
 
 // Função Sala
@@ -98,14 +104,16 @@ async function createEntity(entityType, stepAtual) {
     alert(`Erro ao criar ${entityType}. Por favor, tente novamente.`);
   }
 }
-/*
-async function updateEntity(entityType, stepAtual) {
-  try {
+
+async function updateEntity(entityType,stepAtual) {
     const entityData = getFormData(entityType);
     console.log(entityData);
-
+    try {
     const token = localStorage.getItem('token');
-    const response = await axios.put(`http://localhost:3000/${entityType}`, entityData, {
+    let id=getId();
+    if(entityType=='salaEdit') entityType='sala';
+    else if(entityData==='recepcionistaEdit') entityType='recepcionista';
+    const response = await axios.put(`http://localhost:3000/${entityType}/${id}`, entityData, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
 
@@ -122,17 +130,16 @@ async function updateEntity(entityType, stepAtual) {
     alert(`Erro ao atualizar ${entityType}. Por favor, tente novamente.`);
   }
 }
-*/
+
 // Get - pegar os dados
 function getFormData(entityType) {
-  const id = Number(document.getElementById('id').value);
   switch(entityType) {
     case 'sala':
       const nomeSala = document.getElementById('confirmNomeSala').textContent;
       const andar = Number(getElementValueById('andar'));
       const area = document.getElementById('confirmArea').textContent;
       const capMax = Number(getElementValueById('capMax'));
-      return createSala(id, nomeSala, andar, area, capMax);
+      return createSala(nomeSala, andar, area, capMax);
     
     case 'recepcionista':
       const nome = document.getElementById('confirmNome').textContent;
@@ -140,7 +147,14 @@ function getFormData(entityType) {
       const login = document.getElementById('confirmLogin').textContent;
       const senha = document.getElementById('senha').value;
       const nivelAcesso = Number(document.getElementById('nivelAcesso').value);
-      return createRecepcionista(id,nome, sobrenome, login, senha, nivelAcesso);    
+      return createRecepcionista(nome, sobrenome, login, senha, nivelAcesso);
+      
+    case 'salaEdit':
+      const nomeSalaEdit = document.getElementById('confirmNomeSalaEdit').textContent;
+      const andarEdit = Number(getElementValueById('editAndar'));
+      const areaEdit = document.getElementById('confirmAreaEdit').textContent;
+      const capMaxEdit = Number(getElementValueById('editCapMax'));
+      return createSala(nomeSalaEdit, andarEdit, areaEdit, capMaxEdit);
   }
 }
 
@@ -166,4 +180,28 @@ function fillConfirmationRecepcionista(modalId, currentStep) {
   const nivelAcessoElement = document.getElementById('nivelAcesso');
   const selectedOptionText = nivelAcessoElement.options[nivelAcessoElement.selectedIndex].text;
   setElementTextContentById('confirmNivelAcesso', capitalizeFirstLetter(selectedOptionText));
+}
+
+//Trazer dados do banco para o modal de edição// modal.js
+function fillConfirmationSalaEdit(modalId, currentStep) {
+  nextStep(modalId, currentStep);
+
+  setElementTextContentById('confirmNomeSalaEdit',capitalizeFirstLetter(getElementValueById('editNomeSala')));
+  setElementTextContentById('confirmAndarEdit',  converterAndar(Number(getElementValueById('editAndar'))));
+  setElementTextContentById('confirmAreaEdit', getElementValueById('editArea'));
+  setElementTextContentById('confirmCapMaxEdit', getElementValueById('editCapMax'));
+
+}
+
+function fillConfirmationRecepcionistaEdit(modalId, currentStep) {
+  nextStep(modalId, currentStep);
+
+  setElementTextContentById('confirmNomeEdit',capitalizeFirstLetter(getElementValueById('editNome')));
+  setElementTextContentById('confirmSobrenomeEdit', capitalizeFirstLetter(getElementValueById('editSobrenome')));
+  setElementTextContentById('confirmLoginEdit', getElementValueById('editLogin'));
+  
+  // Corrigindo a linha para obter o texto da opção selecionada
+  const nivelAcessoElement = document.getElementById('editNivelAcesso');
+  const selectedOptionText = nivelAcessoElement.options[nivelAcessoElement.selectedIndex].text;
+  setElementTextContentById('confirmNivelAcessoEdit', capitalizeFirstLetter(selectedOptionText));
 }

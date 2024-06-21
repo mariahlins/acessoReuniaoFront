@@ -16,6 +16,9 @@ function ocultarDocumento(documento) {
     return `${inicio}.${meio}-${fim}`;
 }
 
+function setId(id){
+    localStorage.setItem('id', id);
+}
 function parseDate(dataReservada) {
     const [day, month, year] = dataReservada.split('/');
     return new Date(year, month - 1, day);
@@ -66,6 +69,10 @@ function exibirDataAtual(){
 
 function formataAtivo(ativo){
     return ativo?'Ativo':'Inativo';
+}
+
+function setElementInputValueById(id, value) {
+    document.getElementById(id).value=value;
 }
 class Controller{
     /*Acesso */
@@ -273,7 +280,7 @@ class Controller{
                 (item) => {
                     switch (item.situacao) {
                         case 'D':
-                            return { texto: 'Editar', funcao: 'editarSala', modal: 'modal', modalFuncao: '#modalEditarSala', funcao: 'editarSala',};
+                            return { texto: 'Editar', funcao: 'editarSala', modal: 'modal', modalFuncao: '#modalEditarSala',};
                         case 'I':
                             return { texto: 'Desinterditar', funcao: 'desinterditarSala' };
                         case 'M':
@@ -370,7 +377,7 @@ class Controller{
                     (item) => {
                         switch (item.ativo) {
                             case true:
-                                return { texto: 'Editar', funcao: 'editarRecepcionista', modal: 'modal', modalFuncao: '#modalEditarRecepcionista', id: item.id};
+                                return { texto: 'Editar', funcao: 'editarRecepcionista', modal: 'modal', modalFuncao: '#modalEditarRecepcionista'};
                             case false:
                                 return { texto: 'Excluir', funcao: 'excluirRecepcionista' };
                             default:
@@ -506,11 +513,11 @@ class Controller{
             const botao = document.createElement('button');
             botao.textContent = metodo.texto;
             botao.classList.add(...classes.split(' '));
-            botao.addEventListener('click', () => this[metodo.funcao](id));
             if (metodo.texto === 'Editar') {
                 botao.setAttribute('data-toggle', metodo.modal);
                 botao.setAttribute('data-target', metodo.modalFuncao);
             }
+            botao.addEventListener('click', () => this[metodo.funcao](id));
             elemento = botao;
         } else {
             const elementoPadrao = document.createElement('span');
@@ -724,6 +731,70 @@ class Controller{
                     console.error('Erro ao concluir reserva', error);
                 }
             }
+              
+            static async editarSala(id){
+                const entity=await this.obterSala(id);
+                setId(id);  
+                setElementInputValueById('editNomeSala', entity.nome);
+                setElementInputValueById('editAndar', entity.andar);
+                setElementInputValueById('editArea', entity.area);
+                setElementInputValueById('editCapMax', entity.capMax);
+            }
+
+            static async editarRecepcionista(id){
+                const entity=await this.obterRecepcionista(id);
+                setId(id);
+                setElementInputValueById('editNome', entity.nome);
+                setElementInputValueById('editSobrenome', entity.sobrenome);
+                setElementInputValueById('editLogin', entity.login);
+            }
+
+            static async preencherSelectComAPI(entityType){
+                const selectElement = document.getElementById(entityType);
+                let data;
+    
+                try {
+                    switch (entityType) {
+                        case 'nivelAcesso':
+                        case 'editNivelAcesso':
+                            data = await this.listarNivelAcesso();
+                            break;
+                        case 'salas':
+                            data = await this.listarSalas();
+                            break;
+                        case 'horarioLivre':
+                            data = await this.listarHorarioLivre();
+                            break;
+                        default:
+                            throw new Error('ID do elemento select não suportado');
+                    }
+    
+                    data.forEach(item => {
+                        const option = document.createElement('option');
+                        switch (entityType) {
+                            case 'editNivelAcesso':
+                            case 'nivelAcesso':
+                                option.value = item.id;
+                                option.textContent = item.glossarioNivel;
+                                break;
+                            case 'salas':
+                                option.value = item.id;
+                                option.textContent = `${item.nome} - ${converterAndar(item.andar)}`;
+                                break;
+                            case 'horarioLivre':
+                                option.value = item.horarioLivre;
+                                option.textContent = item.horarioLivre;
+                                break;
+                            default:
+                                throw new Error('ID do elemento select não suportado');
+                        }
+                        selectElement.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error('Erro ao buscar dados da API:', error);
+                }
+            }
+
         /*Atualizar*/
 } 
 document.addEventListener('DOMContentLoaded', () => {
@@ -738,6 +809,10 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(document, { childList: true, subtree: true });
     };
 
+    if(!localStorage.getItem('token')) {
+        window.location.href = '/';
+    }
+
     observeElement('login-form', () => {
         Controller.fazerLogin();
     });
@@ -747,12 +822,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     observeElement('nivelAcesso', ()=>{
-        Controller.preencherSelectComAPI();
+        Controller.preencherSelectComAPI('nivelAcesso');
     });
 
-    observeElement('formEditarRecepcionista',()=>{
-        Controller.preencherInputSala(idSala);
+    observeElement('editNivelAcesso', ()=>{
+        Controller.preencherSelectComAPI('editNivelAcesso');
     });
+
     observeElement('after-login-home', () => {
         const pesquisaFiltro = document.getElementById('pesquisa-filtro');
         if (pesquisaFiltro) {
@@ -804,7 +880,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-
     observeElement('reuniao', () => {
         const pesquisaFiltro = document.getElementById('pesquisa-filtro');
         if (pesquisaFiltro) {
