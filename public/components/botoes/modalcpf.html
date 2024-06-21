@@ -8,23 +8,45 @@
         </button>
       </div>
 
-
-      <div class="modal-body custom-modal-body">
-        <div class="step active" id="step1" data-header="Informações da Reserva">
-          <input type="text" id="cpf" class="form-control mb-2 custom-input" placeholder="CPF">
-          <input type="text" id="dataNascimento" class="form-control mb-2 custom-input" placeholder="Data de Nascimento">
-          <input type="text" id="nome" class="form-control mb-2 custom-input" placeholder="Nome">
-          <input type="text" id="email" class="form-control mb-2 custom-input" placeholder="Email">
-          <input type="text" id="telefone" class="form-control mb-2 custom-input" placeholder="Número de telefone">
-          <input type="text" id="motivoDaReuniao" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião">
-          <div class="d-flex justify-content-between">
-            <button class="btn btn-invisible"></button>
-            <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeCoworking', 1)">Continuar</button>
+        <div class="modal-body custom-modal-body">
+          <div class="step active" id="step1" data-header="Informações da Reserva">
+            <input type="text" id="cpfWithCpf" class="form-control mb-2 custom-input" placeholder="CPF" minlength="14" maxlength="14">
+            <input type="date" id="dataNascimentoWithCpf" class="form-control mb-2 custom-input" placeholder="Data de Nascimento">
+            <div class="d-flex justify-content-between">
+              <button class="btn btn-invisible"></button>
+              <button type="button" class="btn btn-secondary" onclick="usuarioExiste('modalDeCoworking', 1)">Continuar</button>
+            </div>
           </div>
         </div>
 
+        <div class="step" id="step2" data-header="Informações da Reserva">
+          <p>CPF: <strong><span id="confirmCPFWithCpf"></span></strong></p>
+          <p>Data de nascimento: <strong><span id="confirmDataNascimentoWithCpf"></span></strong></p>
+          <p>Nome: <strong><span id="confirmNomeWithCpf"></span></strong></p>
+          <input type="text" id="emailWithCpf" class="form-control mb-2 custom-input" placeholder="Email">
+          <input type="text" id="telefoneWithCpf" class="form-control mb-2 custom-input" placeholder="Número de telefone">
+          <input type="text" id="motivoDaReuniaoWithCpfNew" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião">
+          <div class="d-flex justify-content-between">
+            <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 2)">Voltar</button>
+            <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeCoworking', 3)">Continuar</button>
+          </div>
+        </div>
 
-        <div class="step" id="step2" data-header="Consulta de Horários">
+        <div class="step" id="step3" data-header="Informações da Reserva">
+          <p>CPF: <strong><span id="confirmCPFWithCpfCreat"></span></strong></p>
+          <p>Data de nascimento: <strong><span id="confirmDataNascimentoWithCpfCreat"></span></strong></p>
+          <input type="text" id="nomeWithCpfCreat" class="form-control mb-2 custom-input" placeholder="Nome">
+          <input type="text" id="sobrenomeWithCpfCreat" class="form-control mb-2 custom-input" placeholder="Sobrenome">
+          <input type="text" id="emailWithCpf" class="form-control mb-2 custom-input" placeholder="Email">
+          <input type="text" id="telefoneWithCpf" class="form-control mb-2 custom-input" placeholder="Número de telefone">
+          <input type="text" id="motivoDaReuniaoWithCpfCreat" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião">
+          <div class="d-flex justify-content-between">
+            <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 2)">Voltar</button>
+            <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeCoworking', 3)">Continuar</button>
+          </div>
+        </div>
+
+        <div class="step" id="step4" data-header="Consulta de Horários">
           <div class="h6-container">
             <div class="h6-item">
               <h6>Selecione uma sala:</h6>
@@ -53,13 +75,13 @@
             </div>
           </div>
           <div class="modal-footer-custom d-flex justify-content-between">
-            <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 2)">Voltar</button>
-            <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeCoworking', 2)">Continuar</button>
+            <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 3)">Voltar</button>
+            <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeCoworking', 3)">Continuar</button>
           </div>
         </div>
 
 
-        <div class="step" id="step3" data-header="">
+        <div class="step" id="step4" data-header="">
           <h4 class="confirma mx-auto text-center">A reserva está correta?</h4>
           <p class="mx-auto text-center">Informações da reserva e horários selecionados.</p>
           <div class="d-flex justify-content-space-between mx-auto ml-2">
@@ -79,13 +101,13 @@
             </div>
           </div>
           <div class="modal-footer-custom d-flex justify-content-between">
-            <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 3)">Voltar</button>
-            <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeCoworking', 3)">Confirmar</button>
+            <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 4)">Voltar</button>
+            <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeCoworking', 4)">Confirmar</button>
           </div>
         </div>
 
 
-        <div class="step" id="step4" data-header="">
+        <div class="step" id="step5" data-header="">
           <h4 class="tsucesso mx-auto text-center mt-4">Sala reservada com sucesso!</h4>
           <svg xmlns="http://www.w3.org/2000/svg" width="7rem" height="7rem" fill="#3D9200" class="bi bi-check2-circle mx-auto d-block mt-4" viewBox="0 0 16 16">
             <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0"/>
@@ -94,7 +116,7 @@
           <p class="subTitulo2 mx-auto text-center">Um email com as regras de uso da sala foi enviado</p>
           <p class="subTitulo2 mx-auto text center"> para o email fulano@gmail.com</p>
           <div class="modal-footer-custom d-flex justify-content-center">
-            <button type="button" class="btn btn-final2" onclick="prevStep('modalDeCoworking', 4)">Fazer outra reserva</button>
+            <button class="btn btn-invisible"></button>
             <button type="button" class="btn btn-final" onclick="finish('modalDeCoworking')">Voltar para tela inicial</button>
           </div>
         </div>
@@ -103,3 +125,7 @@
   </div>
 </div>
 <script src="/public/js/utils/trocaModal.js"></script>
+<script>
+  const cpfInput = document.getElementById('cpfWithCpf');
+  cpfInput.addEventListener('input', formatCPF);  
+</script>

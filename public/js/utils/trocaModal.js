@@ -1,4 +1,17 @@
 // Utilidades 
+function formatCPF() {
+  let cpf = cpfInput.value;
+  cpf = cpf.replace(/\D/g, '');
+  cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
+  cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
+  cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  cpfInput.value = cpf;
+}
+
+function removerPontosCPF(cpf){
+  cpf = cpf.replace(/\D/g, '');
+  return cpf;
+}
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
@@ -17,9 +30,11 @@ function converterAndar(andar) {
 function getElementValueById(id) {
   return document.getElementById(id).value;
 }
+
 function getId(){
   return Number(localStorage.getItem('id'));
 }
+
 function setElementTextContentById(id, text) {
   document.getElementById(id).textContent = text;
 }
@@ -28,24 +43,13 @@ function setElementInputValueById(id, value) {
   document.getElementById(id).value=value;
 }
 
-// Função Sala
-function createSala(nome, andar, area, capacidadeMaxima) {
-  return {
-    nome: nome,
-    andar: andar,
-    area: area,
-    capMax:capacidadeMaxima
-  };
-}
-
-// Função Recepcionista
-function createRecepcionista(nome, sobrenome, login, nivelAcesso) {
-  return {
-    nome: nome,
-    sobrenome: sobrenome,
-    login: login,
-    nivelAcesso: nivelAcesso
-  };
+// Função de formartar para data
+function create(args) {
+  let dataFormat = {};
+  Object.keys(args).forEach(key => {
+    dataFormat[key] = args[key];
+  });
+  return dataFormat;
 }
 
 // Gestão do modal
@@ -104,7 +108,7 @@ async function createEntity(entityType, stepAtual) {
   }
 }
 
-async function updateEntity(entityType,stepAtual) {
+async function updateEntity(entityType, stepAtual) {
     const entityData = getFormData(entityType);
     console.log(entityData);
     try {
@@ -115,9 +119,6 @@ async function updateEntity(entityType,stepAtual) {
     const response = await axios.put(`http://localhost:3000/${entityType}/${id}`, entityData, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-
-    console.log(response.status);
-
     const modalId = `modalEditar${capitalizeFirstLetter(entityType)}`;
     if (response.status === 200) {
       return nextStep(modalId, stepAtual); 
@@ -133,12 +134,13 @@ async function updateEntity(entityType,stepAtual) {
 // Get - pegar os dados
 function getFormData(entityType) {
   switch(entityType) {
+    //Get span
     case 'sala':
       const nomeSala = document.getElementById('confirmNomeSala').textContent;
       const andar = Number(getElementValueById('andar'));
       const area = document.getElementById('confirmArea').textContent;
       const capMax = Number(getElementValueById('capMax'));
-      return createSala(nomeSala, andar, area, capMax);
+      return create({nomeSala, andar, area, capMax});
     
     case 'recepcionista':
       const nome = document.getElementById('confirmNome').textContent;
@@ -146,21 +148,26 @@ function getFormData(entityType) {
       const login = document.getElementById('confirmLogin').textContent;
       const senha = document.getElementById('senha').value;
       const nivelAcesso = Number(document.getElementById('nivelAcesso').value);
-      return createRecepcionista(nome, sobrenome, login, senha, nivelAcesso);
+      return create({nome, sobrenome, login, senha, nivelAcesso});
       
     case 'salaEdit':
       const nomeSalaEdit = document.getElementById('confirmNomeSalaEdit').textContent;
       const andarEdit = Number(getElementValueById('editAndar'));
       const areaEdit = document.getElementById('confirmAreaEdit').textContent;
       const capMaxEdit = Number(getElementValueById('editCapMax'));
-      return createSala(nomeSalaEdit, andarEdit, areaEdit, capMaxEdit);
+      return create({nomeSalaEdit, andarEdit, areaEdit, capMaxEdit});
 
     case 'recepcionistaEdit':
       const nomeEdit = document.getElementById('confirmNomeEdit').textContent;
       const sobrenomeEdit = document.getElementById('confirmSobrenomeEdit').textContent;
       const loginEdit = document.getElementById('confirmLoginEdit').textContent;
       const nivelAcessoEdit = Number(document.getElementById('editNivelAcesso').value);
-      return createRecepcionista(nomeEdit, sobrenomeEdit, loginEdit, nivelAcessoEdit);
+      return create({nomeEdit, sobrenomeEdit, loginEdit, nivelAcessoEdit});
+    //get inputs
+    case 'usuario':
+      const cpf = removerPontosCPF(document.getElementById('cpfWithCpf').value);
+      const dataNascimento = document.getElementById('dataNascimentoWithCpf').value;
+      return create({cpf, dataNascimento});
   }
 }
 
@@ -211,3 +218,41 @@ function fillConfirmationRecepcionistaEdit(modalId, currentStep) {
   const selectedOptionText = nivelAcessoElement.options[nivelAcessoElement.selectedIndex].text;
   setElementTextContentById('confirmNivelAcessoEdit', capitalizeFirstLetter(selectedOptionText));
 }
+
+// Confirmar - para Usuários
+function fillConfirmationUsuario(response, modalId, currentStep) {
+  nextStep(modalId, currentStep);
+  //Caso tenha
+  //São imutaveis
+  setElementTextContentById('confirmCPFWithCpf', response.identificador);
+  setElementTextContentById('confirmDataNascimentoWithCpf', response.dataNascimento);
+  setElementTextContentById('confirmNomeWithCpf', capitalizeFirstLetter(response.nome)+" "+capitalizeFirstLetter(response.sobrenome));
+  //Pode atualizar
+  setElementInputValueById('emailWithCpf', response.email);
+  setElementInputValueById('telefoneWithCpf', response.numTelefone);
+}
+//Cria Usuario
+function criarUsuario(entityData, modalId, currentStep) {
+  nextStep(modalId, currentStep);
+  setElementTextContentById('confirmCPFWithCpfCreat', entityData.cpf);
+  setElementTextContentById('confirmDataNascimentoWithCpfCreat', entityData.dataNascimento);
+}
+//Trazer dados do banco para o modal de criacao ou edição de usuario
+async function usuarioExiste(modalId, currentStep) {
+  const entityData = getFormData('usuario'); 
+  const token = localStorage.getItem('token');
+  let response;
+  try {
+    const req = await axios.get(`http://localhost:3000/usuario/consulta/${entityData.cpf}/${entityData.dataNascimento}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    response = req.data;
+  } catch (error) {
+    console.error(`Erro ao consultar usuário ${modalId}:`, error);
+    alert(`Erro ao consultar usuário ${modalId}. Por favor, tente novamente.`);
+  }
+  if (response) fillConfirmationUsuario(response, modalId, currentStep);
+  else criarUsuario(entityData, modalId, 2);
+}
+
+
