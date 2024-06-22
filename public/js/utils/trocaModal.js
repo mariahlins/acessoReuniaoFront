@@ -92,19 +92,18 @@ function updateModalContent(modalId, step) {
 function nextStep(modalId, currentStep) {
   const modalElement = document.getElementById(modalId);
   modalElement.querySelector(`#step${currentStep}`).classList.remove('active');
-
-  let nextStepNumber = currentStep+1;
-
-  if(currentStep == 1 && cpfExists){
-    nextStepNumber=2;
-  }else if(currentStep==1 && !cpfExists){
-    nextStepNumber=3;
-  }
-
-  if(currentStep==2 && cpfExists){
-    nextStepNumber=4;
-  }
-
+    let nextStepNumber = currentStep+1;
+    if(cpfExists!=='undefined'){
+      if(currentStep && cpfExists){
+        nextStepNumber=2;
+      }else if(currentStep && !cpfExists){
+        nextStepNumber=3;
+      }
+  
+      if(currentStep===2 && cpfExists){
+        nextStepNumber=4;
+      }  
+    }
   modalElement.querySelector(`#step${nextStepNumber}`).classList.add('active');
   updateModalContent(modalId, currentStep + 1);
 }
@@ -294,6 +293,7 @@ async function usuarioExiste(modalId, currentStep) {
   } catch (error) {
     console.error(`Erro ao consultar usuário ${modalId}:`, error);
   }
+  var cpfExists;
   if (response) {
     cpfExists = true;
     fillConfirmationUsuario(response, modalId, currentStep);

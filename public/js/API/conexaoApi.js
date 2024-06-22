@@ -72,6 +72,21 @@ function setElementInputValueById(id, value) {
     document.getElementById(id).value=value;
 }
 
+//...data permite que haja uma flexibilizaçã na quantidade de argumentos
+function vetorizacao(...args) {
+    const data = args[0]; 
+    const qtnTela = args[1] || 6;
+    const vetor = [];
+
+    for (let i = 0; i < data.length; i += qtnTela) {
+        const chunk = data.slice(i, i + qtnTela);
+        vetor.push(chunk);
+    }
+    const numeroPaginas = vetor.length;
+    localStorage.setItem('numeroPaginas', numeroPaginas);
+    return vetor;
+}
+
 class Controller{
     /*Acesso */
         
@@ -254,10 +269,10 @@ class Controller{
         }
 
         static async mostrarSalas() {
+            const salas = await this.listarSalas();
+            const tableBody = document.getElementById('after-login-salas');
             try {
-                const salas = await this.listarSalas();
-                const tableBody = document.getElementById('after-login-salas');
-                this.preencherTabela(salas[0], tableBody, (item) => [
+                    this.preencherTabela(salas, tableBody, (item) => [
                     item.nome,
                     converterAndar(item.andar),
                     converterStatusSala(item.situacao),
@@ -804,8 +819,9 @@ class Controller{
                     console.error('Erro ao buscar dados da API:', error);
                 }
             }
-
         /*Atualizar*/
+
+        
 } 
 document.addEventListener('DOMContentLoaded', () => {
     const observeElement = (elementId, callback) => {
@@ -831,7 +847,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Controller.fazerLogout();        
     });
 
-    observeElement('nivelAcesso', ()=>{
+    observeElement('preencherSelect', ()=>{
         Controller.preencherSelectComAPI('nivelAcesso');
     });
 
