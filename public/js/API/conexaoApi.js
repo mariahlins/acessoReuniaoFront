@@ -26,7 +26,7 @@ function parseDate(dataReservada) {
 function ehHoje(dataReserva) {
     const dataAtual = new Date();
     const dataAtualFormatada = `${dataAtual.getDate().toString().padStart(2, '0')}-${(dataAtual.getMonth() + 1).toString().padStart(2, '0')}-${dataAtual.getFullYear().toString()}`;
-    return dataReserva === dataAtualFormatada;
+    return dataReserva===dataAtualFormatada;
 }
 
 
@@ -71,35 +71,19 @@ function formataAtivo(ativo){
 function setElementInputValueById(id, value) {
     document.getElementById(id).value=value;
 }
-//...data permite que haja uma flexibilizaçã na quantidade de argumentos
-function vetorizacao(...args) {
-    const data = args[0]; 
-    const qtnTela = args[1] || 6;
-    const vetor = [];
-
-    for (let i = 0; i < data.length; i += qtnTela) {
-        const chunk = data.slice(i, i + qtnTela);
-        vetor.push(chunk);
-    }
-    const numeroPaginas = vetor.length;
-    localStorage.setItem('numeroPaginas', numeroPaginas);
-    return vetor;
-}
-
-
 
 //...data permite que haja uma flexibilizaçã na quantidade de argumentos
 function vetorizacao(...args) {
-    const data = args[0]; 
+    const data = [...args[0]]; 
     const qtnTela = args[1] || 6;
-    const vetor = [];
+    const  vetor = [];
 
     for (let i = 0; i < data.length; i += qtnTela) {
-        const chunk = data.slice(i, i + qtnTela);
-        vetor.push(chunk);
+        vetor.push( data.slice(i, i + qtnTela));
     }
     const numeroPaginas = vetor.length;
-    localStorage.setItem('numeroPaginas', numeroPaginas);
+    localStorage.setItem('numeroPaginas', numeroPaginas, 'indexPaginacao', 0);
+
     return vetor;
 }
 
@@ -214,19 +198,6 @@ class Controller{
                 throw error;
             }
         }
-        
-        
-            static async listarReservasHoje(){
-                try{
-                    return reservas.filter((reserva) => {
-                        const dataReserva = parseDate(reserva.dataReservada);
-                        return ehHoje(dataReserva);
-                    });
-                }catch(error){
-                    console.error('Erro ao listar reservas de hoje:', error);
-                    throw error;
-                }
-            }
             
     /* Pegar todos */
         
@@ -283,18 +254,17 @@ class Controller{
         static async mostrarUsuarios() {
             const response = await this.listarUsuarios();
             const usuarios = await this.formatarListagem(response);
-            localStorage.setItem('usuario', entidade);
+            localStorage.setItem('entidade', 'usuario');
 
             try {
                 const tableBody = document.getElementById('after-login-usuarios');
-                this.preencherTabela(usuarios[0], tableBody, 
+                this.preencherTabela(usuarios[Number(localStorage.getItem('indexPaginacao'))], tableBody, 
                     (item) => [
                         `${item.nome} ${item.sobrenome}`,
                         ocultarDocumento(item.identificador),
                         item.email
                     ],
                     (item) => {
-                        return { texto: 'Editar', funcao: 'editarUsuario'};
                         return { texto: 'Editar', funcao: 'editarUsuario'};
                     },
                     (item) => {
@@ -306,13 +276,13 @@ class Controller{
                 throw error;
             }
         }
-        // lembrar de trocar [0] por localStorage.get('idPaginagem')
+
         static async mostrarSalas() {
             const response = await this.listarSalas();
             const salas = await this.formatarListagem(response);
             try {
                 const tableBody = document.getElementById('after-login-salas');
-                this.preencherTabela(salas[0], tableBody, (item) => [
+                this.preencherTabela(salas[Number(localStorage.getItem('indexPaginacao'))], tableBody, (item) => [
                     item.nome,
                     converterAndar(item.andar),
                     converterStatusSala(item.situacao),
@@ -356,7 +326,7 @@ class Controller{
             const reunioes = await this.formatarListagem(response);
             try {
                 const tableBody = document.getElementById('reuniao');
-                this.preencherTabela(reunioes[0], tableBody, (item) => [
+                this.preencherTabela(reunioes[Number(localStorage.getItem('indexPaginacao'))], tableBody, (item) => [
                     item.nome,
                     item.data,
                     item.horaInicio,
@@ -374,7 +344,7 @@ class Controller{
             const nivelAcesso = await this.formatarListagem(response);
             try {
                 const tableBody = document.getElementById('after-login-nivelAcesso');
-                this.preencherTabela(nivelAcesso[0], tableBody, (item) => [
+                this.preencherTabela(nivelAcesso[Number(localStorage.getItem('indexPaginacao'))], tableBody, (item) => [
                     item.id,
                     item.nivelAcesso,
                     item.glossarioNivel,
@@ -416,7 +386,7 @@ class Controller{
             try {
                 const tableBody = document.getElementById('after-login-recepcionista');
                 
-                this.preencherTabela(recepcionistas[0], tableBody, 
+                this.preencherTabela(recepcionistas[Number(localStorage.getItem('indexPaginacao'))], tableBody, 
                     (item) => [
                         item.id,
                         `${item.nome} ${item.sobrenome}`,
@@ -450,14 +420,15 @@ class Controller{
                 throw error;
             }
         }
+        
         // lembrar de trocar [0] por localStorage.get('idPaginagem')
         static async mostrarListaNegra(){
             try{
                 const listaNegra = await this.listarListaNegra();
-                const listaNegraFormatada = await this.formatarListagem(listaNegra);
-                const listaNegraComDetalhes = await this.listaNegraComDetalhes(listaNegraFormatada[0]);
+                const listaNegraComDetalhes = await this.listaNegraComDetalhes(listaNegra);
+                const listaNegraFormatada = await this.formatarListagem(listaNegraComDetalhes);
                 const tableBody = document.getElementById('after-login-listaNegra');
-                this.preencherTabela(listaNegraComDetalhes, tableBody, (item) => [
+                this.preencherTabela(listaNegraFormatada[Number(localStorage.getItem('indexPaginacao'))], tableBody, (item) => [
                     item.codBloqueio,
                     `${item.reservista.nome} ${item.reservista.sobrenome}`,
                     ocultarDocumento(item.reservista.identificador),
@@ -481,23 +452,20 @@ class Controller{
 
         static async mostrarTodasReservas(){
             const response = await this.listarReservas();
-            const formatacao = await this.formatarListagem(response);
-            return this.mostrarReservas(formatacao);
+            return this.mostrarReservas(response);
         }
         
         static async mostrarReservasHoje(){
             const response= await this.listarReservasHoje();
-            const formatacao = await this.formatarListagem(response, 2);
-            return this.mostrarReservas(formatacao);
+            return this.mostrarReservas(response);
         }
 
         static async mostrarReservas(reservas) {
             try {
-                // req = reservas[0]
-                const req=reservas[localStorage.getElementById('indexPaginacao')];
-                const reservasComDetalhes= await this.reservaComDetalhes(req);
+                const reservasComDetalhes= await this.reservaComDetalhes(reservas);
+                const req = await this.formatarListagem(reservasComDetalhes);
                 const tabela = document.getElementById('reservas-tabela');
-                this.preencherTabela(reservasComDetalhes, tabela, (item) => [
+                this.preencherTabela(req[Number(localStorage.getItem('indexPaginacao'))], tabela, (item) => [
                         item.sala.nome,
                         `${item.usuario.nome} ${item.usuario.sobrenome}`,  // Corrigido para pegar nome e sobrenome
                         ocultarDocumento(item.usuario.identificador),
