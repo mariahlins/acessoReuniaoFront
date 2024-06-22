@@ -18,7 +18,9 @@ html, body {
     background-color: #565D6D !important;
 }
 
-
+.button-paginacao{
+    border-radius: 15%;
+}
 .bg-azul-claro{
     background-color: #6ea8fe !important;
 }

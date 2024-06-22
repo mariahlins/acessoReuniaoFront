@@ -72,20 +72,6 @@ function setElementInputValueById(id, value) {
     document.getElementById(id).value=value;
 }
 
-//...data permite que haja uma flexibilizaçã na quantidade de argumentos
-function vetorizacao(...args) {
-    const data = [...args[0]]; 
-    const qtnTela = args[1] || 6;
-    const  vetor = [];
-
-    for (let i = 0; i < data.length; i += qtnTela) {
-        vetor.push( data.slice(i, i + qtnTela));
-    }
-    const numeroPaginas = vetor.length;
-    localStorage.setItem('numeroPaginas', numeroPaginas, 'indexPaginacao', 0);
-
-    return vetor;
-}
 
 class Controller{
     /*Acesso */
@@ -137,9 +123,18 @@ class Controller{
     /*Acesso */
 
     /*Formatação de listagem*/
-        static async formatarListagem(dataEntity){
-            const listaFormatada = vetorizacao(dataEntity);
-            return listaFormatada;
+        static async vetorizacao(...args) {
+            const data = [...args[0]]; 
+            const qtnTela = args[1] || 6;
+            const  vetor = [];
+        
+            for (let i = 0; i < data.length; i += qtnTela) {
+                vetor.push( data.slice(i, i + qtnTela));
+            }
+            const numeroPaginas = vetor.length;
+            localStorage.setItem('numeroPaginas', numeroPaginas, 'indexPaginacao', 0);
+        
+            return vetor;
         }
     /*Formatação de listagem*/
     
@@ -253,7 +248,7 @@ class Controller{
         // lembrar de trocar [0] por localStorage.get('idPaginagem')
         static async mostrarUsuarios() {
             const response = await this.listarUsuarios();
-            const usuarios = await this.formatarListagem(response);
+            const usuarios = await this.vetorizacao(response);
             localStorage.setItem('entidade', 'usuario');
 
             try {
@@ -279,7 +274,7 @@ class Controller{
 
         static async mostrarSalas() {
             const response = await this.listarSalas();
-            const salas = await this.formatarListagem(response);
+            const salas = await this.vetorizacao(response);
             try {
                 const tableBody = document.getElementById('after-login-salas');
                 this.preencherTabela(salas[Number(localStorage.getItem('indexPaginacao'))], tableBody, (item) => [
@@ -323,7 +318,7 @@ class Controller{
         // lembrar de trocar [0] por localStorage.get('idPaginagem')
         static async mostrarReuniao() {
             const response = await this.listarReuniao();
-            const reunioes = await this.formatarListagem(response);
+            const reunioes = await this.vetorizacao(response);
             try {
                 const tableBody = document.getElementById('reuniao');
                 this.preencherTabela(reunioes[Number(localStorage.getItem('indexPaginacao'))], tableBody, (item) => [
@@ -341,7 +336,7 @@ class Controller{
         // lembrar de trocar [0] por localStorage.get('idPaginagem')
         static async mostrarNivelAcesso() {
             const response = await this.listarNivelAcesso();
-            const nivelAcesso = await this.formatarListagem(response);
+            const nivelAcesso = await this.vetorizacao(response);
             try {
                 const tableBody = document.getElementById('after-login-nivelAcesso');
                 this.preencherTabela(nivelAcesso[Number(localStorage.getItem('indexPaginacao'))], tableBody, (item) => [
@@ -382,7 +377,7 @@ class Controller{
         // lembrar de trocar [0] por localStorage.get('idPaginagem')
         static async mostrarRecepcionista() {
             const response = await this.listarRecepcionista();
-            const recepcionistas = await this.formatarListagem(response);
+            const recepcionistas = await this.vetorizacao(response);
             try {
                 const tableBody = document.getElementById('after-login-recepcionista');
                 
@@ -423,11 +418,11 @@ class Controller{
         
         // lembrar de trocar [0] por localStorage.get('idPaginagem')
         static async mostrarListaNegra(){
+            const listaNegra = await this.listarListaNegra();
+            const listaNegraComDetalhes = await this.listaNegraComDetalhes(listaNegra);
+            const listaNegraFormatada = await this.vetorizacao(listaNegraComDetalhes);
+            const tableBody = document.getElementById('after-login-listaNegra');
             try{
-                const listaNegra = await this.listarListaNegra();
-                const listaNegraComDetalhes = await this.listaNegraComDetalhes(listaNegra);
-                const listaNegraFormatada = await this.formatarListagem(listaNegraComDetalhes);
-                const tableBody = document.getElementById('after-login-listaNegra');
                 this.preencherTabela(listaNegraFormatada[Number(localStorage.getItem('indexPaginacao'))], tableBody, (item) => [
                     item.codBloqueio,
                     `${item.reservista.nome} ${item.reservista.sobrenome}`,
@@ -449,25 +444,35 @@ class Controller{
                 console.error('Erro ao mostrar lista negra:', error);
             }
         }
-
-        static async mostrarTodasReservas(){
-            const response = await this.listarReservas();
-            return this.mostrarReservas(response);
+        static async mostrarTodasReservas() {
+            try {
+                const response = await this.listarReservas();
+                return this.mostrarReservas(response);
+            } catch (error) {
+                console.error('Erro ao mostrar todas as reservas:', error);
+            }
         }
         
-        static async mostrarReservasHoje(){
-            const response= await this.listarReservasHoje();
-            return this.mostrarReservas(response);
-        }
-
-        static async mostrarReservas(reservas) {
+        static async mostrarReservasHoje() {
             try {
-                const reservasComDetalhes= await this.reservaComDetalhes(reservas);
-                const req = await this.formatarListagem(reservasComDetalhes);
+                const response = await this.listarReservasHoje();
+                return this.mostrarReservas(response, 4);
+            } catch (error) {
+                console.error('Erro ao mostrar reservas de hoje:', error);
+            }
+        }
+        
+        static async mostrarReservas(...reservas) {
+            const rese=[...reservas[0]];
+            try {
+                const reservasComDetalhes = await this.reservaComDetalhes(rese);
+                const req = await this.vetorizacao(reservasComDetalhes, reservas[1]); 
                 const tabela = document.getElementById('reservas-tabela');
-                this.preencherTabela(req[Number(localStorage.getItem('indexPaginacao'))], tabela, (item) => [
+                
+                this.preencherTabela(
+                    req[Number(localStorage.getItem('indexPaginacao'))], tabela, (item) => [
                         item.sala.nome,
-                        `${item.usuario.nome} ${item.usuario.sobrenome}`,  // Corrigido para pegar nome e sobrenome
+                        `${item.usuario.nome} ${item.usuario.sobrenome}`,
                         ocultarDocumento(item.usuario.identificador),
                         item.motivoReserva,
                         `${formatarDataBr(item.dataReservada)} ${item.horaInicio}`,
@@ -495,7 +500,7 @@ class Controller{
                     }
                 );
             } catch (error) {
-                console.error('Erro ao mostrar todas as reservas:', error);
+                console.error('Erro ao mostrar reservas:', error);
             }
         }
         
@@ -504,10 +509,6 @@ class Controller{
     /* Preencher Tabelas */
         
     static async preencherTabela(items, tableBody, colunasDefinicao, metodoUm, metodoDois) {
-        if (!tableBody) {
-            console.error('Elemento tbody não encontrado');
-            return;
-        }
         tableBody.innerHTML = '';
         try {
             items.forEach(item => {
@@ -519,14 +520,22 @@ class Controller{
                     acoesCell.appendChild(buttonPrimario);
                 }
                 if (metodoDois(item).texto) {
-                    //Object.key({nomeVar}[0])
                     const buttonSecundario = this.criarBotao(metodoDois(item), 'btn btn-cancelar bg-cinza peso-500 fc-branco', item.id);
                     acoesCell.appendChild(buttonSecundario);
                 }
                 linha.appendChild(acoesCell);
                 tableBody.appendChild(linha);
-
             });
+    
+            // Criação da navegação de páginação
+           const paginacaoUl = document.getElementById('paginacao');
+
+            for (let i=0; i<localStorage.getItem('numeroPaginas'); i++) {
+                let classButton='page-link page-item button-paginacao';
+                if(i===Number(localStorage.getItem('indexPaginacao'))) classButton='button-paginacao page-link page-item active';
+                paginacaoUl.appendChild(this.criarBotao({texto: i+1, funcao: 'paginacao'}, classButton, i));
+            }
+        
         } catch (error) {
             console.error(`Erro ao preencher tabela:`, error);
         }
@@ -563,7 +572,11 @@ class Controller{
     
         return elemento;
     }
-    
+
+    static async paginacao(id){
+        localStorage.setItem('indexPaginacao', id);
+        window.location.reload();
+    }
      
 
     /* Preencher Tabelas */
