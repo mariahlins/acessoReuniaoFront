@@ -16,6 +16,7 @@ function ocultarDocumento(documento) {
 function setId(id){
     localStorage.setItem('id', id);
 }
+
 function parseDate(dataReservada) {
     const [day, month, year] = dataReservada.split('/');
     return new Date(year, month - 1, day);
@@ -29,6 +30,7 @@ function ehHoje(dataReserva) {
         dataReserva.getFullYear() === dataAtual.getFullYear()
     );
 }
+
 function converterAndar(andar) {
     switch (andar) {
         case 0: return 'Térreo';
@@ -265,7 +267,7 @@ class Controller{
                         item.email
                     ],
                     (item) => {
-                        return { texto: '...', funcao: 'editarUsuario'};
+                        return { texto: 'Editar', funcao: 'editarUsuario'};
                     },
                     (item) => {
                         return { texto: 'Excluir', funcao: 'excluirUsuario' };
@@ -276,11 +278,10 @@ class Controller{
                 throw error;
             }
         }
-        // lembrar de trocar [0] por localStorage.get('idPaginagem')
+
         static async mostrarSalas() {
-            const response = await this.listarSalas();
-            const salas = await this.formatarListagem(response);
             try {
+                const salas = await this.listarSalas();
                 const tableBody = document.getElementById('after-login-salas');
                 this.preencherTabela(salas[0], tableBody, (item) => [
                     item.nome,
