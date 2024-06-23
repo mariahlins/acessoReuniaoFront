@@ -81,42 +81,28 @@ function setElementInputValueById(id, value) {
 //SETs
 
 // Gestão do modal
+// Gestão do modal
 function updateModalContent(modalId, step) {
   const currentStep = document.querySelector(`#${modalId} #step${step}`);
   if (!currentStep) return;
   const newHeader = currentStep.getAttribute('data-header');
   document.querySelector(`#${modalId} .modal-title`).textContent = newHeader;
-
 }
 
-function nextStep(modalId, currentStep) {
+function nextStep(modalId, currentStep){
   const modalElement = document.getElementById(modalId);
+  const next=currentStep+1
   modalElement.querySelector(`#step${currentStep}`).classList.remove('active');
-    let nextStepNumber = currentStep+1;
-    if(cpfExists!=='undefined'){
-      if(currentStep && cpfExists){
-        nextStepNumber=2;
-      }else if(currentStep && !cpfExists){
-        nextStepNumber=3;
-      }
-  
-      if(currentStep===2 && cpfExists){
-        nextStepNumber=4;
-      }  
-    }
-  modalElement.querySelector(`#step${nextStepNumber}`).classList.add('active');
-  updateModalContent(modalId, currentStep + 1);
+  modalElement.querySelector(`#step${next}`).classList.add('active');
+  updateModalContent(modalId, next);
 }
 
 function prevStep(modalId, currentStep) {
+  const prev=currentStep-1;
   const modalElement = document.getElementById(modalId);
   modalElement.querySelector(`#step${currentStep}`).classList.remove('active');
-  let prevStep = currentStep - 1;
-  if (currentStep === 2 || currentStep === 3) {
-    prevStep = 1;
-  }
-  modalElement.querySelector(`#step${prevStep}`).classList.add('active');
-  updateModalContent(modalId, currentStep - 1);
+  modalElement.querySelector(`#step${prev}`).classList.add('active');
+  updateModalContent(modalId, prev);
 }
 
 function resetModal(modalId) {
@@ -131,6 +117,7 @@ function finish(modalId) {
   resetModal(modalId);
   window.location.reload();
 }
+
 //Gestão de modal
 
 // CRUD
@@ -265,26 +252,30 @@ function fillConfirmationRecepcionistaEdit(modalId, currentStep) {
 // Confirmar - para Usuários
 function fillConfirmationUsuario(response, modalId, currentStep) {
   nextStep(modalId, currentStep);
-  //São imutaveis
+  
+  // Preenche os campos com os dados do usuário existente
   setElementTextContentById('confirmCPFWithCpf', response.identificador);
   setElementTextContentById('confirmDataNascimentoWithCpf', response.dataNascimento);
-  setElementTextContentById('confirmNomeWithCpf', converterPrimeiraLetraMaiuscula(response.nome)+" "+converterPrimeiraLetraMaiuscula(response.sobrenome));
-  //Pode atualizar
+  setElementTextContentById('confirmNomeWithCpf', `${converterPrimeiraLetraMaiuscula(response.nome)} ${converterPrimeiraLetraMaiuscula(response.sobrenome)}`);
+  
+  // Atualiza campos editáveis se necessário
   setElementInputValueById('emailWithCpf', response.email);
   setElementInputValueById('telefoneWithCpf', converterNumTel(response.numTelefone));
 }
-//Post
-function criarUsuario(entityData, modalId, currentStep) {
+
+async function criarUsuario(entityData, modalId, currentStep) {
   nextStep(modalId, currentStep);
+  // Preenche os campos com os dados para criação de novo usuário
   setElementTextContentById('confirmCPFWithCpfCreat', converterCPF(entityData.cpf));
   setElementTextContentById('confirmDataNascimentoWithCpfCreat', converterData(entityData.dataNascimento));
 }
 
-//Trazer dados do banco para o modal de criacao ou edição de usuario
+// Consulta se o usuário existe e decide o fluxo
 async function usuarioExiste(modalId, currentStep) {
   const entityData = getFormData('usuario'); 
   const token = localStorage.getItem('token');
   let response;
+  
   try {
     const req = await axios.get(`http://localhost:3000/usuario/consulta/${entityData.cpf}/${entityData.dataNascimento}`, {
       headers: { 'Authorization': `Bearer ${token}` }
@@ -293,14 +284,37 @@ async function usuarioExiste(modalId, currentStep) {
   } catch (error) {
     console.error(`Erro ao consultar usuário ${modalId}:`, error);
   }
-  var cpfExists;
-  if (response) {
-    cpfExists = true;
-    fillConfirmationUsuario(response, modalId, currentStep);
-  } else {
-    cpfExists = false;
-    criarUsuario(entityData, modalId, 1);
+  
+    const step2Content = `
+    <p class="form-control mb-2 custom-input"><strong><span id="confirmCPFWithCpf"></span></strong></p>
+    <p class="form-control mb-2 custom-input"><strong><span id="confirmDataNascimentoWithCpf"></span></strong></p>
+    <p class="form-control mb-2 custom-input"><strong><span id="confirmNomeWithCpf"></span></strong></p>
+    <input type="text" id="emailWithCpf" class="form-control mb-2 custom-input" placeholder="Email">
+    <input type="text" id="telefoneWithCpf" class="form-control mb-2 custom-input" placeholder="Número de telefone">
+    <input type="text" id="motivoDaReuniaoWithCpfNew" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião">
+    <div class="d-flex justify-content-between">
+        <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 2)">Voltar</button>
+        <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeCoworking', 2)">Continuar</button>
+    </div>`;
+
+  const step3Content = `
+    <p class="form-control mb-2 custom-input"><strong><span id="confirmCPFWithCpfCreat"></span></strong></p>
+    <p class="form-control mb-2 custom-input"><strong><span id="confirmDataNascimentoWithCpfCreat"></span></strong></p>
+    <input type="text" id="nomeWithCpfCreat" class="form-control mb-2 custom-input" placeholder="Nome">
+    <input type="text" id="sobrenomeWithCpfCreat" class="form-control mb-2 custom-input" placeholder="Sobrenome">
+    <input type="text" id="emailWithCpf" class="form-control mb-2 custom-input" placeholder="Email">
+    <input type="text" id="telefoneWithCpf" class="form-control mb-2 custom-input" placeholder="Número de telefone">
+    <input type="text" id="motivoDaReuniaoWithCpfCreat" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião">
+    <div class="d-flex justify-content-between">
+        <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 2)">Voltar</button>
+        <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeCoworking', 2)">Continuar</button>
+    </div>`;
+    
+  if (response){
+      document.getElementById('step2').innerHTML = step2Content;
+  fillConfirmationUsuario(response, modalId, currentStep);
+  }else{
+    document.getElementById('step2').innerHTML = step3Content;
+    criarUsuario(entityData, modalId, currentStep);
   }
 }
-
-
