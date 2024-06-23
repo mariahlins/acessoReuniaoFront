@@ -444,6 +444,7 @@ class Controller{
                 console.error('Erro ao mostrar lista negra:', error);
             }
         }
+
         static async mostrarTodasReservas() {
             try {
                 const response = await this.listarReservas();
@@ -545,7 +546,8 @@ class Controller{
         const row = document.createElement('tr');
         colunasDefinicao.forEach(coluna => {
             const td = document.createElement('td');
-            td.textContent = coluna;
+            if(coluna===null) td.textContent = 'Não informado';
+            else td.textContent = coluna;
             row.appendChild(td);
         });
         return row;
