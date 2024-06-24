@@ -853,6 +853,30 @@ static async fazerLogin() {
                                         selectElement.appendChild(label);
                                     }
                                 });
+
+                                data.forEach(item => {
+                                    if (!item.andar && item.situacao === 'D') {
+                                        const input = document.createElement('input');
+                                        input.type = 'radio';
+                                        input.className = 'btn-check';
+                                        input.name = 'salaOptions';
+                                        input.id = item.nome;
+                                        input.autocomplete = 'off';
+                            
+                                        if (first) {
+                                            input.checked = true;
+                                            first = false;
+                                        }
+                            
+                                        const label = document.createElement('label');
+                                        label.className = 'btn btn-outline-primary';
+                                        label.htmlFor = item.nome;
+                                        label.textContent = item.nome;
+                            
+                                        selectElement.appendChild(input);
+                                        selectElement.appendChild(label);
+                                    }
+                                });
                                 break;
                             
                         case 'horarioLivre':
