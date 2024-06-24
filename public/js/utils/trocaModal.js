@@ -70,6 +70,7 @@ function getId(){
   return Number(localStorage.getItem('id'));
 }
 //GETs
+
 //SETs
 function setElementTextContentById(id, text) {
   document.getElementById(id).textContent = text;
@@ -80,7 +81,6 @@ function setElementInputValueById(id, value) {
 }
 //SETs
 
-// Gestão do modal
 // Gestão do modal
 function updateModalContent(modalId, step) {
   const currentStep = document.querySelector(`#${modalId} #step${step}`);
@@ -121,7 +121,7 @@ function finish(modalId) {
 //Gestão de modal
 
 // CRUD
-async function creatEntity(entityType, stepAtual) {
+async function createEntity(entityType, stepAtual) {
   try {
     const entityData = getFormData(entityType);
     const token = localStorage.getItem('token');
@@ -144,19 +144,16 @@ async function updateEntity(entityType, stepAtual) {
     const entityData = getFormData(entityType);
     console.log(entityData);
     try {
-    const token = localStorage.getItem('token');
-    let id=getId();
-    if(entityType=='salaEdit') entityType='sala';
-    else if(entityType==='recepcionistaEdit') entityType='recepcionista';
-    const response = await axios.put(`http://localhost:3000/${entityType}/${id}`, entityData, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    const modalId = `modalEditar${converterPrimeiraLetraMaiuscula(entityType)}`;
-    if (response.status === 200) {
-      return nextStep(modalId, stepAtual); 
-    } else {
-      throw new Error(`Erro ao atualizar ${entityType}. Status: ${response.status}`);
-    }
+      const token = localStorage.getItem('token');
+      let id=getId();
+      if(entityType=='salaEdit') entityType='sala';
+      else if(entityType==='recepcionistaEdit') entityType='recepcionista';
+      const response = await axios.put(`http://localhost:3000/${entityType}/${id}`, entityData, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const modalId = `modalEditar${converterPrimeiraLetraMaiuscula(entityType)}`;
+      if (response.status === 200) return nextStep(modalId, stepAtual); 
+      else throw new Error(`Erro ao atualizar ${entityType}. Status: ${response.status}`);
   } catch (error) {
     console.error(`Erro ao atualizar ${entityType}:`, error);
     alert(`Erro ao atualizar ${entityType}. Por favor, tente novamente.`);
@@ -168,33 +165,33 @@ function getFormData(entityType) {
   switch(entityType) {
     //Get span
     case 'sala':
-      const nomeSala = document.getElementById('confirmNomeSala').textContent;
-      const andar = Number(getElementValueById('andar'));
-      const area = document.getElementById('confirmArea').textContent;
-      const capMax = Number(getElementValueById('capMax'));
-      return converterDateType({nomeSala, andar, area, capMax});
+      var nome = document.getElementById('confirmNomeSala').textContent;
+      var andar = Number(getElementValueById('andar'));
+      var area = document.getElementById('confirmArea').textContent;
+      var capMax = Number(getElementValueById('capMax'));
+      return converterDateType({nome, andar, area, capMax});
     
     case 'recepcionista':
-      const nome = document.getElementById('confirmNome').textContent;
-      const sobrenome = document.getElementById('confirmSobrenome').textContent;
-      const login = document.getElementById('confirmLogin').textContent;
-      const senha = document.getElementById('senha').value;
-      const nivelAcesso = Number(document.getElementById('nivelAcesso').value);
+      var nome = document.getElementById('confirmNome').textContent;
+      var sobrenome = document.getElementById('confirmSobrenome').textContent;
+      var login = document.getElementById('confirmLogin').textContent;
+      var senha = document.getElementById('senha').value;
+      var nivelAcesso = Number(document.getElementById('nivelAcesso').value);
       return converterDateType({nome, sobrenome, login, senha, nivelAcesso});
       
     case 'salaEdit':
-      const nomeSalaEdit = document.getElementById('confirmNomeSalaEdit').textContent;
-      const andarEdit = Number(getElementValueById('editAndar'));
-      const areaEdit = document.getElementById('confirmAreaEdit').textContent;
-      const capMaxEdit = Number(getElementValueById('editCapMax'));
-      return converterDateType({nomeSalaEdit, andarEdit, areaEdit, capMaxEdit});
+      var nome = document.getElementById('confirmNomeSalaEdit').textContent;
+      var andar = Number(getElementValueById('editAndar'));
+      var area = document.getElementById('confirmAreaEdit').textContent;
+      var capMax = Number(getElementValueById('editCapMax'));
+      return converterDateType({nome, andar, area, capMax});
 
     case 'recepcionistaEdit':
-      const nomeEdit = document.getElementById('confirmNomeEdit').textContent;
-      const sobrenomeEdit = document.getElementById('confirmSobrenomeEdit').textContent;
-      const loginEdit = document.getElementById('confirmLoginEdit').textContent;
-      const nivelAcessoEdit = Number(document.getElementById('editNivelAcesso').value);
-      return converterDateType({nomeEdit, sobrenomeEdit, loginEdit, nivelAcessoEdit});
+      var nome = document.getElementById('confirmNomeEdit').textContent;
+      var sobrenome = document.getElementById('confirmSobrenomeEdit').textContent;
+      var login = document.getElementById('confirmLoginEdit').textContent;
+      var nivelAcesso = Number(document.getElementById('editNivelAcesso').value);
+      return converterDateType({nome, sobrenome, login, nivelAcesso});
     //get inputs
     case 'usuario':
       const cpf = removerPontos(document.getElementById('cpfWithCpf').value);
@@ -289,9 +286,9 @@ async function usuarioExiste(modalId, currentStep) {
     <p class="form-control mb-2 custom-input"><strong><span id="confirmCPFWithCpf"></span></strong></p>
     <p class="form-control mb-2 custom-input"><strong><span id="confirmDataNascimentoWithCpf"></span></strong></p>
     <p class="form-control mb-2 custom-input"><strong><span id="confirmNomeWithCpf"></span></strong></p>
-    <input type="text" id="emailWithCpf" class="form-control mb-2 custom-input" placeholder="Email">
-    <input type="text" id="telefoneWithCpf" class="form-control mb-2 custom-input" placeholder="Número de telefone">
-    <input type="text" id="motivoDaReuniaoWithCpfNew" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião">
+    <input type="text" id="emailWithCpf" class="form-control mb-2 custom-input" placeholder="Email" required>
+    <input type="text" id="telefoneWithCpf" class="form-control mb-2 custom-input" placeholder="Número de telefone" required>
+    <input type="text" id="motivoDaReuniaoWithCpfNew" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião" required> 
     <div class="d-flex justify-content-between">
         <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 2)">Voltar</button>
         <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeCoworking', 2)">Continuar</button>
@@ -302,9 +299,9 @@ async function usuarioExiste(modalId, currentStep) {
     <p class="form-control mb-2 custom-input"><strong><span id="confirmDataNascimentoWithCpfCreat"></span></strong></p>
     <input type="text" id="nomeWithCpfCreat" class="form-control mb-2 custom-input" placeholder="Nome">
     <input type="text" id="sobrenomeWithCpfCreat" class="form-control mb-2 custom-input" placeholder="Sobrenome">
-    <input type="text" id="emailWithCpf" class="form-control mb-2 custom-input" placeholder="Email">
-    <input type="text" id="telefoneWithCpf" class="form-control mb-2 custom-input" placeholder="Número de telefone">
-    <input type="text" id="motivoDaReuniaoWithCpfCreat" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião">
+    <input type="text" id="emailWithCpf" class="form-control mb-2 custom-input" placeholder="Email" required>
+    <input type="text" id="telefoneWithCpf" class="form-control mb-2 custom-input" placeholder="Número de telefone" required>
+    <input type="text" id="motivoDaReuniaoWithCpfCreat" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião" required>
     <div class="d-flex justify-content-between">
         <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 2)">Voltar</button>
         <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeCoworking', 2)">Continuar</button>

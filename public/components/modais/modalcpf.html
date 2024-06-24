@@ -10,8 +10,8 @@
 
         <div class="modal-body custom-modal-body">
           <div class="step active" id="step1" data-header="Informações da Reserva">
-            <input type="text" id="cpfWithCpf" class="form-control mb-2 custom-input" placeholder="CPF" minlength="14" maxlength="14">
-            <input type="date" id="dataNascimentoWithCpf" class="form-control mb-2 custom-input" placeholder="Data de Nascimento">
+            <input type="text" id="cpfWithCpf" class="form-control mb-2 custom-input" placeholder="CPF" minlength="14" maxlength="14" required>
+            <input type="date" id="dataNascimentoWithCpf" class="form-control mb-2 custom-input" placeholder="Data de Nascimento" required>
             <div class="d-flex justify-content-between">
               <button class="btn btn-invisible"></button>
               <button type="button" class="btn btn-secondary" onclick="usuarioExiste('modalDeCoworking', 1)">Continuar</button>

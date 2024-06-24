@@ -11,9 +11,9 @@
             <div class="modal-body custom-modal-body">
                 <div class="step active" id="step1" data-header="Informações do recepcionista">
                     <form action="" method="post" id="formEditarRecepcionista">
-                        <input type="text" id="editNome" class="form-control mb-2 custom-input" placeholder="Nome" autocomplete="off">
-                        <input type="text" id="editSobrenome" class="form-control mb-2 custom-input" placeholder="Sobrenome" autocomplete="off">
-                        <input type="text" id="editLogin" class="form-control mb-2 custom-input" placeholder="Login" autocomplete="off">
+                        <input type="text" id="editNome" class="form-control mb-2 custom-input" placeholder="Nome" autocomplete="off" required>
+                        <input type="text" id="editSobrenome" class="form-control mb-2 custom-input" placeholder="Sobrenome" autocomplete="off" required>
+                        <input type="text" id="editLogin" class="form-control mb-2 custom-input" placeholder="Login" autocomplete="off" required>
                         <div class="d-flex justify-content-between">
                             <button class="btn btn-invisible"></button>
                             <button type="button" class="btn btn-secondary" onclick="nextStep('modalEditarRecepcionista',1)">Continuar</button>
@@ -24,7 +24,7 @@
                 
                 <div class="step" id="step2" data-header="Nível de acesso">
                     <h4 class="mx-auto text-center mb-3 mt-1">Qual nível de acesso o usuário terá?</h4>
-                    <select id="editNivelAcesso" class="form-control mb-2 custom-input">
+                    <select id="editNivelAcesso" class="form-control mb-2 custom-input" required>
                         <option >Outro Nível</option>
                     </select>
                     <div class="d-flex justify-content-between">

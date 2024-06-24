@@ -10,10 +10,12 @@
 
             <div class="modal-body custom-modal-body">
                 <div class="step active" id="step1" data-header="Informações da Sala" data-id="1">
-                    <input type="text" id="editNomeSala" class="form-control mb-2 custom-input" placeholder="Nome da sala">
-                    <input type="number" id="editAndar" class="form-control mb-2 custom-input" placeholder="Andar">
-                    <input type="text" id="editArea" class="form-control mb-2 custom-input" placeholder="Área">
-                    <input type="number" id="editCapMax" class="form-control mb-2 custom-input" placeholder="Capacidade máxima">
+                    <input type="text" id="editNomeSala" class="form-control mb-2 custom-input" placeholder="Nome da sala" required>
+                    <select id="editAndar" class="form-control mb-2 custom-input" required>
+                        <option>Outro andar</option>
+                    </select>
+                    <input type="text" id="editArea" class="form-control mb-2 custom-input" placeholder="Área" required>
+                    <input type="number" id="editCapMax" class="form-control mb-2 custom-input" placeholder="Capacidade máxima" required>
                     <div class="d-flex justify-content-between">
                       <button class="btn btn-invisible"></button>
                       <button type="button" class="btn btn-secondary" onclick="fillConfirmationSalaEdit('modalEditarSala', 1)">Confirmar</button>

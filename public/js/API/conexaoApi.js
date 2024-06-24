@@ -89,34 +89,35 @@ function vetorizacao(...args) {
 class Controller{
     /*Acesso */
         
-        //Login
-            static async fazerLogin() {
-                const loginForm = document.getElementById('login-form');
-                if (loginForm) {
-                    loginForm.addEventListener('submit', async (event) => {
-                        event.preventDefault();
-                        const formData = new FormData(loginForm);
-                        const data = {
-                            login: formData.get('login'),
-                            senha: formData.get('senha'),
-                        };
-                        try {
-                            const response = await axios.post('http://localhost:3000/recepcionista/login', data);
-                            if (response.status===200) {
-                                const responseFormatado = response.data;
-                                localStorage.setItem('token', responseFormatado.token);
-                                const nivelAcesso = responseFormatado.nivelAcesso; 
-            
-                                if (nivelAcesso===2) window.location.href = '/public/views/dashboard/homeUniversal.html';
-                                else window.location.href = '/public/views/dashboard/homeRecepcionista.html';
-                            }
-                        } catch (error) {
-                            const errorMsg = document.getElementById('error-msg');
-                            if (errorMsg) errorMsg.textContent = 'Login ou senha inválidos.';
-                        }
-                    });
+// Método para realizar o login
+static async fazerLogin() {
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(loginForm);
+            const data = {
+                login: formData.get('login'),
+                senha: formData.get('senha'),
+            };
+            try {
+                const response = await axios.post('http://localhost:3000/recepcionista/login', data);
+                console.log(response.status===403);
+                if (response.status===200) {
+                    const responseFormatado=response.data;
+                    localStorage.setItem('token', responseFormatado.token);
+                    const nivelAcesso=responseFormatado.nivelAcesso;
+                    if (nivelAcesso===2) window.location.href='/public/views/dashboard/homeUniversal.html';
+                    else window.location.href='/public/views/dashboard/homeRecepcionista.html';
                 }
-            }
+            } catch (error) {
+                alert(error.response.data.message);
+                throw error;
+                }
+        });
+    }
+}
+
         
         //Logout
             static async fazerLogout() {
@@ -792,60 +793,63 @@ class Controller{
                 setElementInputValueById('editLogin', entity.login);
             }
 
-            static async preencherSelectComAPI(entityType){
+            static async preencherSelectComAPI(entityType) {
                 const selectElement = document.getElementById(entityType);
                 let data;
-    
                 try {
                     switch (entityType) {
                         case 'nivelAcesso':
                         case 'editNivelAcesso':
                             data = await this.listarNivelAcesso();
+                            data.forEach(item => {
+                                const option=document.createElement('option');
+                                option.value=item.id;
+                                option.textContent=item.glossarioNivel;
+                                selectElement.appendChild(option);
+                            });
                             break;
                         case 'andar':
-                        case 'andarEdit':
-                            data = await this.listarAndar();
+                        case 'editAndar':
+                            const andares = {
+                                0: 'Térreo',
+                                1: 'Primeiro andar',
+                                2: 'Segundo andar',
+                                3: 'Terceiro andar',
+                                4: 'Quarto andar'
+                            };
+                            Object.keys(andares).forEach(key => {
+                                const option=document.createElement('option');
+                                option.value=key;
+                                option.textContent=andares[key];
+                                selectElement.appendChild(option);
+                            });
                             break;
                         case 'salas':
                             data = await this.listarSalas();
+                            data.forEach(item => {
+                                const option=document.createElement('option');
+                                option.value=item.id;
+                                option.textContent=`${item.nome} - ${converterAndar(item.andar)}`;
+                                selectElement.appendChild(option);
+                            });
                             break;
                         case 'horarioLivre':
                             data = await this.listarHorarioLivre();
+                            data.forEach(item => {
+                                const option=document.createElement('option');
+                                option.value=item.horarioLivre;
+                                option.textContent=item.horarioLivre;
+                                selectElement.appendChild(option);
+                            });
                             break;
                         default:
                             throw new Error('ID do elemento select não suportado');
                     }
-    
-                    data.forEach(item => {
-                        const option = document.createElement('option');
-                        switch (entityType) {
-                            case 'editNivelAcesso':
-                            case 'nivelAcesso':
-                                option.value = item.id;
-                                option.textContent = item.glossarioNivel;
-                                break;
-                            case 'andar':
-                            case 'andarEdit':
-                                option.value = item.id;
-                                option.textContent = converterAndar(item.andar);
-                                break;
-                            case 'salas':
-                                option.value = item.id;
-                                option.textContent = `${item.nome} - ${converterAndar(item.andar)}`;
-                                break;
-                            case 'horarioLivre':
-                                option.value = item.horarioLivre;
-                                option.textContent = item.horarioLivre;
-                                break;
-                            default:
-                                throw new Error('ID do elemento select não suportado');
-                        }
-                        selectElement.appendChild(option);
-                    });
                 } catch (error) {
                     console.error('Erro ao buscar dados da API:', error);
                 }
             }
+            
         /*Atualizar*/
 
         
@@ -874,12 +878,20 @@ document.addEventListener('DOMContentLoaded', () => {
         Controller.fazerLogout();        
     });
 
-    observeElement('preencherSelect', ()=>{
+    observeElement('nivelAcesso', ()=>{
         Controller.preencherSelectComAPI('nivelAcesso');
     });
 
     observeElement('editNivelAcesso', ()=>{
         Controller.preencherSelectComAPI('editNivelAcesso');
+    });
+
+    observeElement('andar', ()=>{
+        Controller.preencherSelectComAPI('andar');
+    });
+
+    observeElement('editAndar', ()=>{
+        Controller.preencherSelectComAPI('editAndar');
     });
 
     observeElement('after-login-home', () => {
