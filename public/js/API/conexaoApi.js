@@ -794,7 +794,7 @@ static async fazerLogin() {
                 setElementInputValueById('editLogin', entity.login);
             }
 
-            static async preencherSelectComAPI(entityType) {
+            static async preencherModalComAPI(entityType) {
                 const selectElement = document.getElementById(entityType);
                 let data;
                 try {
@@ -825,15 +825,36 @@ static async fazerLogin() {
                                 selectElement.appendChild(option);
                             });
                             break;
-                        case 'salas':
-                            data = await this.listarSalas();
-                            data.forEach(item => {
-                                const option=document.createElement('option');
-                                option.value=item.id;
-                                option.textContent=`${item.nome} - ${converterAndar(item.andar)}`;
-                                selectElement.appendChild(option);
-                            });
-                            break;
+                            case 'selecao-salas-modal':
+                                data = await this.listarSalas();
+                                const selectElement = document.getElementById('selecao-salas-modal'); // Certifique-se de que você tem um elemento com este ID
+                                let first = true; // Para garantir que apenas o primeiro botão de opção esteja marcado
+                            
+                                data.forEach(item => {
+                                    if (!item.andar && item.situacao === 'D') {
+                                        const input = document.createElement('input');
+                                        input.type = 'radio';
+                                        input.className = 'btn-check';
+                                        input.name = 'dayOptions';
+                                        input.id = item.nome;
+                                        input.autocomplete = 'off';
+                            
+                                        if (first) {
+                                            input.checked = true;
+                                            first = false;
+                                        }
+                            
+                                        const label = document.createElement('label');
+                                        label.className = 'btn btn-outline-primary';
+                                        label.htmlFor = item.nome;
+                                        label.textContent = item.nome;
+                            
+                                        selectElement.appendChild(input);
+                                        selectElement.appendChild(label);
+                                    }
+                                });
+                                break;
+                            
                         case 'horarioLivre':
                             data = await this.listarHorarioLivre();
                             data.forEach(item => {
@@ -880,19 +901,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     observeElement('nivelAcesso', ()=>{
-        Controller.preencherSelectComAPI('nivelAcesso');
+        Controller.preencherModalComAPI('nivelAcesso');
     });
 
     observeElement('editNivelAcesso', ()=>{
-        Controller.preencherSelectComAPI('editNivelAcesso');
+        Controller.preencherModalComAPI('editNivelAcesso');
+    });
+
+    observeElement('selecao-salas-modal', ()=>{
+        Controller.preencherModalComAPI('selecao-salas-modal');
     });
 
     observeElement('andar', ()=>{
-        Controller.preencherSelectComAPI('andar');
+        Controller.preencherModalComAPI('andar');
     });
 
     observeElement('editAndar', ()=>{
-        Controller.preencherSelectComAPI('editAndar');
+        Controller.preencherModalComAPI('editAndar');
     });
 
     observeElement('after-login-home', () => {
