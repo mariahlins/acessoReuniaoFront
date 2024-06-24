@@ -25,7 +25,7 @@ function parseDate(dataReservada) {
 
 function ehHoje(dataReserva) {
     const dataAtual = new Date();
-    const dataAtualFormatada = `${dataAtual.getDate().toString().padStart(2, '0')}-${(dataAtual.getMonth() + 1).toString().padStart(2, '0')}-${dataAtual.getFullYear().toString()}`;
+    const dataAtualFormatada = `${dataAtual.getFullYear().toString()}-${(dataAtual.getMonth() + 1).toString().padStart(2, '0')}-${dataAtual.getDate().toString().padStart(2, '0')}`;
     return dataReserva===dataAtualFormatada;
 }
 
