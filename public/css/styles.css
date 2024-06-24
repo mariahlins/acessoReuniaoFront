@@ -465,3 +465,36 @@ dt{
 .step.active {
     display: block;
 }
+/* Estilos para a linha de blocos de horários */
+.row.blocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px; /* Espaço entre os blocos */
+    margin-top: 10px; /* Margem superior para separação */
+}
+
+/* Estilos para cada bloco de horário */
+.blocks .col-1 {
+    color: #333; /* Cor do texto */
+    text-align: center; /* Centralizar texto */
+    padding: 10px; /* Espaçamento interno */
+    border: 1px solid #ccc; /* Borda cinza */
+    border-radius: 5px; /* Borda arredondada */
+    cursor: pointer; /* Altera o cursor para indicar interatividade */
+}
+
+.blocks .col-1:hover {
+    background-color: #e0f7fa; /* Cor de fundo ao passar o mouse */
+}
+
+/* Estilo específico para horários reservados */
+.blocks .col-1.reservado {
+    background-color: lightgray; /* Cor de fundo para horários reservados */
+}
+
+/* Estilo para horários selecionados */
+.blocks .col-1.selecionado {
+    background-color: #81d4fa; /* Cor de fundo para horários selecionados */
+    color: white; /* Texto branco para melhor legibilidade */
+    font-weight: bold; /* Texto em negrito */
+}

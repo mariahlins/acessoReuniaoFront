@@ -6,6 +6,11 @@ function formatarDataBr(dataEUA) {
     return `${dia}/${mes}/${ano}`;
 }
 
+function formatarDataEUA(dataBR) {
+    const [dia, mes, ano] = dataBR.split('/');
+    return `${ano}-${mes}-${dia}`;
+}
+
 function ocultarDocumento(documento) {
     const inicio = documento.slice(0, 3);
     const meio = '***.***';
@@ -803,9 +808,9 @@ static async fazerLogin() {
                         case 'editNivelAcesso':
                             data = await this.listarNivelAcesso();
                             data.forEach(item => {
-                                const option=document.createElement('option');
-                                option.value=item.id;
-                                option.textContent=item.glossarioNivel;
+                                const option = document.createElement('option');
+                                option.value = item.id;
+                                option.textContent = item.glossarioNivel;
                                 selectElement.appendChild(option);
                             });
                             break;
@@ -819,45 +824,56 @@ static async fazerLogin() {
                                 4: 'Quarto andar'
                             };
                             Object.keys(andares).forEach(key => {
-                                const option=document.createElement('option');
-                                option.value=key;
-                                option.textContent=andares[key];
+                                const option = document.createElement('option');
+                                option.value = key;
+                                option.textContent = andares[key];
                                 selectElement.appendChild(option);
                             });
                             break;
-                            case 'selecao-salas-modal':
-                                data = await this.listarSalas();                                
-                                let first = true;
-                                data.forEach(item => {
-                                    if (!item.andar && item.situacao === 'D') {
-                                        const input = document.createElement('input');
-                                        input.type = 'radio';
-                                        input.className = 'btn-check';
-                                        input.name = 'salaOptions';
-                                        input.id = item.nome;
-                                        input.autocomplete = 'off';
-                            
-                                        if (first) {
-                                            input.checked = true;
-                                            first = false;
-                                        }
-                            
-                                        const label = document.createElement('label');
-                                        label.className = 'btn btn-outline-primary';
-                                        label.htmlFor = item.nome;
-                                        label.textContent = item.nome;
-                            
-                                        selectElement.appendChild(input);
-                                        selectElement.appendChild(label);
+                        case 'selecao-salas-modal':
+                            data = await this.listarSalas();                                
+                            let first = true;
+                            data.forEach(item => {
+                                if (!item.andar && item.situacao === 'D') {
+                                    const input = document.createElement('input');
+                                    input.type = 'radio';
+                                    input.className = 'btn-check';
+                                    input.name = 'salaOptions';
+                                    input.id = item.nome;
+                                    input.value=item.id;
+                                    input.autocomplete = 'off';
+                                    
+                                    if (first) {
+                                        input.checked = true;
+                                        first = false;
                                     }
-                                });
-                                break;
+                                    
+                                    const label = document.createElement('label');
+                                    label.className = 'btn btn-outline-primary';
+                                    label.htmlFor = item.nome;
+                                    label.textContent = item.nome;
+                                    
+                                    selectElement.appendChild(input);
+                                    selectElement.appendChild(label);
+            
+                                    // Add event listener to dinamizarAgenda on selection
+                                    input.addEventListener('change', async (event) => {
+                                        if (event.target.checked) {
+                                            const selectedDate = await this.getSelectedDate();
+                                            const reservasResponse = await axios.get(`http://localhost:3000/reserva/${item.id}/${selectedDate}`);
+                                            await this.dinamizarAgenda(reservasResponse.data);
+                                        }
+                                    });
+            
+                                }
+                            });
+                            break;
                         case 'horarioLivre':
                             data = await this.listarHorarioLivre();
                             data.forEach(item => {
-                                const option=document.createElement('option');
-                                option.value=item.horarioLivre;
-                                option.textContent=item.horarioLivre;
+                                const option = document.createElement('option');
+                                option.value = item.horarioLivre;
+                                option.textContent = item.horarioLivre;
                                 selectElement.appendChild(option);
                             });
                             break;
@@ -868,6 +884,83 @@ static async fazerLogin() {
                     console.error('Erro ao buscar dados da API:', error);
                 }
             }
+            
+            static async getSelectedDate() {
+                const today = new Date();
+                const selectedDay = document.querySelector('#selecao-dia-modal input[name="dayOptions"]:checked').id;
+                if (selectedDay === 'hoje') {
+                    return today.toISOString().split('T')[0];
+                } else if (selectedDay === 'amanha') {
+                    const tomorrow = new Date(today);
+                    tomorrow.setDate(today.getDate() + 1);
+                    return tomorrow.toISOString().split('T')[0];
+                }
+            }
+            
+            /*
+             static async selecionarHorarioDropdownModalCoworking(salaId, data){
+        try {
+            if (!data){
+                data = new Date();
+            }
+            const reservas = await this.obterReservas();
+            const reservasSala = reservas.data.filter((reserva) => reserva.idSala === salaId);
+
+            const horariosOcupados = reservasSala.map((reserva) => {
+                const inicio = new Date(reserva.horaInicio);
+                const fim = new Date(reserva.horaFimReserva);
+                return { inicio, fim };
+            });
+
+            const horariosDisponiveis = [];
+
+            for (let hora = 0; hora < 24; hora++) {
+                const horario = new Date(data.getFullYear(), data.getMonth(), data.getDate(), hora);
+                if (!horariosOcupados.some(h => h.inicio <= horario && h.fim > horario)) {
+                    horariosDisponiveis.push(horario);
+                }
+            }
+
+            const dropdown = document.getElementById('horariosDropdown');
+            dropdown.innerHTML = ''; 
+            horariosDisponiveis.forEach(horario => {
+                const option = document.createElement('option');
+                option.value = horario.toISOString();
+                option.text = `${horario.toLocaleDateString('pt-BR')} ${String(horario.getHours()).padStart(2, '0')}:00`;
+                dropdown.add(option);
+            });
+        } catch (error) {
+            console.error('Erro ao selecionar horário:', error);
+        }
+    } 
+
+             */
+            // Function to dynamically update the agenda
+            static async dinamizarAgenda(reservas) {
+                try {
+                    const spaces = Array.from(document.querySelectorAll('div.row.blocks .col-1'));
+                    // Resetando todos os blocos para a cor padrão
+                    spaces.forEach(space => {
+                        space.style.backgroundColor = 'lightgreen';
+                    });
+                    // Preenchendo os blocos reservados com a cor cinza
+                    reservas.forEach(reserva => {
+                        if (reserva.horaInicio && typeof reserva.horaInicio==='string') {
+                            const horaReservada = reserva.horaInicio.slice(0, 3)+'00';
+                            const timeBlockIndex = spaces.findIndex(space => space.id === horaReservada);
+                            if (timeBlockIndex !== -1) {
+                                for (let i=timeBlockIndex; i<timeBlockIndex+3; i++) {
+                                    const space = spaces[i];
+                                    if (space) space.style.backgroundColor = 'lightgray';
+                                }
+                            }
+                        } else console.warn('Hora reservada inválida:', reserva.horaReservada);
+                    });
+                } catch (error) {
+                    console.error('Erro ao colorir agenda:', error);
+                }
+            }
+            
             
         /*Atualizar*/
 
@@ -909,6 +1002,9 @@ document.addEventListener('DOMContentLoaded', () => {
         Controller.preencherModalComAPI('selecao-salas-modal');
     });
 
+    observeElement('selecao-dia-modal', ()=>{
+        Controller.getSelectedDate();
+    });
     observeElement('andar', ()=>{
         Controller.preencherModalComAPI('andar');
     });
