@@ -128,55 +128,90 @@ async function createEntity(entityType, stepAtual) {
   const entityData = getFormData(entityType);
   const token = localStorage.getItem('token');
   let response;
+  
   try {
     const req = await axios.post(`http://localhost:3000/${entityType}`, entityData, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    response=req;
+    response = req;
   } catch (error) {
     handleCreateEntityError(error, entityType);
   }
 
-    let modalId = `modalCadastrar${converterPrimeiraLetraMaiuscula(entityType)}`;
-    if (entityType === 'usuario') modalId = 'modalDeCoworking';
-
-    if (response.status === 200) return nextStep(modalId, stepAtual);
-    else throw new Error(`Erro ao criar ${entityType}. Status: ${response.status}`);
-}
-
-function handleCreateEntityError(error, entityType) {
-  if(error.response){
-    if (error.response.status === 409) alert(error.response.data.message);
-    else alert(`Erro ao criar ${entityType}. Por favor, tente novamente. Status: ${error.response.status}`);
-  }else{
-    alert(`Erro ao criar ${entityType}. Por favor, verifique sua conexão e tente novamente.`);
+  let modalId = `modalCadastrar${converterPrimeiraLetraMaiuscula(entityType)}`;
+  if (entityType === 'usuario') {
+    modalId = 'modalDeCoworking';
+    localStorage.setItem('id', entityData.id);
+    localStorage.setItem('cpf', entityData.identificador);
+    localStorage.setItem('dataNascimento', entityData.dataNascimento);
+    localStorage.setItem('nome', `${entityData.nome} ${entityData.sobrenome}`);
+    localStorage.setItem('email', entityData.email);
+    localStorage.setItem('numTelefone', entityData.numTelefone);
+  } 
+  
+  if (response.status === 200) {
+    return nextStep(modalId, stepAtual);
+  } else {
+    throw new Error(`Erro ao criar ${entityType}. Status: ${response.status}`);
   }
 }
 
-
 async function updateEntity(entityType, stepAtual) {
-    const entityData = getFormData(entityType);
-    const token = localStorage.getItem('token');
-    let id=getId();
-    if(entityType=='salaEdit') entityType='sala';
-    else if(entityType==='recepcionistaEdit') entityType='recepcionista';
-    else if(entityType==='usuarioEdit') entityType='usuario';
-    let response;
-    try {
-      const req = await axios.put(`http://localhost:3000/${entityType}/${id}`, entityData, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      response=req;
-    } catch (error) {
-      console.error(`Erro ao atualizar ${entityType}:`, error);
-      alert(`Erro ao atualizar ${entityType}. Por favor, tente novamente.`);
-    }
-    let modalId = `modalEditar${converterPrimeiraLetraMaiuscula(entityType)}`;
-    if(entityType==='usuario') modalId='modalDeCoworking';
-    if (response.status===200){
-      return nextStep(modalId, stepAtual);
-    }  
-    else throw new Error(`Erro ao atualizar ${entityType}. Status: ${response.status}`);
+  const entityData = getFormData(entityType);
+  const token = localStorage.getItem('token');
+  const id = getId();
+  
+  if (entityType === 'salaEdit') entityType = 'sala';
+  else if (entityType === 'recepcionistaEdit') entityType = 'recepcionista';
+  else if (entityType === 'usuarioEdit') {
+    entityType = 'usuario';
+  }
+  
+  let response;
+  try {
+    const req = await axios.put(`http://localhost:3000/${entityType}/${id}`, entityData, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    response = req;
+  } catch (error) {
+    console.error(`Erro ao atualizar ${entityType}:`, error);
+    alert(`Erro ao atualizar ${entityType}. Por favor, tente novamente.`);
+  }
+
+  let modalId = `modalEditar${converterPrimeiraLetraMaiuscula(entityType)}`;
+  if (entityType === 'usuario') modalId = 'modalDeCoworking';
+  
+  if (response.status === 200) {
+    return nextStep(modalId, stepAtual);
+  } else {
+    throw new Error(`Erro ao atualizar ${entityType}. Status: ${response.status}`);
+  }
+}
+
+function fillConfirmationReserva(modalId, currentStep) {
+  nextStep(modalId, currentStep);
+
+  const sala = document.querySelector('#selecao-salas-modal .active') ? document.querySelector('#selecao-salas-modal .active').textContent.trim() : '';
+  const data = document.querySelector('#selecao-dia-modal .active') ? document.querySelector('#selecao-dia-modal .active').textContent.trim() : '';
+  const horario = document.getElementById('horarioSelecionado') ? document.getElementById('horarioSelecionado').textContent.trim() : '';
+
+  setElementTextContentById('cpfUserConfirmReserva', localStorage.getItem('cpf'));
+  setElementTextContentById('aniversarioConfirmResrva', formatarDataBr(localStorage.getItem('dataNascimento')));
+  setElementTextContentById('nomeConfirmSpan', localStorage.getItem('nome'));
+  setElementTextContentById('emailConfirmSpan', localStorage.getItem('email'));
+  setElementTextContentById('numTelConfirmSpan', localStorage.getItem('numTelefone'));
+  setElementTextContentById('salaConfirmSpan', sala);
+  setElementTextContentById('dataConfirmSpan', data);
+  setElementTextContentById('horarioConfirmSpan', horario);
+}
+
+function handleCreateEntityError(error, entityType) {
+  if (error.response) {
+    if (error.response.status === 409) alert(error.response.data.message);
+    else alert(`Erro ao criar ${entityType}. Por favor, tente novamente. Status: ${error.response.status}`);
+  } else {
+    alert(`Erro ao criar ${entityType}. Por favor, verifique sua conexão e tente novamente.`);
+  }
 }
 
 // Get - pegar os dados
@@ -231,6 +266,11 @@ function getFormData(entityType) {
       var email = document.getElementById('emailWithCpfCreat').value;
       var numTelefone = document.getElementById('telefoneWithCpfCreat').value;
       var motivoDaReuniao = document.getElementById('motivoDaReuniaoWithCpfCreat').value;
+      localStorage.setItem('cpf', identificador);
+      localStorage.setItem('dataNascimento',dataNascimento);
+      localStorage.setItem('nome', `${nome} ${sobrenome}`);
+      localStorage.setItem('email', email);
+      localStorage.setItem('numTelefone', numTelefone);  
       return converterDateType({identificador, dataNascimento, nome, sobrenome, email, numTelefone, motivoDaReuniao});
   }
 }
@@ -295,13 +335,14 @@ function fillConfirmationUsuario(response, modalId, currentStep) {
   setElementInputValueById('telefoneWithCpf', converterNumTel(response.numTelefone));
   localStorage.setItem('id', response.id)
 }
-
 async function criarUsuario(entityData, modalId, currentStep) {
   nextStep(modalId, currentStep);
   // Preenche os campos com os dados para criação de novo usuário
   setElementTextContentById('confirmCPFWithCpfCreat', converterCPF(entityData.cpf));
   setElementTextContentById('confirmDataNascimentoWithCpfCreat', converterData(entityData.dataNascimento));
 }
+
+
 
 // Consulta se o usuário existe e decide o fluxo
 async function usuarioExiste(modalId, currentStep) {

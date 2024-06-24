@@ -896,65 +896,36 @@ static async fazerLogin() {
                     return tomorrow.toISOString().split('T')[0];
                 }
             }
-            
-            /*
-             static async selecionarHorarioDropdownModalCoworking(salaId, data){
-        try {
-            if (!data){
-                data = new Date();
-            }
-            const reservas = await this.obterReservas();
-            const reservasSala = reservas.data.filter((reserva) => reserva.idSala === salaId);
 
-            const horariosOcupados = reservasSala.map((reserva) => {
-                const inicio = new Date(reserva.horaInicio);
-                const fim = new Date(reserva.horaFimReserva);
-                return { inicio, fim };
-            });
-
-            const horariosDisponiveis = [];
-
-            for (let hora = 0; hora < 24; hora++) {
-                const horario = new Date(data.getFullYear(), data.getMonth(), data.getDate(), hora);
-                if (!horariosOcupados.some(h => h.inicio <= horario && h.fim > horario)) {
-                    horariosDisponiveis.push(horario);
-                }
-            }
-
-            const dropdown = document.getElementById('horariosDropdown');
-            dropdown.innerHTML = ''; 
-            horariosDisponiveis.forEach(horario => {
-                const option = document.createElement('option');
-                option.value = horario.toISOString();
-                option.text = `${horario.toLocaleDateString('pt-BR')} ${String(horario.getHours()).padStart(2, '0')}:00`;
-                dropdown.add(option);
-            });
-        } catch (error) {
-            console.error('Erro ao selecionar horário:', error);
-        }
-    } 
-
-             */
-            // Function to dynamically update the agenda
             static async dinamizarAgenda(reservas) {
                 try {
+                    const selectContainer = document.getElementById('selecao-horario-modal');
                     const spaces = Array.from(document.querySelectorAll('div.row.blocks .col-1'));
-                    // Resetando todos os blocos para a cor padrão
-                    spaces.forEach(space => {
-                        space.style.backgroundColor = 'lightgreen';
-                    });
-                    // Preenchendo os blocos reservados com a cor cinza
+                    const resetarBlocos = () => {
+                        spaces.forEach(space => {
+                            space.style.backgroundColor = 'lightgreen';
+                        });
+                        Array.from(selectContainer.children).forEach(child => {
+                            child.style.display = 'block';
+                        });
+                    };
+            
+                    resetarBlocos();
                     reservas.forEach(reserva => {
-                        if (reserva.horaInicio && typeof reserva.horaInicio==='string') {
-                            const horaReservada = reserva.horaInicio.slice(0, 3)+'00';
+                        if (reserva.horaInicio && typeof reserva.horaInicio === 'string') {
+                            const horaReservada = reserva.horaInicio.slice(0, 3) + '00';
                             const timeBlockIndex = spaces.findIndex(space => space.id === horaReservada);
                             if (timeBlockIndex !== -1) {
-                                for (let i=timeBlockIndex; i<timeBlockIndex+3; i++) {
-                                    const space = spaces[i];
-                                    if (space) space.style.backgroundColor = 'lightgray';
+                                for (let i = timeBlockIndex; i < timeBlockIndex + 3 && i < spaces.length; i++) {
+                                    spaces[i].style.backgroundColor = 'lightgray';
+                                    selectContainer.children[i+1].style.display = 'none';
                                 }
+                            } else {
+                                console.warn('Bloco de tempo não encontrado para:', horaReservada);
                             }
-                        } else console.warn('Hora reservada inválida:', reserva.horaReservada);
+                        } else {
+                            console.warn('Hora reservada inválida:', reserva.horaInicio);
+                        }
                     });
                 } catch (error) {
                     console.error('Erro ao colorir agenda:', error);

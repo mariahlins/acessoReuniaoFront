@@ -46,6 +46,30 @@
               <h6>Selecione um horário:</h6>
               <select class="form-select" id="selecao-horario-modal">
                 <option selected disabled>Escolha um horário</option>
+                <option value="00:00">00:00</option>
+                <option value="01:00">01:00</option>
+                <option value="02:00">02:00</option>
+                <option value="03:00">03:00</option>
+                <option value="04:00">04:00</option>
+                <option value="05:00">05:00</option>
+                <option value="06:00">06:00</option>
+                <option value="07:00">07:00</option>
+                <option value="08:00">08:00</option>
+                <option value="09:00">09:00</option>
+                <option value="10:00">10:00</option>
+                <option value="11:00">11:00</option>
+                <option value="12:00">12:00</option>
+                <option value="13:00">13:00</option>
+                <option value="14:00">14:00</option>
+                <option value="15:00">15:00</option>
+                <option value="16:00">16:00</option>
+                <option value="17:00">17:00</option>
+                <option value="18:00">18:00</option>
+                <option value="19:00">19:00</option>
+                <option value="20:00">20:00</option>
+                <option value="21:00">21:00</option>
+                <option value="22:00">22:00</option>
+                <option value="23:00">23:00</option>
               </select>
               <p id="horarioSelecionado" class="mt-2"></p>
             </div>
@@ -65,7 +89,7 @@
             <div class="col-1" id="10:00">10:00</div>
             <div class="col-1" id="11:00">11:00</div>
             <div class="col-1" id="12:00">12:00</div>
-            <br>
+            <br></br>
             <div class="col-1" id="13:00">13:00</div>
             <div class="col-1" id="14:00">14:00</div>
             <div class="col-1" id="15:00">15:00</div>
@@ -80,35 +104,35 @@
             </div>
           <div class="modal-footer-custom d-flex justify-content-between">
             <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 3)">Voltar</button>
-            <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeCoworking', 3)">Continuar</button>
+            <button type="button" class="btn btn-secondary" onclick="fillConfirmationReserva('modalDeCoworking', 3)">Continuar</button>
           </div>
         </div>
 
-
-        <div class="step" id="step4" data-header="">
+        <div class="step" id="step4" data-header="Informações da Reserva">
           <h4 class="confirma mx-auto text-center">A reserva está correta?</h4>
           <p class="mx-auto text-center">Informações da reserva e horários selecionados.</p>
           <div class="d-flex justify-content-space-between mx-auto ml-2">
             <div class="info-responsavel mx-auto">
               <h5>Informações do Responsável:</h5>
-              <p>CPF: 123.***.***-78</p>
-              <p>Data de Nascimento: 01/01/2020</p>
-              <p>Nome: Uplio Netto</p>
-              <p>Email: fulano@gmail.com</p>
-              <p>Número de telefone: 82 99999-9999</p>
+              <p>CPF: <span id="cpfUserConfirmReserva"></span></p>
+              <p>Data de Nascimento: <span id="aniversarioConfirmResrva"></span></p>
+              <p id="nomeConfirmResrva">Nome: <span id="nomeConfirmSpan"></span></p>
+              <p id="emailConfirmResrva">Email: <span id="emailConfirmSpan"></span></p>
+              <p id="numTelConfirmResrva">Número de telefone: <span id="numTelConfirmSpan"></span></p>
             </div>
             <div class="info-reserva mx-auto">
               <h5>Informações da Reserva:</h5>
-              <p>Sala: Coworking 01</p>
-              <p>Data: 01/01/2000</p>
-              <p>Horário: 15:00 - 18:00</p>
+              <p>Sala: <span id="salaConfirmSpan"></span></p>
+              <p>Data: <span id="dataConfirmSpan"></span></p>
+              <p>Horário: <span id="horarioConfirmSpan"></span></p>
             </div>
           </div>
           <div class="modal-footer-custom d-flex justify-content-between">
             <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 4)">Voltar</button>
-            <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeCoworking', 4)">Confirmar</button>
+            <button type="button" class="btn btn-secondary" onclick="('modalDeCoworking', 4)">Confirmar</button>
           </div>
         </div>
+        
 
 
         <div class="step" id="step5" data-header="">

@@ -475,6 +475,7 @@ dt{
 
 /* Estilos para cada bloco de horário */
 .blocks .col-1 {
+    background-color: lightgreen; /* Cor de fundo padrão */
     color: #333; /* Cor do texto */
     text-align: center; /* Centralizar texto */
     padding: 10px; /* Espaçamento interno */
