@@ -27,11 +27,8 @@ function converterCPF(cpf){
 }
 
 function converterData(dataEUA){
-  const data = new Date(dataEUA);
-  const dia=data.getDate().toString().padStart(2, '0');
-  const mes=(data.getMonth() + 1).toString().padStart(2, '0'); 
-  const ano=data.getFullYear();
-  return `${dia}/${mes}/${ano}`;
+  const data = dataEUA.split('-');
+  return `${data[2]}/${data[1]}/${data[0]}`;
 }
 
 function converterDataEUA(dataBR){
@@ -130,40 +127,56 @@ function finish(modalId) {
 async function createEntity(entityType, stepAtual) {
   const entityData = getFormData(entityType);
   const token = localStorage.getItem('token');
+  let response;
   try {
-    const response = await axios.post(`http://localhost:3000/${entityType}`, entityData, {
+    const req = await axios.post(`http://localhost:3000/${entityType}`, entityData, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    const modalId = `modalCadastrar${converterPrimeiraLetraMaiuscula(entityType)}`;
-    if(response.status===200) {
-      return nextStep(modalId, stepAtual);
-    }else throw new Error(`Erro ao criar ${entityType}. Status: ${response.status}`);
+    response=req;
   } catch (error) {
-    if (error.response.status === 409) {
-      alert(error.response.data.message);
-    }else{
-      alert(`Erro ao criar ${entityType}. Por favor, tente novamente.`);
-    }
+    handleCreateEntityError(error, entityType);
+  }
+
+    let modalId = `modalCadastrar${converterPrimeiraLetraMaiuscula(entityType)}`;
+    if (entityType === 'usuario') modalId = 'modalDeCoworking';
+
+    if (response.status === 200) return nextStep(modalId, stepAtual);
+    else throw new Error(`Erro ao criar ${entityType}. Status: ${response.status}`);
+}
+
+function handleCreateEntityError(error, entityType) {
+  if(error.response){
+    if (error.response.status === 409) alert(error.response.data.message);
+    else alert(`Erro ao criar ${entityType}. Por favor, tente novamente. Status: ${error.response.status}`);
+  }else{
+    alert(`Erro ao criar ${entityType}. Por favor, verifique sua conexão e tente novamente.`);
   }
 }
 
+
 async function updateEntity(entityType, stepAtual) {
     const entityData = getFormData(entityType);
+    const token = localStorage.getItem('token');
+    let id=getId();
+    if(entityType=='salaEdit') entityType='sala';
+    else if(entityType==='recepcionistaEdit') entityType='recepcionista';
+    else if(entityType==='usuarioEdit') entityType='usuario';
+    let response;
     try {
-      const token = localStorage.getItem('token');
-      let id=getId();
-      if(entityType=='salaEdit') entityType='sala';
-      else if(entityType==='recepcionistaEdit') entityType='recepcionista';
-      const response = await axios.put(`http://localhost:3000/${entityType}/${id}`, entityData, {
+      const req = await axios.put(`http://localhost:3000/${entityType}/${id}`, entityData, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      const modalId = `modalEditar${converterPrimeiraLetraMaiuscula(entityType)}`;
-      if (response.status === 200) return nextStep(modalId, stepAtual); 
-      else throw new Error(`Erro ao atualizar ${entityType}. Status: ${response.status}`);
-  } catch (error) {
-    console.error(`Erro ao atualizar ${entityType}:`, error);
-    alert(`Erro ao atualizar ${entityType}. Por favor, tente novamente.`);
-  }
+      response=req;
+    } catch (error) {
+      console.error(`Erro ao atualizar ${entityType}:`, error);
+      alert(`Erro ao atualizar ${entityType}. Por favor, tente novamente.`);
+    }
+    let modalId = `modalEditar${converterPrimeiraLetraMaiuscula(entityType)}`;
+    if(entityType==='usuario') modalId='modalDeCoworking';
+    if (response.status===200){
+      return nextStep(modalId, stepAtual);
+    }  
+    else throw new Error(`Erro ao atualizar ${entityType}. Status: ${response.status}`);
 }
 
 // Get - pegar os dados
@@ -204,6 +217,11 @@ function getFormData(entityType) {
       var cpf = removerPontos(document.getElementById('cpfWithCpf').value);
       var dataNascimento = document.getElementById('dataNascimentoWithCpf').value;
       return converterDateType({cpf, dataNascimento});
+
+    case 'usuarioEdit':
+      var email = document.getElementById('emailWithCpf').value;
+      var numTelefone = removerPontos(document.getElementById('telefoneWithCpf').value);
+      return converterDateType({email, numTelefone});
 
     case 'usuario':
       var identificador = removerPontos(document.getElementById('confirmCPFWithCpfCreat').innerText);
@@ -269,12 +287,13 @@ function fillConfirmationUsuario(response, modalId, currentStep) {
   
   // Preenche os campos com os dados do usuário existente
   setElementTextContentById('confirmCPFWithCpf', converterCPF(response.identificador));
-  setElementTextContentById('confirmDataNascimentoWithCpf', response.dataNascimento);
+  setElementTextContentById('confirmDataNascimentoWithCpf', converterData(response.dataNascimento));
   setElementTextContentById('confirmNomeWithCpf', `${converterPrimeiraLetraMaiuscula(response.nome)} ${converterPrimeiraLetraMaiuscula(response.sobrenome)}`);
   
   // Atualiza campos editáveis se necessário
   setElementInputValueById('emailWithCpf', response.email);
   setElementInputValueById('telefoneWithCpf', converterNumTel(response.numTelefone));
+  localStorage.setItem('id', response.id)
 }
 
 async function criarUsuario(entityData, modalId, currentStep) {
@@ -298,7 +317,7 @@ async function usuarioExiste(modalId, currentStep) {
     <input type="text" id="motivoDaReuniaoWithCpfNew" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião" required> 
     <div class="d-flex justify-content-between">
         <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 2)">Voltar</button>
-        <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeCoworking', 2)">Continuar</button>
+        <button type="button" class="btn btn-secondary" onclick="updateEntity('usuarioEdit', 2)">Continuar</button>
     </div>`;
 
   const step3Content = `
