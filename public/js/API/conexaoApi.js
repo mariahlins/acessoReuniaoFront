@@ -509,6 +509,7 @@ static async fazerLogin() {
         
     static async preencherTabela(items, tableBody, colunasDefinicao, metodoUm, metodoDois) {
         tableBody.innerHTML = '';
+        if(!items) return tableBody.innerHTML = '<tr><td colspan="6">Nenhum registro ativo, para sanar isso, cadastre algum</td></tr>';
         try {
             items.forEach(item => {
                 const linha = this.enviarInfoParaTabela(colunasDefinicao(item));

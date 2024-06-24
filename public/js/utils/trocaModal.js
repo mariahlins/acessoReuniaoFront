@@ -8,6 +8,7 @@ function formatCPF() {
   cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
   cpfInput.value = cpf;
 }
+
 function formatNumTel() {
   let numTel = numTelInput.value;
   numTel = numTel.replace(/\D/g, '');
@@ -31,6 +32,11 @@ function converterData(dataEUA){
   const mes=(data.getMonth() + 1).toString().padStart(2, '0'); 
   const ano=data.getFullYear();
   return `${dia}/${mes}/${ano}`;
+}
+
+function converterDataEUA(dataBR){
+  const data = dataBR.split('/');
+  return `${data[2]}-${data[1]}-${data[0]}`;
 }
 
 function removerPontos(data){
@@ -122,27 +128,27 @@ function finish(modalId) {
 
 // CRUD
 async function createEntity(entityType, stepAtual) {
+  const entityData = getFormData(entityType);
+  const token = localStorage.getItem('token');
   try {
-    const entityData = getFormData(entityType);
-    const token = localStorage.getItem('token');
     const response = await axios.post(`http://localhost:3000/${entityType}`, entityData, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     const modalId = `modalCadastrar${converterPrimeiraLetraMaiuscula(entityType)}`;
-    if (response.status === 200) {
+    if(response.status===200) {
       return nextStep(modalId, stepAtual);
-    } else {
-      throw new Error(`Erro ao criar ${entityType}. Status: ${response.status}`);
-    }
+    }else throw new Error(`Erro ao criar ${entityType}. Status: ${response.status}`);
   } catch (error) {
-    console.error(`Erro ao criar ${entityType}:`, error);
-    alert(`Erro ao criar ${entityType}. Por favor, tente novamente.`);
+    if (error.response.status === 409) {
+      alert(error.response.data.message);
+    }else{
+      alert(`Erro ao criar ${entityType}. Por favor, tente novamente.`);
+    }
   }
 }
 
 async function updateEntity(entityType, stepAtual) {
     const entityData = getFormData(entityType);
-    console.log(entityData);
     try {
       const token = localStorage.getItem('token');
       let id=getId();
@@ -163,14 +169,14 @@ async function updateEntity(entityType, stepAtual) {
 // Get - pegar os dados
 function getFormData(entityType) {
   switch(entityType) {
-    //Get span
+    // Get span
     case 'sala':
       var nome = document.getElementById('confirmNomeSala').textContent;
       var andar = Number(getElementValueById('andar'));
       var area = document.getElementById('confirmArea').textContent;
       var capMax = Number(getElementValueById('capMax'));
       return converterDateType({nome, andar, area, capMax});
-    
+
     case 'recepcionista':
       var nome = document.getElementById('confirmNome').textContent;
       var sobrenome = document.getElementById('confirmSobrenome').textContent;
@@ -178,7 +184,7 @@ function getFormData(entityType) {
       var senha = document.getElementById('senha').value;
       var nivelAcesso = Number(document.getElementById('nivelAcesso').value);
       return converterDateType({nome, sobrenome, login, senha, nivelAcesso});
-      
+
     case 'salaEdit':
       var nome = document.getElementById('confirmNomeSalaEdit').textContent;
       var andar = Number(getElementValueById('editAndar'));
@@ -192,11 +198,22 @@ function getFormData(entityType) {
       var login = document.getElementById('confirmLoginEdit').textContent;
       var nivelAcesso = Number(document.getElementById('editNivelAcesso').value);
       return converterDateType({nome, sobrenome, login, nivelAcesso});
-    //get inputs
-    case 'usuario':
-      const cpf = removerPontos(document.getElementById('cpfWithCpf').value);
-      const dataNascimento = document.getElementById('dataNascimentoWithCpf').value;
+
+    // Get inputs
+    case 'usuarioVerifica':
+      var cpf = removerPontos(document.getElementById('cpfWithCpf').value);
+      var dataNascimento = document.getElementById('dataNascimentoWithCpf').value;
       return converterDateType({cpf, dataNascimento});
+
+    case 'usuario':
+      var identificador = removerPontos(document.getElementById('confirmCPFWithCpfCreat').innerText);
+      var dataNascimento = converterDataEUA(document.getElementById('confirmDataNascimentoWithCpfCreat').innerText);
+      var nome = document.getElementById('nomeWithCpfCreat').value;
+      var sobrenome = document.getElementById('sobrenomeWithCpfCreat').value;
+      var email = document.getElementById('emailWithCpfCreat').value;
+      var numTelefone = document.getElementById('telefoneWithCpfCreat').value;
+      var motivoDaReuniao = document.getElementById('motivoDaReuniaoWithCpfCreat').value;
+      return converterDateType({identificador, dataNascimento, nome, sobrenome, email, numTelefone, motivoDaReuniao});
   }
 }
 
@@ -251,7 +268,7 @@ function fillConfirmationUsuario(response, modalId, currentStep) {
   nextStep(modalId, currentStep);
   
   // Preenche os campos com os dados do usuário existente
-  setElementTextContentById('confirmCPFWithCpf', response.identificador);
+  setElementTextContentById('confirmCPFWithCpf', converterCPF(response.identificador));
   setElementTextContentById('confirmDataNascimentoWithCpf', response.dataNascimento);
   setElementTextContentById('confirmNomeWithCpf', `${converterPrimeiraLetraMaiuscula(response.nome)} ${converterPrimeiraLetraMaiuscula(response.sobrenome)}`);
   
@@ -269,20 +286,10 @@ async function criarUsuario(entityData, modalId, currentStep) {
 
 // Consulta se o usuário existe e decide o fluxo
 async function usuarioExiste(modalId, currentStep) {
-  const entityData = getFormData('usuario'); 
+  const entityData = getFormData('usuarioVerifica'); 
   const token = localStorage.getItem('token');
-  let response;
-  
-  try {
-    const req = await axios.get(`http://localhost:3000/usuario/consulta/${entityData.cpf}/${entityData.dataNascimento}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    response = req.data;
-  } catch (error) {
-    console.error(`Erro ao consultar usuário ${modalId}:`, error);
-  }
-  
-    const step2Content = `
+
+  const step2Content = `
     <p class="form-control mb-2 custom-input"><strong><span id="confirmCPFWithCpf"></span></strong></p>
     <p class="form-control mb-2 custom-input"><strong><span id="confirmDataNascimentoWithCpf"></span></strong></p>
     <p class="form-control mb-2 custom-input"><strong><span id="confirmNomeWithCpf"></span></strong></p>
@@ -299,19 +306,30 @@ async function usuarioExiste(modalId, currentStep) {
     <p class="form-control mb-2 custom-input"><strong><span id="confirmDataNascimentoWithCpfCreat"></span></strong></p>
     <input type="text" id="nomeWithCpfCreat" class="form-control mb-2 custom-input" placeholder="Nome">
     <input type="text" id="sobrenomeWithCpfCreat" class="form-control mb-2 custom-input" placeholder="Sobrenome">
-    <input type="text" id="emailWithCpf" class="form-control mb-2 custom-input" placeholder="Email" required>
-    <input type="text" id="telefoneWithCpf" class="form-control mb-2 custom-input" placeholder="Número de telefone" required>
+    <input type="text" id="emailWithCpfCreat" class="form-control mb-2 custom-input" placeholder="Email" required>
+    <input type="text" id="telefoneWithCpfCreat" class="form-control mb-2 custom-input" placeholder="Número de telefone" required>
     <input type="text" id="motivoDaReuniaoWithCpfCreat" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião" required>
     <div class="d-flex justify-content-between">
         <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 2)">Voltar</button>
-        <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeCoworking', 2)">Continuar</button>
+        <button type="button" class="btn btn-secondary" onclick="createEntity('usuario', 2)">Continuar</button>
     </div>`;
-    
-  if (response){
-      document.getElementById('step2').innerHTML = step2Content;
-  fillConfirmationUsuario(response, modalId, currentStep);
-  }else{
-    document.getElementById('step2').innerHTML = step3Content;
-    criarUsuario(entityData, modalId, currentStep);
+
+  try {
+    const response = await axios.get(`http://localhost:3000/usuario/consulta/${entityData.cpf}/${entityData.dataNascimento}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    document.getElementById('step2').innerHTML = step2Content;
+    fillConfirmationUsuario(response.data, modalId, currentStep);
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      document.getElementById('step2').innerHTML = step3Content;
+      criarUsuario(entityData, modalId, currentStep);
+    } else {
+      const errorMessage = error.response && error.response.data && error.response.data.message 
+                          ? error.response.data.message 
+                          : 'Erro ao buscar usuário. Por favor, tente novamente mais tarde.';
+      alert(errorMessage);
+    }
   }
 }
