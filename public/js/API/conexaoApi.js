@@ -826,34 +826,8 @@ static async fazerLogin() {
                             });
                             break;
                             case 'selecao-salas-modal':
-                                data = await this.listarSalas();
-                                const selectElement = document.getElementById('selecao-salas-modal'); // Certifique-se de que você tem um elemento com este ID
-                                let first = true; // Para garantir que apenas o primeiro botão de opção esteja marcado
-                            
-                                data.forEach(item => {
-                                    if (!item.andar && item.situacao === 'D') {
-                                        const input = document.createElement('input');
-                                        input.type = 'radio';
-                                        input.className = 'btn-check';
-                                        input.name = 'dayOptions';
-                                        input.id = item.nome;
-                                        input.autocomplete = 'off';
-                            
-                                        if (first) {
-                                            input.checked = true;
-                                            first = false;
-                                        }
-                            
-                                        const label = document.createElement('label');
-                                        label.className = 'btn btn-outline-primary';
-                                        label.htmlFor = item.nome;
-                                        label.textContent = item.nome;
-                            
-                                        selectElement.appendChild(input);
-                                        selectElement.appendChild(label);
-                                    }
-                                });
-
+                                data = await this.listarSalas();                                
+                                let first = true;
                                 data.forEach(item => {
                                     if (!item.andar && item.situacao === 'D') {
                                         const input = document.createElement('input');
@@ -878,7 +852,6 @@ static async fazerLogin() {
                                     }
                                 });
                                 break;
-                            
                         case 'horarioLivre':
                             data = await this.listarHorarioLivre();
                             data.forEach(item => {
