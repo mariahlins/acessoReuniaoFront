@@ -466,14 +466,23 @@ static async fazerLogin() {
             localStorage.setItem('indexPaginacao', id);
             window.location.reload();
         }
+        
+
      
         static async mostrarReservas(...reservas) {
-            const rese=[...reservas[0]];
+            const rese = [...reservas[0]];
             try {
                 const reservasComDetalhes = await this.reservaComDetalhes(rese);
-                const req = vetorizacao(reservasComDetalhes, reservas[1]); 
+        
+                reservasComDetalhes.sort((a, b) => {
+                    const dateTimeA = new Date(`${a.dataReservada}T${a.horaInicio}`);
+                    const dateTimeB = new Date(`${b.dataReservada}T${b.horaInicio}`);
+                    return dateTimeA - dateTimeB;
+                });
+        
+                const req = vetorizacao(reservasComDetalhes, reservas[1]);
                 const tabela = document.getElementById('reservas-tabela');
-                
+        
                 this.preencherTabela(
                     req[Number(localStorage.getItem('indexPaginacao'))], tabela, (item) => [
                         item.sala.nome,
