@@ -167,9 +167,9 @@ async function createEntity(entityType, stepAtual) {
   } catch (error) {
     handleCreateEntityError(error, entityType);
   }
-
   let modalId = `modalCadastrar${converterPrimeiraLetraMaiuscula(entityType)}`;
-  if (entityType === 'usuario') {
+  if(entityType ==='reserva') modalId='modalDeCoworking';
+  else if (entityType === 'usuario') {
     modalId = 'modalDeCoworking';
     localStorage.setItem('id', entityData.id);
     localStorage.setItem('cpf', entityData.identificador);
@@ -178,7 +178,6 @@ async function createEntity(entityType, stepAtual) {
     localStorage.setItem('email', entityData.email);
     localStorage.setItem('numTelefone', entityData.numTelefone);
   } 
-  
   if (response.status === 200) {
     return nextStep(modalId, stepAtual);
   } else {
@@ -218,21 +217,7 @@ async function updateEntity(entityType, stepAtual) {
   }
 }
 
-function fillConfirmationReserva(modalId, currentStep) {
-  nextStep(modalId, currentStep);
-  console.log(getElementValueById('selecao-horario-modal'));
-  setElementTextContentById('cpfUserConfirmReserva', localStorage.getItem('cpf'));
-  setElementTextContentById('aniversarioConfirmResrva', formatarDataBr(localStorage.getItem('dataNascimento')));
-  setElementTextContentById('nomeConfirmSpan', localStorage.getItem('nome'));
-  setElementTextContentById('emailConfirmSpan', localStorage.getItem('email'));
-  setElementTextContentById('numTelConfirmSpan', localStorage.getItem('numTelefone'));
- // setElementTextContentById('motivoConfirmSpan', localStorage.getItem('motivoDaReuniao'));
-  setElementTextContentById('salaConfirmSpan', localStorage.getItem('nomeSala'));
-  setElementTextContentById('dataConfirmSpan', formatarDataBr(localStorage.getItem('diaEscolhido')));
-  setElementTextContentById('horarioConfirmSpan', getElementValueById('selecao-horario-modal'));
-  setElementTextContentById('horarioSaidaConfirmSpan', adicionarHora(getElementValueById('selecao-horario-modal')));
 
-}
 
 function handleCreateEntityError(error, entityType) {
   if (error.response) {
@@ -316,6 +301,15 @@ function getFormData(entityType) {
       localStorage.setItem('numTelefone', numTelefone);
       localStorage.setItem('motivoDaReuniao', motivoReserva);  
       return converterDateType({identificador, dataNascimento, nome, sobrenome, email, numTelefone, motivoDaReuniao});
+  
+    case 'reserva':
+      var idRecepcionista=Number(localStorage.getItem('idRecepcionista'));
+      var idUsuario=Number(localStorage.getItem('id'));
+      var idSala=Number(localStorage.getItem('idReserva'));
+      var motivoReserva = localStorage.getItem('motivoDaReuniao');
+      var dataReservada = converterDataEUA(document.getElementById('dataConfirmSpan').innerText);
+      var horaInicio = document.getElementById('horarioConfirmSpan').innerText;
+      return converterDateType({idRecepcionista, idUsuario, idSala, motivoReserva, dataReservada, horaInicio});
   }
 }
 
@@ -350,6 +344,21 @@ function fillConfirmationSalaEdit(modalId, currentStep) {
   setElementTextContentById('confirmAndarEdit',  converterAndar(Number(getElementValueById('editAndar'))));
   setElementTextContentById('confirmAreaEdit', getElementValueById('editArea'));
   setElementTextContentById('confirmCapMaxEdit', getElementValueById('editCapMax'));
+
+}
+
+function fillConfirmationReserva(modalId, currentStep) {
+  nextStep(modalId, currentStep);
+  setElementTextContentById('cpfUserConfirmReserva', localStorage.getItem('cpf'));
+  setElementTextContentById('aniversarioConfirmResrva', formatarDataBr(localStorage.getItem('dataNascimento')));
+  setElementTextContentById('nomeConfirmSpan', localStorage.getItem('nome'));
+  setElementTextContentById('emailConfirmSpan', localStorage.getItem('email'));
+  setElementTextContentById('numTelConfirmSpan', localStorage.getItem('numTelefone'));
+ // setElementTextContentById('motivoConfirmSpan', localStorage.getItem('motivoDaReuniao'));
+  setElementTextContentById('salaConfirmSpan', localStorage.getItem('nomeSala'));
+  setElementTextContentById('dataConfirmSpan', formatarDataBr(localStorage.getItem('diaEscolhido')));
+  setElementTextContentById('horarioConfirmSpan', getElementValueById('selecao-horario-modal'));
+  setElementTextContentById('horarioSaidaConfirmSpan', adicionarHora(getElementValueById('selecao-horario-modal')));
 
 }
 

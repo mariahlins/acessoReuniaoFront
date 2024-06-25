@@ -111,6 +111,7 @@ static async fazerLogin() {
                 if (response.status===200) {
                     const responseFormatado=response.data;
                     localStorage.setItem('token', responseFormatado.token);
+                    localStorage.setItem('idRecepcionista', responseFormatado.id);
                     const nivelAcesso=responseFormatado.nivelAcesso;
                     if (nivelAcesso===2) window.location.href='/public/views/dashboard/homeUniversal.html';
                     else window.location.href='/public/views/dashboard/homeRecepcionista.html';
@@ -900,7 +901,9 @@ static async fazerLogin() {
             
                     const resetarBlocos=()=>{
                         spaces.forEach(space=>{
-                            space.style.backgroundColor='lightgreen';
+                            if(hoje===dia){
+                                if(currentHour>=parseInt(space.id)) space.style.backgroundColor='lightgray';
+                            }else space.style.backgroundColor='lightgreen';
                         });
                         Array.from(selectContainer.children).forEach(child => {
                             if(hoje===dia){
