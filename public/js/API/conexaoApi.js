@@ -980,6 +980,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const today = new Date().toISOString().split('T')[0];
             localStorage.setItem('diaEscolhido', today);
+            localStorage.setItem('nomeSala', firstRadio.id);
             localStorage.setItem('idReserva', firstRadio.value);
     
             await Controller.dinamizarAgenda(today, firstRadio.value);
@@ -987,6 +988,7 @@ document.addEventListener('DOMContentLoaded', () => {
             salaOptions.forEach(radio => {
                 radio.addEventListener('change', async () => {
                     localStorage.setItem('idReserva', radio.value);
+                    localStorage.setItem('nomeSala', radio.id);
                     const selectedDate = localStorage.getItem('diaEscolhido');
                     const idReserva = localStorage.getItem('idReserva');
                     await Controller.dinamizarAgenda(selectedDate, idReserva);

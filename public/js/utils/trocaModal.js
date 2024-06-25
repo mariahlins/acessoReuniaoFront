@@ -40,6 +40,14 @@ function removerPontos(data){
   return data.replace(/\D/g, '');
 }
 
+function adicionarHora(time) {
+  const [hour, minute] = time.split(':').map(Number);
+  let novaHora=hour+3;
+
+  if(novaHora>=23) novaHora-=23;
+  return `${novaHora.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+}
+
 function converterPrimeiraLetraMaiuscula(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
@@ -212,19 +220,18 @@ async function updateEntity(entityType, stepAtual) {
 
 function fillConfirmationReserva(modalId, currentStep) {
   nextStep(modalId, currentStep);
-
-  const sala = document.querySelector('#selecao-salas-modal .active') ? document.querySelector('#selecao-salas-modal .active').textContent.trim() : '';
-  const data = document.querySelector('#selecao-dia-modal .active') ? document.querySelector('#selecao-dia-modal .active').textContent.trim() : '';
-  const horario = document.getElementById('horarioSelecionado') ? document.getElementById('horarioSelecionado').textContent.trim() : '';
-
+  console.log(getElementValueById('selecao-horario-modal'));
   setElementTextContentById('cpfUserConfirmReserva', localStorage.getItem('cpf'));
   setElementTextContentById('aniversarioConfirmResrva', formatarDataBr(localStorage.getItem('dataNascimento')));
   setElementTextContentById('nomeConfirmSpan', localStorage.getItem('nome'));
   setElementTextContentById('emailConfirmSpan', localStorage.getItem('email'));
   setElementTextContentById('numTelConfirmSpan', localStorage.getItem('numTelefone'));
-  setElementTextContentById('salaConfirmSpan', sala);
-  setElementTextContentById('dataConfirmSpan', data);
-  setElementTextContentById('horarioConfirmSpan', horario);
+ // setElementTextContentById('motivoConfirmSpan', localStorage.getItem('motivoDaReuniao'));
+  setElementTextContentById('salaConfirmSpan', localStorage.getItem('nomeSala'));
+  setElementTextContentById('dataConfirmSpan', formatarDataBr(localStorage.getItem('diaEscolhido')));
+  setElementTextContentById('horarioConfirmSpan', getElementValueById('selecao-horario-modal'));
+  setElementTextContentById('horarioSaidaConfirmSpan', adicionarHora(getElementValueById('selecao-horario-modal')));
+
 }
 
 function handleCreateEntityError(error, entityType) {
@@ -270,29 +277,44 @@ function getFormData(entityType) {
       return converterDateType({nome, sobrenome, login, nivelAcesso});
 
     // Get inputs
+    //Chamado na primeira tela do modal
     case 'usuarioVerifica':
       var cpf = removerPontos(document.getElementById('cpfWithCpf').value);
       var dataNascimento = document.getElementById('dataNascimentoWithCpf').value;
       return converterDateType({cpf, dataNascimento});
 
     case 'usuarioEdit':
-      var email = document.getElementById('emailWithCpf').value;
-      var numTelefone = removerPontos(document.getElementById('telefoneWithCpf').value);
-      return converterDateType({email, numTelefone});
+        var identificador = document.getElementById('confirmCPFWithCpf').innerText;
+        var dataNascimento = converterDataEUA(document.getElementById('confirmDataNascimentoWithCpf').innerText);
+        var nome = document.getElementById('nomeWithCpf').innerText;
+        var email = document.getElementById('emailWithCpf').value;
+        var numTelefone = document.getElementById('telefoneWithCpf').value;
+        var motivoReserva = document.getElementById('motivoDaReuniaoWithCpf').value;
+
+        localStorage.setItem('cpf', identificador);
+        localStorage.setItem('dataNascimento',dataNascimento);
+        localStorage.setItem('nome', nome);
+        localStorage.setItem('email', email);
+        localStorage.setItem('numTelefone', numTelefone);
+        localStorage.setItem('motivoDaReuniao', motivoReserva);   
+        numTelefone = removerPontos(numTelefone);
+        return converterDateType({email, numTelefone});
 
     case 'usuario':
-      var identificador = removerPontos(document.getElementById('confirmCPFWithCpfCreat').innerText);
-      var dataNascimento = converterDataEUA(document.getElementById('confirmDataNascimentoWithCpfCreat').innerText);
-      var nome = document.getElementById('nomeWithCpfCreat').value;
-      var sobrenome = document.getElementById('sobrenomeWithCpfCreat').value;
-      var email = document.getElementById('emailWithCpfCreat').value;
-      var numTelefone = document.getElementById('telefoneWithCpfCreat').value;
-      var motivoDaReuniao = document.getElementById('motivoDaReuniaoWithCpfCreat').value;
+      var identificador = removerPontos(document.getElementById('confirmCPFWithCpf').innerText);
+      var dataNascimento = converterDataEUA(document.getElementById('confirmDataNascimentoWithCpf').innerText);
+      var nome = document.getElementById('nomeWithCpf').value;
+      var sobrenome = document.getElementById('sobrenomeWithCpf').value;
+      var email = document.getElementById('emailWithCpf').value;
+      var numTelefone = document.getElementById('telefoneWithCpf').value;
+      var motivoReserva = document.getElementById('motivoDaReuniaoWithCpf').value;
+
       localStorage.setItem('cpf', identificador);
       localStorage.setItem('dataNascimento',dataNascimento);
       localStorage.setItem('nome', `${nome} ${sobrenome}`);
       localStorage.setItem('email', email);
-      localStorage.setItem('numTelefone', numTelefone);  
+      localStorage.setItem('numTelefone', numTelefone);
+      localStorage.setItem('motivoDaReuniao', motivoReserva);  
       return converterDateType({identificador, dataNascimento, nome, sobrenome, email, numTelefone, motivoDaReuniao});
   }
 }
@@ -350,7 +372,7 @@ function fillConfirmationUsuario(response, modalId, currentStep) {
   // Preenche os campos com os dados do usuário existente
   setElementTextContentById('confirmCPFWithCpf', converterCPF(response.identificador));
   setElementTextContentById('confirmDataNascimentoWithCpf', converterData(response.dataNascimento));
-  setElementTextContentById('confirmNomeWithCpf', `${converterPrimeiraLetraMaiuscula(response.nome)} ${converterPrimeiraLetraMaiuscula(response.sobrenome)}`);
+  setElementTextContentById('nomeWithCpf', `${converterPrimeiraLetraMaiuscula(response.nome)} ${converterPrimeiraLetraMaiuscula(response.sobrenome)}`);
   
   // Atualiza campos editáveis se necessário
   setElementInputValueById('emailWithCpf', response.email);
@@ -360,8 +382,8 @@ function fillConfirmationUsuario(response, modalId, currentStep) {
 async function criarUsuario(entityData, modalId, currentStep) {
   nextStep(modalId, currentStep);
   // Preenche os campos com os dados para criação de novo usuário
-  setElementTextContentById('confirmCPFWithCpfCreat', converterCPF(entityData.cpf));
-  setElementTextContentById('confirmDataNascimentoWithCpfCreat', converterData(entityData.dataNascimento));
+  setElementTextContentById('confirmCPFWithCpf', converterCPF(entityData.cpf));
+  setElementTextContentById('confirmDataNascimentoWithCpf', converterData(entityData.dataNascimento));
 }
 
 
@@ -374,23 +396,23 @@ async function usuarioExiste(modalId, currentStep) {
   const step2Content = `
     <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="confirmCPFWithCpf"></span></strong></p>
     <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="confirmDataNascimentoWithCpf"></span></strong></p>
-    <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="confirmNomeWithCpf"></span></strong></p>
+    <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="nomeWithCpf"></span></strong></p>
     <input type="text" id="emailWithCpf" class="form-control mb-2 custom-input" placeholder="Email" required>
-    <input type="text" id="telefoneWithCpf" class="form-control mb-2 custom-input" placeholder="Número de telefone" required>
-    <input type="text" id="motivoDaReuniaoWithCpfNew" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião" required> 
+    <input type="text" id="telefoneWithCpf" class="form-control mb-2 custom-input" placeholder="Número de telefone" minlength="12" maxlength="14" required>
+    <input type="text" id="motivoDaReuniaoWithCpf" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião" required> 
     <div class="d-flex justify-content-between">
         <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 2)">Voltar</button>
         <button type="button" class="btn btn-secondary" onclick="updateEntity('usuarioEdit', 2)">Continuar</button>
     </div>`;
 
   const step3Content = `
-    <p class="form-control mb-2 custom-input"><strong><span id="confirmCPFWithCpfCreat"></span></strong></p>
-    <p class="form-control mb-2 custom-input"><strong><span id="confirmDataNascimentoWithCpfCreat"></span></strong></p>
-    <input type="text" id="nomeWithCpfCreat" class="form-control mb-2 custom-input" placeholder="Nome">
-    <input type="text" id="sobrenomeWithCpfCreat" class="form-control mb-2 custom-input" placeholder="Sobrenome">
-    <input type="text" id="emailWithCpfCreat" class="form-control mb-2 custom-input" placeholder="Email" required>
-    <input type="text" id="telefoneWithCpfCreat" class="form-control mb-2 custom-input" placeholder="Número de telefone" required>
-    <input type="text" id="motivoDaReuniaoWithCpfCreat" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião" required>
+    <p class="form-control mb-2 custom-input"><strong><span id="confirmCPFWithCpf"></span></strong></p>
+    <p class="form-control mb-2 custom-input"><strong><span id="confirmDataNascimentoWithCpf"></span></strong></p>
+    <input type="text" id="nomeWithCpf" class="form-control mb-2 custom-input" placeholder="Nome">
+    <input type="text" id="sobrenomeWithCpf" class="form-control mb-2 custom-input" placeholder="Sobrenome">
+    <input type="text" id="emailWithCpf" class="form-control mb-2 custom-input" placeholder="Email" required>
+    <input type="text" id="telefoneWithCpf" class="form-control mb-2 custom-input" placeholder="Número de telefone" minlength="12" maxlength="14" required>
+    <input type="text" id="motivoDaReuniaoWithCpf" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião" required>
     <div class="d-flex justify-content-between">
         <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 2)">Voltar</button>
         <button type="button" class="btn btn-secondary" onclick="createEntity('usuario', 2)">Continuar</button>
