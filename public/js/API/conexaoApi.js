@@ -971,23 +971,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     observeElement('selecao-salas-modal', async () => {
         await Controller.preencherModalComAPI('selecao-salas-modal');
-        
+    
         const salaOptions = document.querySelectorAll('input[name="salaOptions"]');
-        
-        salaOptions.forEach(radio => {
-            radio.addEventListener('change', () => {
-                localStorage.setItem('idReserva', radio.value);
-                const selectedDate = localStorage.getItem('diaEscolhido');
-                const idReserva = localStorage.getItem('idReserva');
-                Controller.dinamizarAgenda(selectedDate, idReserva);
+    
+        if (salaOptions.length > 0) {
+            const firstRadio = salaOptions[0];
+            firstRadio.checked = true;
+
+            const today = new Date().toISOString().split('T')[0];
+            localStorage.setItem('diaEscolhido', today);
+            localStorage.setItem('idReserva', firstRadio.value);
+    
+            await Controller.dinamizarAgenda(today, firstRadio.value);
+    
+            salaOptions.forEach(radio => {
+                radio.addEventListener('change', async () => {
+                    localStorage.setItem('idReserva', radio.value);
+                    const selectedDate = localStorage.getItem('diaEscolhido');
+                    const idReserva = localStorage.getItem('idReserva');
+                    await Controller.dinamizarAgenda(selectedDate, idReserva);
+                });
             });
-        });
+        }
     });
     
-    // Observador para mudanças nos inputs de seleção de dia
+    
     observeElement('selecao-dia-modal', () => {
         const dayOptions = document.querySelectorAll('input[name="dayOptions"]');
-        
+
         dayOptions.forEach(radio => {
             radio.addEventListener('change', () => {
                 Controller.getSelectedDate(radio.id).then(valor => {
