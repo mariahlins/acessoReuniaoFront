@@ -364,7 +364,7 @@ dt{
 }
 
 .custom-modal-size {
-    max-width: 800px; 
+    max-width: 105vh; 
     max-height: 90vh;
 }
 

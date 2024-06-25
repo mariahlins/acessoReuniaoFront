@@ -3,16 +3,14 @@
     <div class="modal-content">
       <div class="modal-header">
         <h6 class="modal-title text-center w-100" id="modalHeader">Informações da Reserva</h6>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
       </div>
 
 
       <div class="modal-body custom-modal-body">
-        <div class="step active" id="step1" data-header="Informações da Reserva">
-          <input type="text" id="cpf" class="form-control mb-2 custom-input" placeholder="CPF">
-          <input type="text" id="dataNascimento" class="form-control mb-2 custom-input" placeholder="Data de Nascimento">
+        <div class="step active" id="step1" data-header="Informações do responsável">
+          <input type="text" id="cpfWithCpf" class="form-control mb-2 custom-input" placeholder="CPF" minlength="14" maxlength="14" required>
+          <input type="date" id="dataNascimentoWithCpf" class="form-control mb-2 custom-input" placeholder="Data de Nascimento" required>
           <input type="text" id="nome" class="form-control mb-2 custom-input" placeholder="Nome">
           <input type="text" id="nomeEmpresa" class="form-control mb-2 custom-input" placeholder="Nome da Empresa">
           <input type="text" id="motivoDaReuniao" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião">

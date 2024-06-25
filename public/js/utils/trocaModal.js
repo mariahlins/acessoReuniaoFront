@@ -85,6 +85,28 @@ function setElementInputValueById(id, value) {
 //SETs
 
 // Gestão do modal
+document.getElementById("botao").disabled = true;
+function checkInputs() {
+    var nascimento = document.getElementById("dataNascimentoWithCpf").value;
+    var cpff = document.getElementById("cpfWithCpf").value;
+
+    //aceita se os dois estiverem okeis
+    if (nascimento.trim() !== '' && cpff.trim() !== '') {
+        document.getElementById("botao").disabled = false;
+    } else {
+        //esse else é pra caso algum dos campos seja apagado
+        document.getElementById("botao").disabled = true;
+    }
+}
+//pega a data de nascimento
+document.getElementById("dataNascimentoWithCpf").addEventListener("input", function(event) {
+    checkInputs();
+});
+//pega o cpf digitado
+document.getElementById("cpfWithCpf").addEventListener("input", function(event) {
+    checkInputs();
+});
+
 function updateModalContent(modalId, step) {
   const currentStep = document.querySelector(`#${modalId} #step${step}`);
   if (!currentStep) return;
@@ -350,9 +372,9 @@ async function usuarioExiste(modalId, currentStep) {
   const token = localStorage.getItem('token');
 
   const step2Content = `
-    <p class="form-control mb-2 custom-input"><strong><span id="confirmCPFWithCpf"></span></strong></p>
-    <p class="form-control mb-2 custom-input"><strong><span id="confirmDataNascimentoWithCpf"></span></strong></p>
-    <p class="form-control mb-2 custom-input"><strong><span id="confirmNomeWithCpf"></span></strong></p>
+    <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="confirmCPFWithCpf"></span></strong></p>
+    <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="confirmDataNascimentoWithCpf"></span></strong></p>
+    <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="confirmNomeWithCpf"></span></strong></p>
     <input type="text" id="emailWithCpf" class="form-control mb-2 custom-input" placeholder="Email" required>
     <input type="text" id="telefoneWithCpf" class="form-control mb-2 custom-input" placeholder="Número de telefone" required>
     <input type="text" id="motivoDaReuniaoWithCpfNew" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião" required> 
