@@ -138,6 +138,12 @@ input {
     color:#adb5bd;
 }
 
+.btn-group label{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    direction: ltr;
+}
 
 input[type="text"] {
     font-size: 1vw;
@@ -487,7 +493,6 @@ dt{
 .blocks .col-1:hover {
     background-color: #e0f7fa; /* Cor de fundo ao passar o mouse */
 }
-
 /* Estilo específico para horários reservados */
 .blocks .col-1.reservado {
     background-color: lightgray; /* Cor de fundo para horários reservados */

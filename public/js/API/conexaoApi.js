@@ -839,53 +839,35 @@ static async fazerLogin() {
                                 selectElement.appendChild(option);
                             });
                             break;
-                        case 'selecao-salas-modal':
-                            data = await this.listarSalas();                                
-                            let first = true;
-                            data.forEach(item => {
-                                if (!item.andar && item.situacao === 'D') {
-                                    const input = document.createElement('input');
-                                    input.type = 'radio';
-                                    input.className = 'btn-check';
-                                    input.name = 'salaOptions';
-                                    input.id = item.nome;
-                                    input.value=item.id;
-                                    input.autocomplete = 'off';
-                                    
-                                    if (first) {
-                                        input.checked = true;
-                                        first = false;
-                                    }
-                                    
-                                    const label = document.createElement('label');
-                                    label.className = 'btn btn-outline-primary';
-                                    label.htmlFor = item.nome;
-                                    label.textContent = item.nome;
-                                    
-                                    selectElement.appendChild(input);
-                                    selectElement.appendChild(label);
-            
-                                    // Add event listener to dinamizarAgenda on selection
-                                    input.addEventListener('change', async (event) => {
-                                        if (event.target.checked) {
-                                            const selectedDate = await this.getSelectedDate();
-                                            const reservasResponse = await axios.get(`http://localhost:3000/reserva/${item.id}/${selectedDate}`);
-                                            await this.dinamizarAgenda(reservasResponse.data);
+                            case 'selecao-salas-modal':
+                                const dataSalas = await this.listarSalas();
+                                let firstSala = true;
+                    
+                                dataSalas.forEach(async (sala) => {
+                                    if (!sala.andar && sala.situacao === 'D') {
+                                        const inputSala = document.createElement('input');
+                                        inputSala.type = 'radio';
+                                        inputSala.className = 'btn-check';
+                                        inputSala.name = 'salaOptions';
+                                        inputSala.id = sala.nome;
+                                        inputSala.value = sala.id;
+                                        inputSala.autocomplete = 'off';
+                    
+                                        if(firstSala){
+                                            inputSala.checked = true;
+                                            firstSala = false;
                                         }
-                                    });
-            
-                                }
-                            });
-                            break;
-                        case 'horarioLivre':
-                            data = await this.listarHorarioLivre();
-                            data.forEach(item => {
-                                const option = document.createElement('option');
-                                option.value = item.horarioLivre;
-                                option.textContent = item.horarioLivre;
-                                selectElement.appendChild(option);
-                            });
-                            break;
+                    
+                                        const labelSala = document.createElement('label');
+                                        labelSala.className = 'btn btn-outline-primary';
+                                        labelSala.htmlFor = sala.nome;
+                                        labelSala.textContent = sala.nome;
+                    
+                                        selectElement.appendChild(inputSala);
+                                        selectElement.appendChild(labelSala);
+                                    }
+                                });
+                                break;
                         default:
                             throw new Error('ID do elemento select não suportado');
                     }
@@ -893,10 +875,9 @@ static async fazerLogin() {
                     console.error('Erro ao buscar dados da API:', error);
                 }
             }
-            
-            static async getSelectedDate() {
+          
+            static async getSelectedDate(selectedDay) {
                 const today = new Date();
-                const selectedDay = document.querySelector('#selecao-dia-modal input[name="dayOptions"]:checked').id;
                 if (selectedDay === 'hoje') {
                     return today.toISOString().split('T')[0];
                 } else if (selectedDay === 'amanha') {
@@ -906,40 +887,50 @@ static async fazerLogin() {
                 }
             }
 
-            static async dinamizarAgenda(reservas) {
+            static async dinamizarAgenda(dia, idReserva) {
                 try {
+                    const reservas = await axios.get(`http://localhost:3000/reserva/${idReserva}/${dia}`);
+                    const reservasData = reservas.data;
+                    //pegar só o dia
+                    const hoje=new Date().toISOString().split('T')[0];
+            
                     const selectContainer = document.getElementById('selecao-horario-modal');
                     const spaces = Array.from(document.querySelectorAll('div.row.blocks .col-1'));
-                    const resetarBlocos = () => {
-                        spaces.forEach(space => {
-                            space.style.backgroundColor = 'lightgreen';
+                    const currentHour = new Date().getHours();
+            
+                    const resetarBlocos=()=>{
+                        spaces.forEach(space=>{
+                            space.style.backgroundColor='lightgreen';
                         });
                         Array.from(selectContainer.children).forEach(child => {
-                            child.style.display = 'block';
+                            if(hoje===dia){
+                                if(parseInt(child.value)>=currentHour) child.style.display='block';
+                                else child.style.display='none';
+                            }else{
+                                child.style.display='block';
+                            }
                         });
                     };
-            
+
                     resetarBlocos();
-                    reservas.forEach(reserva => {
+            
+                    reservasData.forEach(reserva => {
                         if (reserva.horaInicio && typeof reserva.horaInicio === 'string') {
-                            const horaReservada = reserva.horaInicio.slice(0, 3) + '00';
-                            const timeBlockIndex = spaces.findIndex(space => space.id === horaReservada);
-                            if (timeBlockIndex !== -1) {
-                                for (let i = timeBlockIndex; i < timeBlockIndex + 3 && i < spaces.length; i++) {
+                            const horaReservada=reserva.horaInicio.slice(0, 3) + '00';
+                            const timeBlockIndex=spaces.findIndex(space => space.id === horaReservada);
+                            if (timeBlockIndex!==-1) {
+                                for (let i=timeBlockIndex; i<timeBlockIndex+3 && i<spaces.length; i++) {
                                     spaces[i].style.backgroundColor = 'lightgray';
                                     selectContainer.children[i+1].style.display = 'none';
                                 }
-                            } else {
-                                console.warn('Bloco de tempo não encontrado para:', horaReservada);
-                            }
-                        } else {
-                            console.warn('Hora reservada inválida:', reserva.horaInicio);
-                        }
+                            } else console.warn('Bloco de tempo não encontrado para:', reservedHour);
+                        } else console.warn('Hora reservada inválida:', reserva.horaInicio);
                     });
                 } catch (error) {
                     console.error('Erro ao colorir agenda:', error);
                 }
             }
+            
             
             
         /*Atualizar*/
@@ -978,13 +969,37 @@ document.addEventListener('DOMContentLoaded', () => {
         Controller.preencherModalComAPI('editNivelAcesso');
     });
 
-    observeElement('selecao-salas-modal', ()=>{
-        Controller.preencherModalComAPI('selecao-salas-modal');
+    observeElement('selecao-salas-modal', async () => {
+        await Controller.preencherModalComAPI('selecao-salas-modal');
+        
+        const salaOptions = document.querySelectorAll('input[name="salaOptions"]');
+        
+        salaOptions.forEach(radio => {
+            radio.addEventListener('change', () => {
+                localStorage.setItem('idReserva', radio.value);
+                const selectedDate = localStorage.getItem('diaEscolhido');
+                const idReserva = localStorage.getItem('idReserva');
+                Controller.dinamizarAgenda(selectedDate, idReserva);
+            });
+        });
+    });
+    
+    // Observador para mudanças nos inputs de seleção de dia
+    observeElement('selecao-dia-modal', () => {
+        const dayOptions = document.querySelectorAll('input[name="dayOptions"]');
+        
+        dayOptions.forEach(radio => {
+            radio.addEventListener('change', () => {
+                Controller.getSelectedDate(radio.id).then(valor => {
+                    localStorage.setItem('diaEscolhido', valor);
+                    const selectedDate = localStorage.getItem('diaEscolhido');
+                    const idReserva = localStorage.getItem('idReserva');
+                    Controller.dinamizarAgenda(selectedDate, idReserva);
+                });
+            });
+        });
     });
 
-    observeElement('selecao-dia-modal', ()=>{
-        Controller.getSelectedDate();
-    });
     observeElement('andar', ()=>{
         Controller.preencherModalComAPI('andar');
     });

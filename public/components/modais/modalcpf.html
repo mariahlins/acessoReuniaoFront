@@ -23,8 +23,7 @@
           <div class="h6-container">
             <div class="h6-item">
               <h6>Selecione uma sala:</h6>
-              <div class="btn-group d-flex justify-content-between" id="selecao-salas-modal" role="group" aria-label="Toggle buttons example">
-              </div>
+              <div class="btn-group d-flex justify-content-between" id="selecao-salas-modal" role="group" aria-label="Toggle buttons example"></div>
             </div>
 
             <div class="h6-item">
@@ -43,38 +42,45 @@
               <h6>Selecione um horário:</h6>
               <select class="form-select" id="selecao-horario-modal">
                 <option selected disabled>Escolha um horário</option>
-                <option value="09:00">09:00</option>
-                <option value="10:00">10:00</option>
-                <option value="11:00">11:00</option>
-                <option value="12:00">12:00</option>
-                <option value="13:00">13:00</option>
-                <option value="14:00">14:00</option>
-                <option value="15:00">15:00</option>
-                <option value="16:00">16:00</option>
-                <br>
-                <option value="17:00">17:00</option>
-                <option value="18:00">18:00</option>
-                <option value="19:00">19:00</option>
-                <option value="20:00">20:00</option>
-                <option value="21:00">21:00</option>
-                <option value="22:00">22:00</option>
-                <option value="23:00">23:00</option>
-                <option value="00:00">00:00</option>
-                <br>
-                <option value="01:00">01:00</option>
-                <option value="02:00">02:00</option>
-                <option value="03:00">03:00</option>
-                <option value="04:00">04:00</option>
-                <option value="05:00">05:00</option>
-                <option value="06:00">06:00</option>
-                <option value="07:00">07:00</option>
-                <option value="08:00">08:00</option>
+                <option value="01:00" style="display:none">01:00</option>
+                <option value="02:00" style="display:none">02:00</option>
+                <option value="03:00" style="display:none">03:00</option>
+                <option value="04:00" style="display:none">04:00</option>
+                <option value="05:00" style="display:none">05:00</option>
+                <option value="06:00" style="display:none">06:00</option>
+                <option value="07:00" style="display:none">07:00</option>
+                <option value="08:00" style="display:none">08:00</option>
+                <option value="09:00" style="display:none">09:00</option>
+                <option value="10:00" style="display:none">10:00</option>
+                <option value="11:00" style="display:none">11:00</option>
+                <option value="12:00" style="display:none">12:00</option>
+                <option value="13:00" style="display:none">13:00</option>
+                <option value="14:00" style="display:none">14:00</option>
+                <option value="15:00" style="display:none">15:00</option>
+                <option value="16:00" style="display:none">16:00</option>
+                <option value="17:00" style="display:none">17:00</option>
+                <option value="18:00" style="display:none">18:00</option>
+                <option value="19:00" style="display:none">19:00</option>
+                <option value="20:00" style="display:none">20:00</option>
+                <option value="21:00" style="display:none">21:00</option>
+                <option value="22:00" style="display:none">22:00</option>
+                <option value="23:00" style="display:none">23:00</option>
+                <option value="00:00" style="display:none">00:00</option>
               </select>
               <p id="horarioSelecionado" class="mt-2"></p>
             </div>
 
           </div>
           <div class="row blocks">
+            <div class="col-1" id="01:00">01:00</div>
+            <div class="col-1" id="02:00">02:00</div>
+            <div class="col-1" id="03:00">03:00</div>
+            <div class="col-1" id="04:00">04:00</div>
+            <div class="col-1" id="05:00">05:00</div>
+            <div class="col-1" id="06:00">06:00</div>
+            <div class="col-1" id="07:00">07:00</div>
+            <div class="col-1" id="08:00">08:00</div>
+            <br></br>
             <div class="col-1" id="09:00">09:00</div>
             <div class="col-1" id="10:00">10:00</div>
             <div class="col-1" id="11:00">11:00</div>
@@ -93,14 +99,6 @@
             <div class="col-1" id="23:00">23:00</div>
             <div class="col-1" id="00:00">00:00</div>
             <br></br>
-            <div class="col-1" id="01:00">01:00</div>
-            <div class="col-1" id="02:00">02:00</div>
-            <div class="col-1" id="03:00">03:00</div>
-            <div class="col-1" id="04:00">04:00</div>
-            <div class="col-1" id="05:00">05:00</div>
-            <div class="col-1" id="06:00">06:00</div>
-            <div class="col-1" id="07:00">07:00</div>
-            <div class="col-1" id="08:00">08:00</div>
             </div>
           <div class="modal-footer-custom d-flex justify-content-between">
             <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 3)">Voltar</button>
