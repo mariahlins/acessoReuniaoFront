@@ -619,54 +619,63 @@ static async fazerLogin() {
     /* SubConsultas */
  
         /*Filtrar tabelas*/
-            static async filtrarTabela(idTabela){
-                const valorFiltro = document.getElementById('pesquisa-filtro').value;
-                const tabela = document.getElementById(idTabela);
-                
-                if (!tabela) {
-                    console.error(`Tabela com id "${idTabela}" não encontrada`);
-                    return;
+        static async filtrarTabela(idTabela){
+            const valorFiltro = document.getElementById('pesquisa-filtro').value;
+            const tabela = document.getElementById(idTabela);
+        
+            const linhas = tabela.getElementsByTagName('tr');
+            const idColunaAcao = 'coluna-acao';
+        
+            const normalizarTexto = (texto) =>{
+                return texto.toLowerCase()
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "");
+            };
+        
+            const textoFiltro = normalizarTexto(valorFiltro);
+        
+            for (let i = 0; i < linhas.length; i++){
+                const colunas = linhas[i].getElementsByTagName('td');                
+                const cabecalho = linhas[i].getElementsByTagName('th').length > 0;        
+                if (cabecalho){
+                    linhas[i].style.display = "";
+                    continue;
                 }
-            
-                const linhas = tabela.getElementsByTagName('tr');
-                const idColunaAcao = 'coluna-acao'; 
-            
-                const isFiltroNumero = !isNaN(valorFiltro);
-            
-                for (let i = 1; i < linhas.length; i++){
-                    const colunas = linhas[i].getElementsByTagName('td');
-                    let corresponde = false;
-                
-                    if(valorFiltro===''){
-                        linhas[i].style.display = "";
-                        continue;
-                    }
-
-                    for (let j = 0; j < colunas.length; j++){
-                        if (colunas[j].id===idColunaAcao) continue;
-                
-                        const coluna = colunas[j];
-                        if(coluna){
-                            if(isFiltroNumero){
-                                if(coluna.textContent===valorFiltro){
-                                    corresponde = true;
-                                    break;
-                                }
+                let corresponde = false;
+                if (textoFiltro === ''){
+                    linhas[i].style.display = "";
+                    continue;
+                }
+        
+                for (let j = 0; j < colunas.length; j++){
+                    if (colunas[j].id === idColunaAcao) continue;
+                    const coluna = colunas[j];
+                    if (coluna){
+                        const textoColuna = normalizarTexto(coluna.textContent);
+                        if (textoFiltro === "disponivel" || textoFiltro === "indisponivel"){
+                            if (textoColuna === textoFiltro) {
+                                corresponde = true;
+                                break;
                             }
-                            else if(coluna.textContent.toLowerCase().includes(valorFiltro.toLowerCase())){
+                        } 
+                        else{
+                            const regex = new RegExp(`\\b${textoFiltro}`, 'i');
+                            if (textoColuna.includes(textoFiltro) || regex.test(textoColuna)) {
                                 corresponde = true;
                                 break;
                             }
                         }
                     }
-                    if(corresponde){
-                        linhas[i].style.display = "";
-                    }
-                    else{
-                        linhas[i].style.display = "none";
-                    }
+                }
+                if (corresponde){
+                    linhas[i].style.display = "";
+                }
+                else{
+                    linhas[i].style.display = "none";
                 }
             }
+        }
+                      
         /*Filtrar tabelas*/
 
         /*Excluir*/
