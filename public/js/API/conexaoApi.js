@@ -263,7 +263,7 @@ static async fazerLogin() {
                         item.email
                     ],
                     (item) => {
-                        return { texto: 'Editar', funcao: 'editarUsuario'};
+                        return { texto: 'Editar', funcao: 'editarUsuario',  modal: 'modal', modalFuncao: '#modalEditarUsuario'};
                     },
                     (item) => {
                         return { texto: 'Excluir', funcao: 'excluirUsuario' };
@@ -776,9 +776,7 @@ static async fazerLogin() {
             static async estadoReserva(endPoint, id) {
                 try {
                     const token = localStorage.getItem('token');
-                    console.log(`Calling API: http://localhost:3000/${endPoint}/${id}`);
                     await axios.put(`http://localhost:3000/${endPoint}/${id}`, {}, { headers: { Authorization: `Bearer ${token}`}});
-                    console.log(`API call successful: ${endPoint}`);
                     window.location.reload();
                 } catch (error) {
                     console.error(`Erro ao alterar estado da reserva: ${endPoint}`, error);
@@ -786,21 +784,17 @@ static async fazerLogin() {
             }
             
             static async cancelarReserva(id) {
-                console.log(`Cancelar reserva ID: ${id}`);
                 return this.estadoReserva('reserva/cancelar', id);
             }
             
             static async confirmarReserva(id) {
-                console.log(`Confirmar reserva ID: ${id}`);
                 return this.estadoReserva('reserva/confirmar', id);
             }
             
             static async concluirReserva(id) {
                 try {
                     const token = localStorage.getItem('token');
-                    console.log(`Calling API: http://localhost:3000/reserva/concluir/${id}`);
                     await axios.put(`http://localhost:3000/reserva/concluir/${id}`, { infracao: false }, { headers: { Authorization: `Bearer ${token}`}});
-                    console.log(`API call successful: reserva/concluir/${id}`);
                     window.location.reload();
                 } catch (error) {
                     console.error('Erro ao concluir reserva', error);
@@ -822,6 +816,19 @@ static async fazerLogin() {
                 setElementInputValueById('editSobrenome', entity.sobrenome);
                 setElementInputValueById('editLogin', entity.login);
             }
+
+            static async editarUsuario(id){
+                const entity=await this.obterUsuario(id);
+                setId(id);
+                console.log(entity);
+                setElementTextContentById('confirmCPFWithCpf', converterCPF(entity.identificador));
+                setElementTextContentById('confirmDataNascimentoWithCpf', formatarDataBr(entity.dataNascimento));
+                setElementInputValueById('nomeWithCpf', entity.nome);
+                setElementInputValueById('sobrenomeWithCpf', entity.sobrenome);
+                setElementInputValueById('emailWithCpf', entity.email);
+                setElementInputValueById('telefoneWithCpf', entity.numTelefone);
+            }
+
 
             static async preencherModalComAPI(entityType) {
                 const selectElement = document.getElementById(entityType);

@@ -192,10 +192,10 @@ async function updateEntity(entityType, stepAtual) {
   
   if (entityType === 'salaEdit') entityType = 'sala';
   else if (entityType === 'recepcionistaEdit') entityType = 'recepcionista';
-  else if (entityType === 'usuarioEdit') {
-    entityType = 'usuario';
-  }
-  
+  else if (entityType === 'usuarioEdit') entityType = 'usuario';
+  else if (entityType === 'onlyUsuarioEdit') entityType = 'usuario';
+  else if (entityType === 'reserva') entityType = 'reserva';
+
   let response;
   try {
     const req = await axios.put(`http://localhost:3000/${entityType}/${id}`, entityData, {
@@ -208,7 +208,7 @@ async function updateEntity(entityType, stepAtual) {
   }
 
   let modalId = `modalEditar${converterPrimeiraLetraMaiuscula(entityType)}`;
-  if (entityType === 'usuario') modalId = 'modalDeCoworking';
+  if (entityType==='usuario') modalId = 'modalDeCoworking';
   
   if (response.status === 200) {
     return nextStep(modalId, stepAtual);
@@ -284,6 +284,13 @@ function getFormData(entityType) {
         localStorage.setItem('motivoDaReuniao', motivoReserva);   
         numTelefone = removerPontos(numTelefone);
         return converterDateType({email, numTelefone});
+    case 'onlyUsuarioEdit':
+      var identificador = document.getElementById('confirmCPFWithCpf').innerText;
+      var dataNascimento = converterDataEUA(document.getElementById('confirmDataNascimentoWithCpf').innerText);
+      var nome = document.getElementById('nomeWithCpf').innerText;
+      var email = document.getElementById('emailWithCpf').value;
+      var numTelefone = document.getElementById('telefoneWithCpf').value;
+      var motivoReserva = document.getElementById('motivoDaReuniaoWithCpf').value;
 
     case 'usuario':
       var identificador = removerPontos(document.getElementById('confirmCPFWithCpf').innerText);
@@ -347,6 +354,16 @@ function fillConfirmationSalaEdit(modalId, currentStep) {
 
 }
 
+function fillConfirmationUsuarioEditUnique(modalId, currentStep) {
+  nextStep(modalId, currentStep);
+
+  setElementTextContentById('confirmCPFWithCpfConfirm', document.getElementById('confirmCPFWithCpf').innerText);
+  setElementTextContentById('confirmDataNascimentoWithCpfConfirm', document.getElementById('confirmDataNascimentoWithCpf').innerText);
+  setElementTextContentById('confirmNomeWithCpfConfirm', `${converterPrimeiraLetraMaiuscula(getElementValueById('nomeWithCpf'))} ${converterPrimeiraLetraMaiuscula(getElementValueById('sobrenomeWithCpf'))}`);
+  setElementTextContentById('confirmEmailWithCpfConfirm',  getElementValueById('emailWithCpf'));
+  setElementTextContentById('confirmTelefoneWithCpfConfirm', converterNumTel(getElementValueById('telefoneWithCpf')));
+
+}
 function fillConfirmationReserva(modalId, currentStep) {
   nextStep(modalId, currentStep);
   setElementTextContentById('cpfUserConfirmReserva', localStorage.getItem('cpf'));

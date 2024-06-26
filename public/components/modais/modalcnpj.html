@@ -9,16 +9,13 @@
 
       <div class="modal-body custom-modal-body">
         <div class="step active" id="step1" data-header="Informações do responsável">
-          <input type="text" id="cpfWithCpf" class="form-control mb-2 custom-input" placeholder="CPF" minlength="14" maxlength="14" required>
-          <input type="date" id="dataNascimentoWithCpf" class="form-control mb-2 custom-input" placeholder="Data de Nascimento" required>
-          <input type="text" id="nome" class="form-control mb-2 custom-input" placeholder="Nome">
-          <input type="text" id="nomeEmpresa" class="form-control mb-2 custom-input" placeholder="Nome da Empresa">
-          <input type="text" id="motivoDaReuniao" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião">
-          <div class="d-flex justify-content-between">
-            <button class="btn btn-invisible"></button>
-            <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeEmpresas', 1)">Continuar</button>
-          </div>
+          <input type="text" id="cpfWithCNPJ" class="form-control custom-input" placeholder="CPF" minlength="14" maxlength="14" required>
+          <input type="text" id="dataNascimentoWithCNPJ" class="form-control mb-2 custom-input" placeholder="Data de Nascimento" required onfocus="this.type='date'"  onblur="if (!this.value) this.type='text'">
+        <div class="d-flex justify-content-between">
+          <button class="btn btn-invisible"></button>
+          <button type="button" class="btn btn-secondary" id="botao" onclick="usuarioExiste('modalDeEmpresas', 1)">Continuar</button>
         </div>
+      </div>
 
 
         <div class="step" id="step2" data-header="Consulta de Horários">
@@ -91,3 +88,7 @@
   </div>
 </div>
 <script src="/public/js/utils/trocaModal.js"></script>
+<script>
+  const cpfInputCNPJ = document.getElementById('cpfWithCNPJ');
+  if (cpfInputCNPJ) cpfInputCNPJ.addEventListener('input', formatCPF);
+</script>

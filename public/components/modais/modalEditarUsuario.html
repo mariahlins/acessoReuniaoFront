@@ -10,12 +10,13 @@
                 <div class="step active" id="step1" data-header="Informações do usuário" data-id="1">
                     <p class="form-control mb-2 custom-input"><strong><span id="confirmCPFWithCpf"></span></strong></p>
                     <p class="form-control mb-2 custom-input"><strong><span id="confirmDataNascimentoWithCpf"></span></strong></p>
-                    <p class="form-control mb-2 custom-input"><strong><span id="confirmNomeWithCpf"></span></strong></p>
+                    <input type="text" id="nomeWithCpf" class="form-control mb-2 custom-input" placeholder="Nome">
+                    <input type="text" id="sobrenomeWithCpf" class="form-control mb-2 custom-input" placeholder="Sobrenome">
                     <input type="text" id="emailWithCpf" class="form-control mb-2 custom-input" placeholder="Email" required>
-                    <input type="text" id="telefoneWithCpf" class="form-control mb-2 custom-input" placeholder="Número de telefone" required>
+                    <input type="text" id="telefoneWithCpf" class="form-control mb-2 custom-input" placeholder="Número de telefone" minlength="12" maxlength="14" required>
                     <div class="d-flex justify-content-between">
-                        <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalEditarUsuario', 1)">Voltar</button>
-                        <button type="button" class="btn btn-secondary" onclick="nextStep('modalEditarUsuario', 1)">Continuar</button>
+                        <button class="btn btn-invisible"></button>
+                        <button type="button" class="btn btn-secondary" onclick="fillConfirmationUsuarioEditUnique('modalEditarUsuario', 1)">Confirmar</button>
                     </div>
                 </div>
 
