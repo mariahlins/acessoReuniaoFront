@@ -8,10 +8,8 @@
 
         <div class="modal-body custom-modal-body">
           <div class="step active" id="step1" data-header="Informações do responsável">
-              <div class="form-text text-center">CPF</div>
               <input type="text" id="cpfWithCpf" class="form-control custom-input" placeholder="CPF" minlength="14" maxlength="14" required>
-              <div class="form-text text-center">Data de nascimento</div>
-              <input type="date" id="dataNascimentoWithCpf" class="form-control mb-2 custom-input" placeholder="Data de Nascimento" required>
+              <input type="text" id="dataNascimentoWithCpf" class="form-control mb-2 custom-input" placeholder="Data de Nascimento" required onfocus="this.type='date'"  onblur="if (!this.value) this.type='text'">
             <div class="d-flex justify-content-between">
               <button class="btn btn-invisible"></button>
               <button type="button" class="btn btn-secondary" id="botao" onclick="usuarioExiste('modalDeCoworking', 1)">Continuar</button>
@@ -44,6 +42,7 @@
               <h6>Selecione um horário:</h6>
               <select class="form-select" id="selecao-horario-modal">
                 <option selected disabled>Escolha um horário</option>
+                <option value="00:00" style="display:none">00:00</option>
                 <option value="01:00" style="display:none">01:00</option>
                 <option value="02:00" style="display:none">02:00</option>
                 <option value="03:00" style="display:none">03:00</option>
@@ -67,13 +66,13 @@
                 <option value="21:00" style="display:none">21:00</option>
                 <option value="22:00" style="display:none">22:00</option>
                 <option value="23:00" style="display:none">23:00</option>
-                <option value="00:00" style="display:none">00:00</option>
               </select>
               <p id="horarioSelecionado" class="mt-2"></p>
             </div>
 
           </div>
           <div class="row blocks justify-content-center">
+            <div class="col-1" id="00:00">00:00</div>
             <div class="col-1" id="01:00">01:00</div>
             <div class="col-1" id="02:00">02:00</div>
             <div class="col-1" id="03:00">03:00</div>
@@ -81,8 +80,8 @@
             <div class="col-1" id="05:00">05:00</div>
             <div class="col-1" id="06:00">06:00</div>
             <div class="col-1" id="07:00">07:00</div>
-            <div class="col-1" id="08:00">08:00</div>
             <br></br>
+            <div class="col-1" id="08:00">08:00</div>
             <div class="col-1" id="09:00">09:00</div>
             <div class="col-1" id="10:00">10:00</div>
             <div class="col-1" id="11:00">11:00</div>
@@ -90,8 +89,8 @@
             <div class="col-1" id="13:00">13:00</div>
             <div class="col-1" id="14:00">14:00</div>
             <div class="col-1" id="15:00">15:00</div>
-            <div class="col-1" id="16:00">16:00</div>
             <br></br>
+            <div class="col-1" id="16:00">16:00</div>
             <div class="col-1" id="17:00">17:00</div>
             <div class="col-1" id="18:00">18:00</div>
             <div class="col-1" id="19:00">19:00</div>
@@ -99,7 +98,6 @@
             <div class="col-1" id="21:00">21:00</div>
             <div class="col-1" id="22:00">22:00</div>
             <div class="col-1" id="23:00">23:00</div>
-            <div class="col-1" id="00:00">00:00</div>
             <br></br>
             </div>
           <div class="modal-footer-custom d-flex justify-content-between mt-2">
@@ -137,7 +135,7 @@
                             <p class="mb-1"><strong>Data:</strong> <span id="dataConfirmSpan"></span></p>
                             <p class="mb-1"><strong>Entrada:</strong> <span id="horarioConfirmSpan"></span></p>
                             <p class="mb-1"><strong>Saída:</strong> <span id="horarioSaidaConfirmSpan"></span></p>
-                            <p class="mb-1"><strong>Motivo:</strong> <span id=""></span></p>
+                            <p class="mb-1"><strong>Motivo:</strong> <span id="motivoReservaSpan"></span></p>
                         </div>
                     </div>
                 </div>
@@ -147,7 +145,7 @@
         
           <div class="modal-footer-custom d-flex justify-content-between">
             <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 4)">Voltar</button>
-            <button type="button" class="btn btn-secondary" onclick="('modalDeCoworking', 4)">Confirmar</button>
+            <button type="button" class="btn btn-secondary" onclick="createEntity('reserva', 4)">Confirmar</button>
           </div>
         </div>
         

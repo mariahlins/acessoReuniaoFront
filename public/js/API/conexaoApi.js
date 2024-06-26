@@ -474,10 +474,10 @@ static async fazerLogin() {
             try {
                 const reservasComDetalhes = await this.reservaComDetalhes(rese);
         
-                reservasComDetalhes.sort((a, b) => {
-                    const dateTimeA = new Date(`${a.dataReservada}T${a.horaInicio}`);
-                    const dateTimeB = new Date(`${b.dataReservada}T${b.horaInicio}`);
-                    return dateTimeA - dateTimeB;
+                reservasComDetalhes.sort((antigas, atuais) => {
+                    const reservasMaisAntigas= new Date(`${antigas.dataReservada}T${antigas.horaInicio}`);
+                    const reservasMaisRecentes= new Date(`${atuais.dataReservada}T${atuais.horaInicio}`);
+                    return reservasMaisRecentes-reservasMaisAntigas;
                 });
         
                 const req = vetorizacao(reservasComDetalhes, reservas[1]);
@@ -776,31 +776,36 @@ static async fazerLogin() {
             static async estadoReserva(endPoint, id) {
                 try {
                     const token = localStorage.getItem('token');
-                    await axios.put(`http://localhost:3000/${endPoint}/${id}`, {},{ headers: { Authorization: `Bearer ${token}`}});
+                    console.log(`Calling API: http://localhost:3000/${endPoint}/${id}`);
+                    await axios.put(`http://localhost:3000/${endPoint}/${id}`, {}, { headers: { Authorization: `Bearer ${token}`}});
+                    console.log(`API call successful: ${endPoint}`);
                     window.location.reload();
                 } catch (error) {
-                    console.error(`Erro ao alterar estado da reserva`, error);
+                    console.error(`Erro ao alterar estado da reserva: ${endPoint}`, error);
                 }
             }
             
             static async cancelarReserva(id) {
+                console.log(`Cancelar reserva ID: ${id}`);
                 return this.estadoReserva('reserva/cancelar', id);
             }
             
             static async confirmarReserva(id) {
+                console.log(`Confirmar reserva ID: ${id}`);
                 return this.estadoReserva('reserva/confirmar', id);
             }
             
-            static async concluirReserva(id){
-                try{
-                    let token = localStorage.getItem('token');
-                    await axios.put(`http://localhost:3000/reserva/concluir/${id}`, {infracao:false}, {headers: { 'Authorization': `Bearer ${token}`}});
+            static async concluirReserva(id) {
+                try {
+                    const token = localStorage.getItem('token');
+                    console.log(`Calling API: http://localhost:3000/reserva/concluir/${id}`);
+                    await axios.put(`http://localhost:3000/reserva/concluir/${id}`, { infracao: false }, { headers: { Authorization: `Bearer ${token}`}});
+                    console.log(`API call successful: reserva/concluir/${id}`);
                     window.location.reload();
-                }catch(error){
+                } catch (error) {
                     console.error('Erro ao concluir reserva', error);
                 }
             }
-              
             static async editarSala(id){
                 const entity=await this.obterSala(id);
                 setId(id);  
@@ -911,12 +916,12 @@ static async fazerLogin() {
                     const resetarBlocos=()=>{
                         spaces.forEach(space=>{
                             if(hoje===dia){
-                                if(currentHour>=parseInt(space.id)) space.style.backgroundColor='lightgray';
+                                if(currentHour>parseInt(space.id)) space.style.backgroundColor='lightgray';
                             }else space.style.backgroundColor='lightgreen';
                         });
                         Array.from(selectContainer.children).forEach(child => {
                             if(hoje===dia){
-                                if(parseInt(child.value)>=currentHour) child.style.display='block';
+                                if(parseInt(child.value) >= parseInt(currentHour)) return child.style.display='block';
                                 else child.style.display='none';
                             }else{
                                 child.style.display='block';

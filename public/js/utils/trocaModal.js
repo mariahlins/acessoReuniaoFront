@@ -354,11 +354,11 @@ function fillConfirmationReserva(modalId, currentStep) {
   setElementTextContentById('nomeConfirmSpan', localStorage.getItem('nome'));
   setElementTextContentById('emailConfirmSpan', localStorage.getItem('email'));
   setElementTextContentById('numTelConfirmSpan', localStorage.getItem('numTelefone'));
- // setElementTextContentById('motivoConfirmSpan', localStorage.getItem('motivoDaReuniao'));
   setElementTextContentById('salaConfirmSpan', localStorage.getItem('nomeSala'));
   setElementTextContentById('dataConfirmSpan', formatarDataBr(localStorage.getItem('diaEscolhido')));
   setElementTextContentById('horarioConfirmSpan', getElementValueById('selecao-horario-modal'));
   setElementTextContentById('horarioSaidaConfirmSpan', adicionarHora(getElementValueById('selecao-horario-modal')));
+  setElementTextContentById('motivoReservaSpan', localStorage.getItem('motivoDaReuniao'));
 
 }
 

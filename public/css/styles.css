@@ -137,14 +137,14 @@ input {
     font-family: 'Inter', sans-serif;
     color:#adb5bd;
 }
-
+/*
 .btn-group label{
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
     direction: ltr;
 }
-
+*/
 input[type="text"] {
     font-size: 1vw;
     transition: border-color 0.3s;
