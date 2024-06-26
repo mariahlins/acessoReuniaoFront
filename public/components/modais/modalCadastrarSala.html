@@ -22,11 +22,20 @@
 
                 <div class="step" id="step2" data-header="Confirmação">
                     <h4 class="mx-auto text-center">As informações estão corretas?</h4>
-                    <div class="confirm-info">
-                        <p>Nome da sala: <strong><span id="confirmNomeSala"></span></strong></p>
-                        <p>Andar: <strong><span id="confirmAndar"></span></strong></p>
-                        <p>Área: <strong><span id="confirmArea"></span></strong></p>
-                        <p>Capacidade Máxima: <strong><span id="confirmCapMax"></span></strong></p>
+                    <div class="container mt-4 d-flex justify-content-center">
+                        <div class="col-md-6 mb-3">
+                            <div class="card" style="width: 100%;">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Informações da sala</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p class="mb-1"><strong>Nome da sala:</strong> <span id="confirmNomeSala"></span></p>
+                                    <p class="mb-1"><strong>Andar:</strong> <span id="confirmAndar"></span></p>
+                                    <p class="mb-1"><strong>Área:</strong> <span id="confirmArea"></span></p>
+                                    <p class="mb-1"><strong>Capacidade máxima:</strong> <span id="confirmCapMax"></span></p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer-custom d-flex justify-content-between">
                         <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalCadastrarSala', 2)">Voltar</button>

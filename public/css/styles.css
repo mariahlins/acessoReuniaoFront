@@ -44,7 +44,7 @@ h1{
     font-size: 2.5vw !important;
 }
 h3{
-    font-size: 1.2vw !important;
+    font-size: 1.8vw !important;
     font-family: "Lexend",sans-serif;
     font-weight: 700;
 }
@@ -202,15 +202,12 @@ input[type=number] {
 }
 
 .btn-confirmar{
-    background-color: #fff !important;
-    color: #0624AA !important;
-    border-color: #0624AA !important;
+    background-color: #00047E !important;
+    color: #F2F6FA !important;
 }
 
 .btn-confirmar:hover{
-    background-color: #0624AA !important;
-    color: #fff !important;
-    border-color: #fff !important;
+    background-color: #007bff !important;
 }
 
 .btn-cancelar{
@@ -220,7 +217,7 @@ input[type=number] {
 }
 
 .btn-cancelar:hover{
-    background-color: #9095A1 !important;
+    background-color: #a8aeba !important;
     color:  #f0f0f0!important;
     border-color:  #f0f0f0 !important;
 }
@@ -236,29 +233,18 @@ input[type=number] {
     background-color: #6ea8fe;
 }
 
-.btn.btn-outline-primary{
-    border-color: #0624AA;
-    color: #0624AA;
-}
-
-.btn.btn-outline-primary:hover{
-    background-color: #0624AA;
-    color: #F2F6FA;
-}
-
 .btn.btn-outline-secondary{
     width: 12rem;
     height: 3rem; 
     font-size: 1vw; 
     padding: 10px 20px; 
-    color: #0624AA;
-    background-color: #fff;
-    border-color: #0624AA;
+    color: #F2F6FA;
+    background-color: #0624AA;
 }
 
 .btn.btn-outline-secondary:hover{
     color: #fff;
-    background-color: #0624AA;
+    background-color: #007bff;
 }
 
 .btn.btn-final{
@@ -481,6 +467,7 @@ dt{
 
 /* Estilos para cada bloco de horário */
 .blocks .col-1 {
+    flex: 0 0 calc(100% / 8 - 10px);
     background-color: lightgreen; /* Cor de fundo padrão */
     color: #333; /* Cor do texto */
     text-align: center; /* Centralizar texto */
@@ -503,4 +490,26 @@ dt{
     background-color: #81d4fa; /* Cor de fundo para horários selecionados */
     color: white; /* Texto branco para melhor legibilidade */
     font-weight: bold; /* Texto em negrito */
+}
+
+/*cards da confirmação de informações*/
+.card {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #9097a7;
+    color: white;
+    border-bottom: none;
+    border-radius: 10px 10px 0 0;
+}
+
+
+.card-body p {
+    font-size: 14px;
+}
+
+.card-body p strong {
+    color: #333;
 }

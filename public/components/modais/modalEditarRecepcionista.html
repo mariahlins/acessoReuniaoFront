@@ -33,12 +33,21 @@
 
                 <div class="step" id="step3" data-header="Confirmação">
                     <h4 class="mx-auto text-center">As informações estão corretas?</h4>
-                    <div class="confirm-info">
-                        <p>Nome: <strong><span id="confirmNomeEdit"></span></strong></p>
-                        <p>Sobrenome: <strong><span id="confirmSobrenomeEdit"></span></strong></p>
-                        <p>Login: <strong><span id="confirmLoginEdit"></span></strong></p>
-                        <p>Nível de acesso: <strong><span id="confirmNivelAcessoEdit"></span></strong></span></p>
-                        <p style="display:hidden"><span id="hiddenSenha"></span></p>
+                    <div class="container mt-4 d-flex justify-content-center">
+                        <div class="col-md-6 mb-3">
+                            <div class="card" style="width: 100%;">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Informações do recepcionista</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p class="mb-1"><strong>Nome: </strong><span id="confirmNome"></span></p>
+                                    <p class="mb-1"><strong>Sobrenome: </strong><span id="confirmSobrenome"></span></p>
+                                    <p class="mb-1"><strong>Login: </strong><span id="confirmLogin"></span></p>
+                                    <p class="mb-1"><strong>Nível de acesso: </strong><span id="confirmNivelAcesso"></span></span></p>
+                                    <p style="display:hidden"><span id="hiddenSenha"></span></p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer-custom d-flex justify-content-between">
                         <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalEditarRecepcionista', 3)">Voltar</button>

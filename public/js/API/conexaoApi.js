@@ -495,7 +495,7 @@ static async fazerLogin() {
                     (item) => {
                         switch (item.statusReserva) {
                             case 'PENDENTE':
-                                return { texto: 'Confirmar', funcao: 'confirmarReserva' };
+                                return { texto: 'Iniciar', funcao: 'confirmarReserva' };
                             case 'CONFIRMADO':
                                 return { texto: 'Concluir', funcao: 'concluirReserva' };
                             case 'CONCLUIDO':
