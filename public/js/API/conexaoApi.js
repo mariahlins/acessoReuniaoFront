@@ -284,18 +284,27 @@ static async fazerLogin() {
             const responseEstadosSalas = await this.listarEstadosSalas();
             const salas = vetorizacao(response);
             
-            const estadosSalasMap = responseEstadosSalas.reduce((acc, estadoSala) => {
+            const estadoSala = responseEstadosSalas.reduce((acc, estadoSala) => {
                 acc[estadoSala.idSala] = estadoSala.observacao;
                 return acc;
             }, {});
+            
+            const salasPaginacao = salas[Number(localStorage.getItem('indexPaginacao'))];
+            const salasComEstados = salasPaginacao.map(sala => {
+                return {
+                    ...sala,
+                    observacao: estadoSala[sala.id] || 'Sem observações'
+                };
+            });
+            
             try {
                 const tableBody = document.getElementById('after-login-salas');
-                this.preencherTabela(salas[Number(localStorage.getItem('indexPaginacao'))], tableBody, (item) => [
+                this.preencherTabela(salasComEstados, tableBody, (item) => [
                     item.nome,
-                    converterAndar(item.andar),
+                    item.andar,
                     converterStatusSala(item.situacao),
-                    estadosSalasMap[item.id] || 'Sem observações', 
-                    item.capMax,
+                    item.observacao, 
+                    item.capMax 
                 ],
                 //d- Disponivel, I- interditado, M- manutenção
                 (item) => {
