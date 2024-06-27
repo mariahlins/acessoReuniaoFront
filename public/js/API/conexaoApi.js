@@ -185,6 +185,10 @@ static async fazerLogin() {
                 return this.listarTodos('recepcionista');
             }
 
+            static async listarEstadosSalas(){
+                return this.listarTodos('estadoSala');
+            }
+
         //Metodo não expecifico
         static async listarReservasHoje() {
             try {
@@ -277,13 +281,20 @@ static async fazerLogin() {
 
         static async mostrarSalas() {
             const response = await this.listarSalas();
+            const responseEstadosSalas = await this.listarEstadosSalas();
             const salas = vetorizacao(response);
+            
+            const estadosSalasMap = responseEstadosSalas.reduce((acc, estadoSala) => {
+                acc[estadoSala.idSala] = estadoSala.observacao;
+                return acc;
+            }, {});
             try {
                 const tableBody = document.getElementById('after-login-salas');
                 this.preencherTabela(salas[Number(localStorage.getItem('indexPaginacao'))], tableBody, (item) => [
                     item.nome,
                     converterAndar(item.andar),
                     converterStatusSala(item.situacao),
+                    estadosSalasMap[item.id] || 'Sem observações', 
                     item.capMax,
                 ],
                 //d- Disponivel, I- interditado, M- manutenção

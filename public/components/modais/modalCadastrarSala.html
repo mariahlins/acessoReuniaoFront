@@ -14,6 +14,7 @@
                     </select>
                     <input type="text" id="area" class="form-control mb-2 custom-input" minlength="4" placeholder="Área" required>
                     <input type="number" id="capMax" class="form-control mb-2 custom-input" placeholder="Capacidade máxima" required>
+                    <input type="text" id="estadoSala" class="form-control mb-2 custom-input" placeholder="Estado da sala" required>
                     <div class="d-flex justify-content-between">
                         <button class="btn btn-invisible"></button>
                         <button type="button" class="btn btn-secondary" onclick="fillConfirmationSala('modalCadastrarSala', 1)">Confirmar</button>
@@ -33,6 +34,7 @@
                                     <p class="mb-1"><strong>Andar:</strong> <span id="confirmAndar"></span></p>
                                     <p class="mb-1"><strong>Área:</strong> <span id="confirmArea"></span></p>
                                     <p class="mb-1"><strong>Capacidade máxima:</strong> <span id="confirmCapMax"></span></p>
+                                    <p class="mb-1"><strong>Estado da sala:</strong> <span id="confirmEstadoSala"></span></p>
                                 </div>
                             </div>
                         </div>

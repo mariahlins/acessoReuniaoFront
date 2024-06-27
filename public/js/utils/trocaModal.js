@@ -157,31 +157,51 @@ function finish(modalId) {
 async function createEntity(entityType, stepAtual) {
   const entityData = getFormData(entityType);
   const token = localStorage.getItem('token');
-  let response;
-  
+  let responseStatus = 200; 
+  let responseData = {};
+
   try {
-    const req = await axios.post(`http://localhost:3000/${entityType}`, entityData, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    response = req;
+    if (entityType === 'sala') {
+      const {observacao, ...entityDataSala} = entityData;
+      const req1 = await axios.post(`http://localhost:3000/${entityType}`, entityDataSala, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (req1.status !== 200) responseStatus = req1.status;
+      const idSala = req1.data.id;
+      const estadoSalaData = {idSala, observacao};
+      const req2 = await axios.post(`http://localhost:3000/estadoSala`, estadoSalaData, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (req2.status !== 200) responseStatus = req2.status;
+      responseData = {req1: req1.data, req2: req2.data}; 
+    } else {
+      const req = await axios.post(`http://localhost:3000/${entityType}`, entityData, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (req.status !== 200) responseStatus = req.status; 
+      responseData = req.data;
+    }
   } catch (error) {
     handleCreateEntityError(error, entityType);
   }
+
   let modalId = `modalCadastrar${converterPrimeiraLetraMaiuscula(entityType)}`;
-  if(entityType ==='reserva') modalId='modalDeCoworking';
-  else if (entityType === 'usuario') {
+  if (entityType === 'reserva' || entityType === 'usuario') {
     modalId = 'modalDeCoworking';
-    localStorage.setItem('id', entityData.id);
-    localStorage.setItem('cpf', entityData.identificador);
-    localStorage.setItem('dataNascimento', entityData.dataNascimento);
-    localStorage.setItem('nome', `${entityData.nome} ${entityData.sobrenome}`);
-    localStorage.setItem('email', entityData.email);
-    localStorage.setItem('numTelefone', entityData.numTelefone);
-  } 
-  if (response.status === 200) {
+    if (entityType === 'usuario') {
+      localStorage.setItem('id', entityData.id);
+      localStorage.setItem('cpf', entityData.identificador);
+      localStorage.setItem('dataNascimento', entityData.dataNascimento);
+      localStorage.setItem('nome', `${entityData.nome} ${entityData.sobrenome}`);
+      localStorage.setItem('email', entityData.email);
+      localStorage.setItem('numTelefone', entityData.numTelefone);
+    }
+  }
+
+  if (responseStatus === 200) {
     return nextStep(modalId, stepAtual);
   } else {
-    throw new Error(`Erro ao criar ${entityType}. Status: ${response.status}`);
+    alert(`Erro ao criar ${entityType}. Por favor, tente novamente.`);
   }
 }
 
@@ -221,7 +241,7 @@ async function updateEntity(entityType, stepAtual) {
 
 function handleCreateEntityError(error, entityType) {
   if (error.response) {
-    if (error.response.status === 409) alert(error.response.data.message);
+    if (error.response.status === 409) alert(`Erro ao criar ${entityType}. Já existe um registro com esses dados.`);
     else alert(`Erro ao criar ${entityType}. Por favor, tente novamente. Status: ${error.response.status}`);
   } else {
     alert(`Erro ao criar ${entityType}. Por favor, verifique sua conexão e tente novamente.`);
@@ -237,7 +257,8 @@ function getFormData(entityType) {
       var andar = Number(getElementValueById('andar'));
       var area = document.getElementById('confirmArea').textContent;
       var capMax = Number(getElementValueById('capMax'));
-      return converterDateType({nome, andar, area, capMax});
+      var observacao = document.getElementById('confirmEstadoSala').textContent;
+      return converterDateType({nome, andar, area, capMax, observacao});
 
     case 'recepcionista':
       var nome = document.getElementById('confirmNome').textContent;
@@ -328,6 +349,7 @@ function fillConfirmationSala(modalId, currentStep) {
   setElementTextContentById('confirmAndar', converterAndar(Number(getElementValueById('andar'))));
   setElementTextContentById('confirmArea', converterPrimeiraLetraMaiuscula(getElementValueById('area')));
   setElementTextContentById('confirmCapMax', getElementValueById('capMax'));
+  setElementTextContentById('confirmEstadoSala', converterPrimeiraLetraMaiuscula(getElementValueById('estadoSala')));
 }
 
 // Confirmar - para Usuários
