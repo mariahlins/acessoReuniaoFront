@@ -846,7 +846,6 @@ static async fazerLogin() {
             static async editarUsuario(id){
                 const entity=await this.obterUsuario(id);
                 setId(id);
-                console.log(entity);
                 setElementTextContentById('confirmCPFWithCpf', converterCPF(entity.identificador));
                 setElementTextContentById('confirmDataNascimentoWithCpf', formatarDataBr(entity.dataNascimento));
                 setElementInputValueById('nomeWithCpf', entity.nome);
