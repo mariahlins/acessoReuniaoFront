@@ -189,12 +189,12 @@ async function createEntity(entityType, stepAtual) {
   if (entityType === 'reserva' || entityType === 'usuario') {
     modalId = 'modalDeCoworking';
     if (entityType === 'usuario') {
-      localStorage.setItem('id', entityData.id);
-      localStorage.setItem('cpf', entityData.identificador);
-      localStorage.setItem('dataNascimento', entityData.dataNascimento);
-      localStorage.setItem('nome', `${entityData.nome} ${entityData.sobrenome}`);
-      localStorage.setItem('email', entityData.email);
-      localStorage.setItem('numTelefone', entityData.numTelefone);
+      localStorage.setItem('id', responseData.id);
+      localStorage.setItem('cpf', responseData.identificador);
+      localStorage.setItem('dataNascimento', responseData.dataNascimento);
+      localStorage.setItem('nome', `${responseData.nome} ${responseData.sobrenome}`);
+      localStorage.setItem('email', responseData.email);
+      localStorage.setItem('numTelefone', responseData.numTelefone);
     }
   }
 
