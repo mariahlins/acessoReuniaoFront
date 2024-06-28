@@ -328,7 +328,7 @@ function getFormData(entityType) {
       localStorage.setItem('email', email);
       localStorage.setItem('numTelefone', numTelefone);
       localStorage.setItem('motivoDaReuniao', motivoReserva);  
-      return converterDateType({identificador, dataNascimento, nome, sobrenome, email, numTelefone, motivoDaReuniao});
+      return converterDateType({identificador, dataNascimento, nome, sobrenome, email, numTelefone});
   
     case 'reserva':
       var idRecepcionista=Number(localStorage.getItem('idRecepcionista'));

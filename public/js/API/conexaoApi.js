@@ -529,6 +529,8 @@ static async fazerLogin() {
                     (item) => {
                         if (item.statusReserva === 'PENDENTE') {
                             return { texto: 'Cancelar', funcao: 'cancelarReserva' };
+                        }else if(item.statusReserva === 'CONFIRMADO'){
+                            return { texto: ' ', funcao: ' ', style: 'border: none !important; cursor: default;'};
                         }
                         return {};
                     }
@@ -556,6 +558,10 @@ static async fazerLogin() {
                 }
                 if (metodoDois(item).texto) {
                     const buttonSecundario = this.criarBotao(metodoDois(item), 'btn btn-cancelar bg-cinza peso-500 fc-branco', item.id);
+                    if(metodoDois(item).style){
+                        buttonSecundario.style = metodoDois(item).style;
+                        buttonSecundario.disabled = true;
+                    } 
                     acoesCell.appendChild(buttonSecundario);
                 }
                 linha.appendChild(acoesCell);

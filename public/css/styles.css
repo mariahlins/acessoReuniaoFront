@@ -182,6 +182,9 @@ input[type=number] {
     color: #00047E;
     cursor: pointer;
 }
+td .btn{
+    width: 10vw !important;
+}
 
 .btn-action hover{
     text-decoration: underline;
