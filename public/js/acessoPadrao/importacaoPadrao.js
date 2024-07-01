@@ -4,60 +4,74 @@ $(function() {
 
         // Importa o conteúdo do cabeçalho
         $.get("/public/components/cabecalho/cabecalho.html", function(cabecalhoContent) {
-            $("main").prepend(cabecalhoContent);
+            $("main").prepend(cabecalhoContent); 
             $("#main-title").text(title);
 
-            // Importa o conteúdo dos modais
-            $.get("/public/components/modais/modalcpf.html", function(modalcpfContent) {
-                $("main").append(modalcpfContent);
-
-                $.get("/public/components/modais/modalcnpj.html", function(modalcnpjContent) {
-                    $("main").append(modalcnpjContent);
-
-                    // Determina o URL do conteúdo do corpo da página
-                    let url;
-                    switch (pagina) {
-                        case "homeRecepcionista.html":
-                            url = "/public/components/body/corpo.html";
-                            break;
-                        case "reservas.html":
-                            url = "/public/components/body/corpoReservas.html";
-                            break;
-                        case "salas.html":
-                            url = "/public/components/body/corpoSalas.html";
-                            break;
-                        case "usuarios.html":
-                            $.get("/public/components/botoes/botaoListaNegraPadrao.html", function(universalContent) {
-                                $("main").append(universalContent);
-                                loadModalsAndBody("/public/components/body/corpoUsuarios.html");
-                            });
-                            return; // Finaliza a função, pois o corpo será carregado dentro do callback
-                        case "listaNegraPadrao.html":
-                            $.get("/public/components/botoes/botoaUsuarioPadtao.html", function(universalContent) {
-                                $("main").append(universalContent);
-                                loadModalsAndBody("/public/components/body/corpoListaNegra.html");
-                            });
-                            return; // Finaliza a função, pois o corpo será carregado dentro do callback
-                        default:
-                            console.error("Página não encontrada: " + pagina);
-                            return;
-                    }
-
-                    if (url) {
-                        $.get(url, function(bodyContent) {
-                            $("main").append(bodyContent);
-                            loadFooter();
-                        });
-                    }
-                });
-            });
+            // Importa o conteúdo específico para cada página
+            switch (pagina) {
+                case "homeRecepcionista.html":
+                    loadModalsAndBody(
+                        [
+                            "/public/components/modais/modalcpf.html",
+                            "/public/components/modais/modalcnpj.html"
+                        ],
+                        "/public/components/body/corpo.html"
+                    );
+                    break;
+                case "reservas.html":
+                    loadModalsAndBody(
+                        [
+                            "/public/components/modais/modalcpf.html",
+                            "/public/components/modais/modalcnpj.html"
+                        ],
+                        "/public/components/body/corpoReservas.html"
+                    );
+                    break;
+                case "salas.html":
+                    loadModalsAndBody(
+                        [
+                            "/public/components/modais/modalcpf.html",
+                            "/public/components/modais/modalcnpj.html"
+                        ],
+                        "/public/components/body/corpoSalas.html"
+                    );
+                    break;
+                case "usuarios.html":
+                    loadModalsAndBody(
+                        [
+                            "/public/components/modais/modalcpf.html",
+                            "/public/components/modais/modalcnpj.html",
+                            "/public/components/botoes/botaoListaNegraPadrao.html",
+                            "/public/components/modais/modalEditarUsuario.html"
+                        ],
+                        "/public/components/body/corpoUsuarios.html"
+                    );
+                    break;
+                case "listaNegraPadrao.html":
+                    loadModalsAndBody(
+                        [
+                            "/public/components/modais/modalcpf.html",
+                            "/public/components/modais/modalcnpj.html",
+                            "/public/components/botoes/botoaUsuarioPadtao.html"
+                        ],
+                        "/public/components/body/corpoListaNegra.html"
+                    );
+                    break;
+                default:
+                    console.error("Página não encontrada: " + pagina);
+                    break;
+            }
         });
     }
 
-    function loadModalsAndBody(bodyUrl) {
-        $.get(bodyUrl, function(bodyContent) {
-            $("main").append(bodyContent);
-            loadFooter();
+    function loadModalsAndBody(modalUrls, bodyUrl) {
+        const promises = modalUrls.map(url => $.get(url).then(content => $("main").append(content)));
+
+        $.when(...promises).done(function() {
+            $.get(bodyUrl, function(bodyContent) {
+                $("main").append(bodyContent);
+                loadFooter();
+            });
         });
     }
 
