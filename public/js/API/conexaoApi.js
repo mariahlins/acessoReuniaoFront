@@ -301,7 +301,7 @@ static async fazerLogin() {
                 const tableBody = document.getElementById('after-login-salas');
                 this.preencherTabela(salasComEstados, tableBody, (item) => [
                     item.nome,
-                    item.andar,
+                    converterAndar(item.andar),
                     converterStatusSala(item.situacao),
                     item.observacao, 
                     item.capMax 

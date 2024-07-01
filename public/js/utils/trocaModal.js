@@ -104,7 +104,12 @@ function getId(){
 
 //SETs
 function setElementTextContentById(id, text) {
-  document.getElementById(id).textContent = text;
+  const element = document.getElementById(id);
+  if (element) {
+    element.textContent = text;
+  } else {
+    console.error(`Elemento com ID ${id} não encontrado.`);
+  }
 }
 
 function setElementInputValueById(id, value) {
@@ -226,46 +231,63 @@ async function createEntity(entityType, stepAtual) {
 }
 
 async function updateEntity(entityType, stepAtual) {
-  const entityData = getFormData(entityType);
-  const token = localStorage.getItem('token');
-  const modalEditarUsuario = document.getElementById('modalEditarUsuario');
-  const id = getId();
-
-  let modalId = `modalEditar${converterPrimeiraLetraMaiuscula(entityType)}`;
-  
-  if (entityType === 'salaEdit') entityType = 'sala';
-  else if (entityType === 'recepcionistaEdit') entityType = 'recepcionista';
-  /*era usado o mesmo case de getFormData de usuario para fazer a reserva e editar usuario e isso tava paia
-  pq quando dava certo em um dava errado no outro justamente porque um usa o modalCoworking e o outro
-  modalEditarUsuario, então eu mantive o mesmo case do getFormData e mudei o modalId de acordo com uma checagem
-  do id para saber em qual tela eu estou, se eu to na tela de editar usuario ou na tela de fazer reserva
-  */
-  else if (entityType === 'usuarioEdit' && modalEditarUsuario){
-    modalId = 'modalEditarUsuario';
-    entityType = 'usuario';
-  }  
-  else if (entityType === 'usuarioEdit'){
-    modalId = 'modalDeCoworking';
-    entityType = 'usuario';
-  }
-  else if (entityType === 'onlyUsuarioEdit') entityType = 'usuario';
-  else if (entityType === 'reserva') entityType = 'reserva';
-
-  let response;
   try {
-    const req = await axios.put(`http://localhost:3000/${entityType}/${id}`, entityData, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    response = req;
+    const entityData = getFormData(entityType);
+    const token = localStorage.getItem('token');
+    const id = getId();
+    const modalId = getModalId(entityType);
+    const response = await sendUpdateRequest(entityType, id, entityData, token);
+    return handleResponse(response, modalId, stepAtual);
   } catch (error) {
     console.error(`Erro ao atualizar ${entityType}:`, error);
     alert(`Erro ao atualizar ${entityType}. Por favor, tente novamente.`);
   }
+}
+
+function getModalId(entityType) {
+  const modalEditarUsuario = document.getElementById('modalEditarUsuario');
+  switch (entityType) {
+    case 'salaEdit':
+      return 'modalEditarSala';
+    case 'recepcionistaEdit':
+      return 'modalEditarRecepcionista';
+    case 'usuarioEdit':
+      return modalEditarUsuario ? 'modalEditarUsuario' : 'modalDeCoworking';
+    case 'onlyUsuarioEdit':
+    case 'reserva':
+      return `modalEditar${converterPrimeiraLetraMaiuscula(entityType)}`;
+    default:
+      return `modalEditar${converterPrimeiraLetraMaiuscula(entityType)}`;
+  }
+}
+
+async function sendUpdateRequest(entityType, id, entityData, token, modalId) {
+  const entityTypeMap = {
+    'salaEdit': 'sala',
+    'recepcionistaEdit': 'recepcionista',
+    'usuarioEdit': 'usuario',
+    'onlyUsuarioEdit': 'usuario',
+    'reserva': 'reserva'
+  };
+
+  const finalEntityType = entityTypeMap[entityType] || entityType;
+  const url = `http://localhost:3000/${finalEntityType}/${id}`;
+
+  return await axios.put(url, entityData, {
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+}
+
+function handleResponse(response, modalId, stepAtual) {
   if (response.status === 200) {
     return nextStep(modalId, stepAtual);
   } else {
-    throw new Error(`Erro ao atualizar ${entityType}. Status: ${response.status}`);
+    throw new Error(`Erro ao atualizar. Status: ${response.status}`);
   }
+}
+
+function converterPrimeiraLetraMaiuscula(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 
@@ -441,7 +463,6 @@ function fillConfirmationReserva(modalId, currentStep) {
 
 function fillConfirmationRecepcionistaEdit(modalId, currentStep) {
   nextStep(modalId, currentStep);
-
   setElementTextContentById('confirmNomeEdit',converterPrimeiraLetraMaiuscula(getElementValueById('editNome')));
   setElementTextContentById('confirmSobrenomeEdit', converterPrimeiraLetraMaiuscula(getElementValueById('editSobrenome')));
   setElementTextContentById('confirmLoginEdit', getElementValueById('editLogin'));
