@@ -520,19 +520,28 @@ dt{
 .card-body p strong {
     color: #333;
 }
+:root {
+    --main: #fff;
+    --text: #333;
+    --second: #666;
+    --azulTitulo: #0724aa;
+    --hover: #f0f0f0;
+    --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    --blue: #007bff;
+    --white: #fff;
+}
+
+.custom-calendar {
+    font-family: Arial, sans-serif;
+}
 
 .calendar {
     height: max-content;
-    width: max-content;
-    background-color: var(--bg-main);
+    background-color: var(--main);
     border-radius: 30px;
     padding: 20px;
     position: relative;
     overflow: hidden;
-    /* transform: scale(1.25); */
-}
-
-.calendar {
     box-shadow: var(--shadow);
 }
 
@@ -542,11 +551,7 @@ dt{
     align-items: center;
     font-size: 25px;
     font-weight: 600;
-    color: var(--color-txt);
-    padding: 10px;
-}
-
-.calendar-body {
+    color: var(--text);
     padding: 10px;
 }
 
@@ -554,20 +559,20 @@ dt{
     height: 50px;
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    font-weight: 600;
+    font-weight: 400;
 }
 
 .calendar-week-day div {
     display: grid;
     place-items: center;
-    color: var(--bg-second);
+    color: var(--azulTitulo);
 }
 
 .calendar-days {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 2px;
-    color: var(--color-txt);
+    color: var(--text);
 }
 
 .calendar-days div {
@@ -594,7 +599,7 @@ dt{
 .calendar-days div span:nth-child(3) {
     width: 2px;
     height: 0;
-    background-color: var(--color-txt);
+    background-color: var(--text);
 }
 
 .calendar-days div:hover span:nth-child(1),
@@ -613,10 +618,10 @@ dt{
 }
 
 .calendar-days div span:nth-child(2),
-.calendar-days div span:nth-child(4) {
+.calendar-days div.span:nth-child(4) {
     width: 0;
     height: 2px;
-    background-color: var(--color-txt);
+    background-color: var(--text);
 }
 
 .calendar-days div:hover span:nth-child(2),
@@ -664,7 +669,7 @@ dt{
 }
 
 .month-picker:hover {
-    background-color: var(--color-hover);
+    background-color: var(--hover);
 }
 
 .year-picker {
@@ -683,7 +688,7 @@ dt{
 }
 
 .year-change:hover {
-    background-color: var(--color-hover);
+    background-color: var(--hover);
 }
 
 .calendar-footer {
@@ -693,23 +698,13 @@ dt{
     align-items: center;
 }
 
-.toggle {
-    display: flex;
-}
-
-.toggle span {
-    margin-right: 10px;
-    color: var(--color-txt);
-}
-
-
 .month-list {
     position: absolute;
     width: 100%;
     height: 100%;
     top: 0;
     left: 0;
-    background-color: var(--bg-main);
+    background-color: var(--main);
     padding: 20px;
     grid-template-columns: repeat(3, auto);
     gap: 5px;
@@ -737,11 +732,29 @@ dt{
     border-radius: 10px;
     text-align: center;
     cursor: pointer;
-    color: var(--color-txt);
+    color: var(--text);
 }
 
 .month-list > div > div:hover {
-    background-color: var(--color-hover);
+    background-color: var(--hover);
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0.3s, opacity 0.3s;
+}
+
+.overlay.show {
+    visibility: visible;
+    opacity: 1;
 }
 
 @keyframes to-top {
