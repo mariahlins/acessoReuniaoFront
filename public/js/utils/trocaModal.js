@@ -71,6 +71,26 @@ function converterDateType(args) {
   return dataFormat;
 }
 
+/*Como nem todos os campos que tem na reserva eu tenho em editar e vice e versa, eu preciso validar se o campo existe
+e se ele existe eu armazeno no localStorage
+*/
+function obtemDadosValidos(campos) {
+  return Object.entries(campos).reduce((acc, [key, value]) => {
+    if (value) {
+      acc[key] = value;
+    }
+    return acc;
+  }, {});
+}
+function armazenaDadosLocalStorage(campos) {
+  Object.entries(campos).forEach(([key, value]) => {
+    if (value) {
+      localStorage.setItem(key, value);
+    }
+  });
+}
+
+
 //Formatar para campos de textos
 //GETs
 function getElementValueById(id) {
@@ -197,7 +217,7 @@ async function createEntity(entityType, stepAtual) {
       localStorage.setItem('numTelefone', responseData.numTelefone);
     }
   }
-
+  console.log('modalId', modalId)
   if (responseStatus === 200) {
     return nextStep(modalId, stepAtual);
   } else {
@@ -208,11 +228,26 @@ async function createEntity(entityType, stepAtual) {
 async function updateEntity(entityType, stepAtual) {
   const entityData = getFormData(entityType);
   const token = localStorage.getItem('token');
+  const modalEditarUsuario = document.getElementById('modalEditarUsuario');
   const id = getId();
+
+  let modalId = `modalEditar${converterPrimeiraLetraMaiuscula(entityType)}`;
   
   if (entityType === 'salaEdit') entityType = 'sala';
   else if (entityType === 'recepcionistaEdit') entityType = 'recepcionista';
-  else if (entityType === 'usuarioEdit') entityType = 'usuario';
+  /*era usado o mesmo case de getFormData de usuario para fazer a reserva e editar usuario e isso tava paia
+  pq quando dava certo em um dava errado no outro justamente porque um usa o modalCoworking e o outro
+  modalEditarUsuario, então eu mantive o mesmo case do getFormData e mudei o modalId de acordo com uma checagem
+  do id para saber em qual tela eu estou, se eu to na tela de editar usuario ou na tela de fazer reserva
+  */
+  else if (entityType === 'usuarioEdit' && modalEditarUsuario){
+    modalId = 'modalEditarUsuario';
+    entityType = 'usuario';
+  }  
+  else if (entityType === 'usuarioEdit'){
+    modalId = 'modalDeCoworking';
+    entityType = 'usuario';
+  }
   else if (entityType === 'onlyUsuarioEdit') entityType = 'usuario';
   else if (entityType === 'reserva') entityType = 'reserva';
 
@@ -226,10 +261,6 @@ async function updateEntity(entityType, stepAtual) {
     console.error(`Erro ao atualizar ${entityType}:`, error);
     alert(`Erro ao atualizar ${entityType}. Por favor, tente novamente.`);
   }
-
-  let modalId = `modalEditar${converterPrimeiraLetraMaiuscula(entityType)}`;
-  if (entityType==='usuario') modalId = 'modalDeCoworking';
-  
   if (response.status === 200) {
     return nextStep(modalId, stepAtual);
   } else {
@@ -289,27 +320,28 @@ function getFormData(entityType) {
       var dataNascimento = document.getElementById('dataNascimentoWithCpf').value;
       return converterDateType({cpf, dataNascimento});
 
-    case 'usuarioCNPJVerifica':
-      var cpf = removerPontos(document.getElementById('cpfWithCNPJ').value);
-      var dataNascimento = document.getElementById('dataNascimentoWithCNPJ').value;
-      return converterDateType({cpf, dataNascimento});
+      case 'usuarioEdit':
+      var identificador = removerPontos(document.getElementById('confirmCPFWithCpf')?.innerText);
+      var dataNascimento = converterDataEUA(document.getElementById('confirmDataNascimentoWithCpf')?.innerText);
+      var nome = document.getElementById('nomeWithCpf')?.value;
+      var sobrenome = document.getElementById('sobrenomeWithCpf')?.value;
+      var email = document.getElementById('emailWithCpf')?.value;
+      var numTelefone = document.getElementById('telefoneWithCpf')?.value;
+      var motivoReserva = document.getElementById('motivoDaReuniaoWithCpf')?.value;
 
-    case 'usuarioEdit':
-        var identificador = document.getElementById('confirmCPFWithCpf').innerText;
-        var dataNascimento = converterDataEUA(document.getElementById('confirmDataNascimentoWithCpf').innerText);
-        var nome = document.getElementById('nomeWithCpf').innerText;
-        var email = document.getElementById('emailWithCpf').value;
-        var numTelefone = document.getElementById('telefoneWithCpf').value;
-        var motivoReserva = document.getElementById('motivoDaReuniaoWithCpf').value;
+      const campos = {
+        cpf: identificador,
+        dataNascimento,
+        nome,
+        sobrenome,
+        email,
+        numTelefone: numTelefone ? removerPontos(numTelefone) : null,
+        motivoDaReuniao: motivoReserva
+      };
 
-        localStorage.setItem('cpf', identificador);
-        localStorage.setItem('dataNascimento',dataNascimento);
-        localStorage.setItem('nome', nome);
-        localStorage.setItem('email', email);
-        localStorage.setItem('numTelefone', numTelefone);
-        localStorage.setItem('motivoDaReuniao', motivoReserva);   
-        numTelefone = removerPontos(numTelefone);
-        return converterDateType({email, numTelefone});
+      const dadosValidos = obtemDadosValidos(campos);
+      armazenaDadosLocalStorage(dadosValidos);
+      return converterDateType(dadosValidos);
 
     case 'onlyUsuarioEdit':
       var identificador = document.getElementById('confirmCPFWithCpf').innerText;
