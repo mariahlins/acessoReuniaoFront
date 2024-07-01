@@ -289,6 +289,11 @@ function getFormData(entityType) {
       var dataNascimento = document.getElementById('dataNascimentoWithCpf').value;
       return converterDateType({cpf, dataNascimento});
 
+    case 'usuarioCNPJVerifica':
+      var cpf = removerPontos(document.getElementById('cpfWithCNPJ').value);
+      var dataNascimento = document.getElementById('dataNascimentoWithCNPJ').value;
+      return converterDateType({cpf, dataNascimento});
+
     case 'usuarioEdit':
         var identificador = document.getElementById('confirmCPFWithCpf').innerText;
         var dataNascimento = converterDataEUA(document.getElementById('confirmDataNascimentoWithCpf').innerText);
@@ -305,6 +310,7 @@ function getFormData(entityType) {
         localStorage.setItem('motivoDaReuniao', motivoReserva);   
         numTelefone = removerPontos(numTelefone);
         return converterDateType({email, numTelefone});
+
     case 'onlyUsuarioEdit':
       var identificador = document.getElementById('confirmCPFWithCpf').innerText;
       var dataNascimento = converterDataEUA(document.getElementById('confirmDataNascimentoWithCpf').innerText);
@@ -438,7 +444,19 @@ async function criarUsuario(entityData, modalId, currentStep) {
 
 // Consulta se o usuário existe e decide o fluxo
 async function usuarioExiste(modalId, currentStep) {
-  const entityData = getFormData('usuarioVerifica'); 
+  let entityData;
+  switch (modalId) {
+    case 'modalDeEmpresas':
+      entityData = getFormData('usuarioCNPJVerifica');
+      break;
+    case 'modalDeCoworking':
+      entityData = getFormData('usuarioVerifica');
+      break;
+    default:
+      console.error('Modal ID desconhecido:', modalId);
+      return;
+  }
+
   const token = localStorage.getItem('token');
 
   const step2Content = `
@@ -470,7 +488,7 @@ async function usuarioExiste(modalId, currentStep) {
     const response = await axios.get(`http://localhost:3000/usuario/consulta/${entityData.cpf}/${entityData.dataNascimento}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-
+    console.log(response);
     document.getElementById('step2').innerHTML = step2Content;
     fillConfirmationUsuario(response.data, modalId, currentStep);
   } catch (error) {
@@ -478,9 +496,9 @@ async function usuarioExiste(modalId, currentStep) {
       document.getElementById('step2').innerHTML = step3Content;
       criarUsuario(entityData, modalId, currentStep);
     } else {
-      const errorMessage = error.response && error.response.data && error.response.data.message 
-                          ? error.response.data.message 
-                          : 'Erro ao buscar usuário. Por favor, tente novamente mais tarde.';
+      const errorMessage = error.response && error.response.data && error.response.data.message
+        ? error.response.data.message
+        : 'Erro ao buscar usuário. Por favor, tente novamente mais tarde.';
       alert(errorMessage);
     }
   }

@@ -18,14 +18,18 @@
       </div>
 
 
-        <div class="step" id="step2" data-header="Consulta de Horários">
-          <h6 class="mx-auto text-center">Selecione uma data:</h6>
-          <div class="modal-footer-custom d-flex justify-content-between">
-            <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeEmpresas', 2)">Voltar</button>
-            <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeEmpresas', 2)">Continuar</button>
-          </div>
+      <div class="step" id="step2" data-header="Consulta de Horários">
+        <div class="custom-calendar">
+          <h2>Dias disponíveis</h2>
+          <input type="text" id="calendar" placeholder="Selecione uma data">
         </div>
-
+      
+        <div class="modal-footer-custom d-flex justify-content-between" style="max-width: 400px; margin: 20px auto;">
+          <button type="button" class="btn btn-outline-primary" onclick="prevStep()">Voltar</button>
+          <button type="button" class="btn btn-secondary" onclick="nextStep()">Continuar</button>
+        </div>
+      </div>
+      
 
         <div class="step" id="step3" data-header="Consulta de Horários">
           <div class="h6-container">
@@ -88,6 +92,9 @@
   </div>
 </div>
 <script src="/public/js/utils/trocaModal.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
 <script>
   const cpfInputCNPJ = document.getElementById('cpfWithCNPJ');
   if (cpfInputCNPJ) cpfInputCNPJ.addEventListener('input', formatCPF);

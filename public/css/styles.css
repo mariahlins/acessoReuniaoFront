@@ -326,10 +326,14 @@ tbody tr:last-child td:last-child {
     border-bottom-right-radius: 5px !important;
 }
 dt{
-    font-size: .8vw !important;
+    font-size: .6vw !important;
     font-weight: 600;
 }
 
+.frontInputHide{
+    border: none !important;
+    color:#f2f6fa00 !important;
+}
 .btn-primary{
     width: 23vw;
     height: 6vw;
