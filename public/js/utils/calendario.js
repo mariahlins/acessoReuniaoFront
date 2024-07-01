@@ -2,6 +2,7 @@ const calendar = document.querySelector('.calendar');
 const month_picker = calendar.querySelector('#month-picker');
 const calendar_header_year = calendar.querySelector('#year');
 const calendar_days = calendar.querySelector('.calendar-days');
+const overlay = document.querySelector('#overlay');
 
 const month_names = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
@@ -20,14 +21,30 @@ const generateCalendar = (month, year) => {
     
     let first_day = new Date(year, month, 1);
     
-    for (let i = 0; i <= days_of_month[month] + first_day.getDay() - 1; i++) {
+    for (let i = 0; i < days_of_month[month] + first_day.getDay(); i++) {
         let day = document.createElement('div');
         if (i >= first_day.getDay()) {
-            day.classList.add('calendar-day-hover');
-            day.innerHTML = i - first_day.getDay() + 1;
-            if (i - first_day.getDay() + 1 === currDate.getDate() && year === currDate.getFullYear() && month === currDate.getMonth()) {
-                day.classList.add('curr-date');
+            let dayNumber = i - first_day.getDay() + 1;
+            
+            let dayInput = document.createElement('input');
+            dayInput.type = 'radio';
+            dayInput.classList.add('btn-check');
+            dayInput.name = 'dayOptionsCalendar';
+            dayInput.id = `${year}-${month+1}-${dayNumber}`; 
+            dayInput.autocomplete = 'off';
+            
+            let dayLabel = document.createElement('label');
+            dayLabel.classList.add('btn', 'btn-outline-primary');
+            dayLabel.htmlFor = `${year}-${month+1}-${dayNumber}`;
+            dayLabel.textContent = dayNumber;
+            
+            if (new Date(year, month, dayNumber+1) < currDate) {
+                dayInput.disabled = true;
+                dayLabel.classList.add('disabled');
             }
+            
+            day.appendChild(dayInput);
+            day.appendChild(dayLabel);
         }
         calendar_days.appendChild(day);
     }
@@ -69,7 +86,6 @@ document.querySelector('#next-year').onclick = () => {
     generateCalendar(curr_month.value, curr_year.value);
 };
 
-const overlay = document.querySelector('#overlay');
 overlay.onclick = () => {
     month_list.classList.remove('show');
     overlay.classList.remove('show');

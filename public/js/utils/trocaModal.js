@@ -291,7 +291,6 @@ function converterPrimeiraLetraMaiuscula(string) {
 }
 
 
-
 function handleCreateEntityError(error, entityType) {
   if (error.response) {
     if (error.response.status === 409) alert(`Erro ao criar ${entityType}. Já existe um registro com esses dados.`);
@@ -477,6 +476,10 @@ function fillConfirmationRecepcionistaEdit(modalId, currentStep) {
   setElementTextContentById('confirmNivelAcessoEdit', converterPrimeiraLetraMaiuscula(nivelAcessoElement.options[nivelAcessoElement.selectedIndex].text));
 }
 
+function chamaDataDeReservas(){
+
+}
+
 // Confirmar - para Usuários
 function fillConfirmationUsuario(response, modalId, currentStep) {
   nextStep(modalId, currentStep);
@@ -491,6 +494,7 @@ function fillConfirmationUsuario(response, modalId, currentStep) {
   setElementInputValueById('telefoneWithCpf', converterNumTel(response.numTelefone));
   localStorage.setItem('id', response.id)
 }
+
 async function criarUsuario(entityData, modalId, currentStep) {
   nextStep(modalId, currentStep);
   // Preenche os campos com os dados para criação de novo usuário
@@ -498,10 +502,9 @@ async function criarUsuario(entityData, modalId, currentStep) {
   setElementTextContentById('confirmDataNascimentoWithCpf', converterData(entityData.dataNascimento));
 }
 
-
 // Função para exibir o conteúdo da etapa 2
-function exibirStep2(userData) {
-  const step2Content = `
+async function exibirStep2() {
+  return `
   <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="confirmCPFWithCpf"></span></strong></p>
   <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="confirmDataNascimentoWithCpf"></span></strong></p>
   <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="nomeWithCpf"></span></strong></p>
@@ -512,11 +515,10 @@ function exibirStep2(userData) {
     <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 2)">Voltar</button>
     <button type="button" class="btn btn-secondary" onclick="updateEntity('usuarioEdit', 2)">Continuar</button>
   </div>`;
-  document.getElementById('step2').innerHTML = step2Content;
 }
 
-function exibirStep3() {
-  const step3Content = `
+async function exibirStep3() {
+  return `
   <p class="form-control mb-2 custom-input"><strong><span id="confirmCPFWithCpf"></span></strong></p>
   <p class="form-control mb-2 custom-input"><strong><span id="confirmDataNascimentoWithCpf"></span></strong></p>
   <input type="text" id="nomeWithCpf" class="form-control mb-2 custom-input" placeholder="Nome">
@@ -528,10 +530,9 @@ function exibirStep3() {
       <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 2)">Voltar</button>
       <button type="button" class="btn btn-secondary" onclick="createEntity('usuario', 2)">Continuar</button>
   </div>`;
-  document.getElementById('step2').innerHTML = step3Content;
 }
 
-function obterEntityData(modalId) {
+async function obterEntityData(modalId) {
   switch (modalId) {
     case 'modalDeEmpresas':
       return getFormData('usuarioCNPJVerifica');
@@ -555,24 +556,29 @@ async function consultarUsuario(entityData) {
   }
 }
 
-// Consulta se o usuário existe e decide o fluxo
 async function usuarioExiste(modalId, currentStep) {
-  const entityData = obterEntityData(modalId);
+  const entityData = await obterEntityData(modalId);
+  //Está a haver um erro, este comendario serve para verificar o que está a acontecer
+  console.log(entityData, modalId);
   try {
     const response = await consultarUsuario(entityData);
+
     switch (modalId) {
       case 'modalDeEmpresas':
-        if(response.status === 200) nextStep(modalId, currentStep);
-        else alert('Usuario não tem acesso');
+        if (response.status === 200) {
+          nextStep(modalId, currentStep);
+        } else {
+          alert('Usuário não tem acesso');
+        }
         break;
       case 'modalDeCoworking':
-        exibirStep2(response.data);
+        document.getElementById('step2').innerHTML = await exibirStep2();
         fillConfirmationUsuario(response.data, modalId, currentStep);
         break;
     }
   } catch (error) {
     if (error.response && error.response.status === 404 && modalId === 'modalDeCoworking') {
-      exibirStep3();
+      document.getElementById('step2').innerHTML = await exibirStep3();
       criarUsuario(entityData, modalId, currentStep);
     } else {
       const errorMessage = error.response && error.response.data && error.response.data.message

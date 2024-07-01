@@ -1062,6 +1062,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    observeElement('calendar-days', () => {
+        const dayOptions = document.querySelectorAll('input[name="dayOptionsCalendar"]');
+        dayOptions.forEach(radio => {
+        radio.addEventListener('change', () => {
+           const selectedDate = radio.id; // Obtém o número do dia selecionado
+            console.log('Dia selecionado:', selectedDate);
+          /*localStorage.setItem('diaEscolhido', selectedDate);
+            const idReserva = localStorage.getItem('idReserva');
+            Controller.dinamizarAgenda(selectedDate, idReserva);*/
+        });
+      });
+    });
+
     observeElement('andar', ()=>{
         Controller.preencherModalComAPI('andar');
     });
