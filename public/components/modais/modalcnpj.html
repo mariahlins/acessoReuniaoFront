@@ -21,12 +21,41 @@
       <div class="step" id="step2" data-header="Consulta de Horários">
         <div class="custom-calendar">
           <h2>Dias disponíveis</h2>
-          <input type="text" id="calendar" placeholder="Selecione uma data">
+
+          <div class="calendar">
+            <div class="calendar-header">
+                <span class="month-picker" id="month-picker">February</span>
+                <div class="year-picker">
+                    <span class="year-change" id="prev-year">
+                        <pre><</pre>
+                    </span>
+                    <span id="year">2021</span>
+                    <span class="year-change" id="next-year">
+                        <pre>></pre>
+                    </span>
+                </div>
+            </div>
+            <div class="calendar-body">
+                <div class="calendar-week-day">
+                    <div>Sun</div>
+                    <div>Mon</div>
+                    <div>Tue</div>
+                    <div>Wed</div>
+                    <div>Thu</div>
+                    <div>Fri</div>
+                    <div>Sat</div>
+                </div>
+                <div class="calendar-days"></div>
+            </div>
+            <div class="calendar-footer">
+            </div>
+            <div class="month-list"></div>
+        </div>
         </div>
       
         <div class="modal-footer-custom d-flex justify-content-between" style="max-width: 400px; margin: 20px auto;">
-          <button type="button" class="btn btn-outline-primary" onclick="prevStep()">Voltar</button>
-          <button type="button" class="btn btn-secondary" onclick="nextStep()">Continuar</button>
+          <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeEmpresas', 2)">Voltar</button>
+          <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeEmpresas', 2)">Continuar</button>
         </div>
       </div>
       
@@ -92,10 +121,9 @@
   </div>
 </div>
 <script src="/public/js/utils/trocaModal.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
 <script>
   const cpfInputCNPJ = document.getElementById('cpfWithCNPJ');
   if (cpfInputCNPJ) cpfInputCNPJ.addEventListener('input', formatCPF);
 </script>
+
+<script src="/public/js/utils/calendario.js"></script>

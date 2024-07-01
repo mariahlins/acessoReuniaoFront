@@ -3,7 +3,7 @@ $(function() {
         const pagina = window.location.pathname.split("/").pop();
 
         // Importa o conteúdo do cabeçalho
-        $.get("/public/components/cabecalho/cabecalho.html", function(cabecalhoContent) {
+        $.get("/public/components/git cabecalho/cabecalho.html", function(cabecalhoContent) {
             $("main").prepend(cabecalhoContent); 
             // Atualiza referenciando o id no título
             $("#main-title").text(title);

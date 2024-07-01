@@ -1,20 +1,20 @@
 // Utilidades 
 //Formatar para inputs (formatação em tempo real)
-function formatCPF() {
-  let cpf = cpfInput.value;
+function formatCPF(event) {
+  let cpf = event.target.value;
   cpf = cpf.replace(/\D/g, '');
   cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
   cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
   cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-  cpfInput.value = cpf;
+  event.target.value = cpf;
 }
 
-function formatNumTel() {
-  let numTel = numTelInput.value;
+function formatNumTel(event) {
+  let numTel = event.target.value;
   numTel = numTel.replace(/\D/g, '');
   numTel = numTel.replace(/(\d{2})(\d)/, '($1) $2'); 
   numTel = numTel.replace(/(\d{5})(\d{4})/, '$1-$2');
-  return numTelInput.value = numTel;
+  event.target.value = numTel;
 }
 
 //Formatar para campos de textos
@@ -118,7 +118,7 @@ function setElementInputValueById(id, value) {
 //SETs
 
 // Gestão do modal
-document.getElementById("botao").disabled = true;
+//document.getElementById("botao").disabled = true;
 function checkInputs() {
     var nascimento = document.getElementById("dataNascimentoWithCpf").value;
     var cpff = document.getElementById("cpfWithCpf").value;
@@ -342,6 +342,11 @@ function getFormData(entityType) {
       var dataNascimento = document.getElementById('dataNascimentoWithCpf').value;
       return converterDateType({cpf, dataNascimento});
 
+    case 'usuarioCNPJVerifica':
+      var cpf = removerPontos(document.getElementById('cpfWithCNPJ').value);
+      var dataNascimento = document.getElementById('dataNascimentoWithCNPJ').value;
+      return converterDateType({cpf, dataNascimento});
+
       case 'usuarioEdit':
       var identificador = removerPontos(document.getElementById('confirmCPFWithCpf')?.innerText);
       var dataNascimento = converterDataEUA(document.getElementById('confirmDataNascimentoWithCpf')?.innerText);
@@ -494,59 +499,80 @@ async function criarUsuario(entityData, modalId, currentStep) {
 }
 
 
+// Função para exibir o conteúdo da etapa 2
+function exibirStep2(userData) {
+  const step2Content = `
+  <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="confirmCPFWithCpf"></span></strong></p>
+  <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="confirmDataNascimentoWithCpf"></span></strong></p>
+  <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="nomeWithCpf"></span></strong></p>
+  <input type="text" id="emailWithCpf" class="form-control mb-2 custom-input" placeholder="Email" required>
+  <input type="text" id="telefoneWithCpf" class="form-control mb-2 custom-input" placeholder="Número de telefone" minlength="12" maxlength="14" required>
+  <input type="text" id="motivoDaReuniaoWithCpf" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião" required> 
+  <div class="d-flex justify-content-between">
+    <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 2)">Voltar</button>
+    <button type="button" class="btn btn-secondary" onclick="updateEntity('usuarioEdit', 2)">Continuar</button>
+  </div>`;
+  document.getElementById('step2').innerHTML = step2Content;
+}
 
-// Consulta se o usuário existe e decide o fluxo
-async function usuarioExiste(modalId, currentStep) {
-  let entityData;
+function exibirStep3() {
+  const step3Content = `
+  <p class="form-control mb-2 custom-input"><strong><span id="confirmCPFWithCpf"></span></strong></p>
+  <p class="form-control mb-2 custom-input"><strong><span id="confirmDataNascimentoWithCpf"></span></strong></p>
+  <input type="text" id="nomeWithCpf" class="form-control mb-2 custom-input" placeholder="Nome">
+  <input type="text" id="sobrenomeWithCpf" class="form-control mb-2 custom-input" placeholder="Sobrenome">
+  <input type="text" id="emailWithCpf" class="form-control mb-2 custom-input" placeholder="Email" required>
+  <input type="text" id="telefoneWithCpf" class="form-control mb-2 custom-input" placeholder="Número de telefone" minlength="12" maxlength="14" required>
+  <input type="text" id="motivoDaReuniaoWithCpf" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião" required>
+  <div class="d-flex justify-content-between">
+      <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 2)">Voltar</button>
+      <button type="button" class="btn btn-secondary" onclick="createEntity('usuario', 2)">Continuar</button>
+  </div>`;
+  document.getElementById('step2').innerHTML = step3Content;
+}
+
+function obterEntityData(modalId) {
   switch (modalId) {
     case 'modalDeEmpresas':
-      entityData = getFormData('usuarioCNPJVerifica');
-      break;
+      return getFormData('usuarioCNPJVerifica');
     case 'modalDeCoworking':
-      entityData = getFormData('usuarioVerifica');
-      break;
+      return getFormData('usuarioVerifica');
     default:
       console.error('Modal ID desconhecido:', modalId);
       return;
   }
+}
 
-  const token = localStorage.getItem('token');
-
-  const step2Content = `
-    <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="confirmCPFWithCpf"></span></strong></p>
-    <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="confirmDataNascimentoWithCpf"></span></strong></p>
-    <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="nomeWithCpf"></span></strong></p>
-    <input type="text" id="emailWithCpf" class="form-control mb-2 custom-input" placeholder="Email" required>
-    <input type="text" id="telefoneWithCpf" class="form-control mb-2 custom-input" placeholder="Número de telefone" minlength="12" maxlength="14" required>
-    <input type="text" id="motivoDaReuniaoWithCpf" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião" required> 
-    <div class="d-flex justify-content-between">
-        <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 2)">Voltar</button>
-        <button type="button" class="btn btn-secondary" onclick="updateEntity('usuarioEdit', 2)">Continuar</button>
-    </div>`;
-
-  const step3Content = `
-    <p class="form-control mb-2 custom-input"><strong><span id="confirmCPFWithCpf"></span></strong></p>
-    <p class="form-control mb-2 custom-input"><strong><span id="confirmDataNascimentoWithCpf"></span></strong></p>
-    <input type="text" id="nomeWithCpf" class="form-control mb-2 custom-input" placeholder="Nome">
-    <input type="text" id="sobrenomeWithCpf" class="form-control mb-2 custom-input" placeholder="Sobrenome">
-    <input type="text" id="emailWithCpf" class="form-control mb-2 custom-input" placeholder="Email" required>
-    <input type="text" id="telefoneWithCpf" class="form-control mb-2 custom-input" placeholder="Número de telefone" minlength="12" maxlength="14" required>
-    <input type="text" id="motivoDaReuniaoWithCpf" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião" required>
-    <div class="d-flex justify-content-between">
-        <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 2)">Voltar</button>
-        <button type="button" class="btn btn-secondary" onclick="createEntity('usuario', 2)">Continuar</button>
-    </div>`;
-
+async function consultarUsuario(entityData) {
   try {
+    const token = localStorage.getItem('token');
     const response = await axios.get(`http://localhost:3000/usuario/consulta/${entityData.cpf}/${entityData.dataNascimento}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    console.log(response);
-    document.getElementById('step2').innerHTML = step2Content;
-    fillConfirmationUsuario(response.data, modalId, currentStep);
+    return response;
   } catch (error) {
-    if (error.response && error.response.status === 404) {
-      document.getElementById('step2').innerHTML = step3Content;
+    throw error;
+  }
+}
+
+// Consulta se o usuário existe e decide o fluxo
+async function usuarioExiste(modalId, currentStep) {
+  const entityData = obterEntityData(modalId);
+  try {
+    const response = await consultarUsuario(entityData);
+    switch (modalId) {
+      case 'modalDeEmpresas':
+        if(response.status === 200) nextStep(modalId, currentStep);
+        else alert('Usuario não tem acesso');
+        break;
+      case 'modalDeCoworking':
+        exibirStep2(response.data);
+        fillConfirmationUsuario(response.data, modalId, currentStep);
+        break;
+    }
+  } catch (error) {
+    if (error.response && error.response.status === 404 && modalId === 'modalDeCoworking') {
+      exibirStep3();
       criarUsuario(entityData, modalId, currentStep);
     } else {
       const errorMessage = error.response && error.response.data && error.response.data.message
