@@ -118,7 +118,7 @@ function setElementInputValueById(id, value) {
 //SETs
 
 // Gestão do modal
-//document.getElementById("botao").disabled = true;
+document.getElementById("botao").disabled = true;
 function checkInputs() {
     var nascimento = document.getElementById("dataNascimentoWithCpf").value;
     var cpff = document.getElementById("cpfWithCpf").value;
@@ -534,6 +534,10 @@ async function usuarioExiste(modalId, currentStep) {
           <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 2)">Voltar</button>
           <button type="button" class="btn btn-secondary" onclick="updateEntity('usuarioEdit', 2)">Continuar</button>
         </div>`;
+
+        const telefoneInput = document.getElementById('telefoneWithCpf');
+        if (telefoneInput) telefoneInput.addEventListener('input', formatNumTel);
+
         fillConfirmationUsuario(response.data, modalId, currentStep);
         break;
       case 'modalDeEmpresas':
@@ -559,6 +563,10 @@ async function usuarioExiste(modalId, currentStep) {
           <button type="button" class="btn btn-secondary" onclick="createEntity('usuario', 2)">Continuar</button>
       </div>`;
       criarUsuario(entityData, modalId, currentStep);
+      
+      const telefoneInput = document.getElementById('telefoneWithCpf');
+      if (telefoneInput) telefoneInput.addEventListener('input', formatNumTel);
+
     } else {
       const errorMessage = error.response && error.response.data && error.response.data.message
         ? error.response.data.message
