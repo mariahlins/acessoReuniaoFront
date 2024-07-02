@@ -521,8 +521,7 @@ async function usuarioExiste(modalId, currentStep) {
     const response = await axios.get(`http://localhost:3000/usuario/consulta/${entityData.cpf}/${entityData.dataNascimento}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    switch (modalId) {
-      case 'modalDeCoworking':
+      if(modalId==='modalDeCoworking'){
         document.getElementById('step2').innerHTML = `
         <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="confirmCPFWithCpf"></span></strong></p>
         <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="confirmDataNascimentoWithCpf"></span></strong></p>
@@ -539,15 +538,13 @@ async function usuarioExiste(modalId, currentStep) {
         if (telefoneInput) telefoneInput.addEventListener('input', formatNumTel);
 
         fillConfirmationUsuario(response.data, modalId, currentStep);
-        break;
-      case 'modalDeEmpresas':
-        if (response.status === 200) {
-          nextStep(modalId, currentStep);
-        } else {
-          alert('Usuário não tem acesso');
-        }
-        break;
-    }
+      }else if(modalId==='modalDeEmpresas'){
+          if (response.status === 200) {
+            nextStep(modalId, currentStep);
+          } else {
+            alert('Usuário não tem acesso');
+          }
+      }
   } catch (error) {
     if (error.response && error.response.status === 404 && modalId === 'modalDeCoworking') {
       document.getElementById('step2').innerHTML = `
