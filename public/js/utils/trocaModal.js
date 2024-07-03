@@ -363,7 +363,6 @@ function getFormData(entityType) {
         sobrenome,
         email,
         numTelefone: numTelefone ? removerPontos(numTelefone) : null,
-        motivoDaReuniao: motivoReserva
       };
 
       const dadosValidos = obtemDadosValidos(campos);
@@ -463,7 +462,18 @@ function fillConfirmationReserva(modalId, currentStep) {
   setElementTextContentById('horarioConfirmSpan', getElementValueById('selecao-horario-modal'));
   setElementTextContentById('horarioSaidaConfirmSpan', adicionarHora(getElementValueById('selecao-horario-modal')));
   setElementTextContentById('motivoReservaSpan', localStorage.getItem('motivoDaReuniao'));
+}
 
+function fillConfirmationReservaCNPJ(modalId, currentStep){
+  nextStep(modalId, currentStep);
+
+  setElementTextContentById('cpfUserConfirmReservaCNPJ', localStorage.getItem('cpf'));
+  setElementTextContentById('aniversarioConfirmResrvaCNPJ', formatarDataBr(localStorage.getItem('dataNascimento')));
+  setElementTextContentById('nomeConfirmSpanCNPJ', localStorage.getItem('nome'));
+  setElementTextContentById('emailConfirmSpanCNPJ', localStorage.getItem('email'));
+  setElementTextContentById('numTelConfirmSpanCNPJ', localStorage.getItem('numTelefone'));
+  setElementTextContentById('motivoReservaSpanCNPJ', localStorage.getItem('motivoDaReuniao')?localStorage.getItem('motivoDaReuniao'):'não informado');
+  
 }
 
 function fillConfirmationRecepcionistaEdit(modalId, currentStep) {

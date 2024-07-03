@@ -103,15 +103,42 @@
 
             <div class="h6-item">
               <h6>Duração da reserva:</h6>
-              <select class="form-select" id="tempoDropdown">
-                <option selected disabled>Duração da Reserva</option>
-              </select>
+              <input type="number" name="" id="duracaoReserva">
               <p id="duracaoReserva" class="mt-2"></p>
             </div>
           </div>
+          <div class="row blocks justify-content-center">
+            <div class="col-1" id="00:00">00:00</div>
+            <div class="col-1" id="01:00">01:00</div>
+            <div class="col-1" id="02:00">02:00</div>
+            <div class="col-1" id="03:00">03:00</div>
+            <div class="col-1" id="04:00">04:00</div>
+            <div class="col-1" id="05:00">05:00</div>
+            <div class="col-1" id="06:00">06:00</div>
+            <div class="col-1" id="07:00">07:00</div>
+            <br></br>
+            <div class="col-1" id="08:00">08:00</div>
+            <div class="col-1" id="09:00">09:00</div>
+            <div class="col-1" id="10:00">10:00</div>
+            <div class="col-1" id="11:00">11:00</div>
+            <div class="col-1" id="12:00">12:00</div>
+            <div class="col-1" id="13:00">13:00</div>
+            <div class="col-1" id="14:00">14:00</div>
+            <div class="col-1" id="15:00">15:00</div>
+            <br></br>
+            <div class="col-1" id="16:00">16:00</div>
+            <div class="col-1" id="17:00">17:00</div>
+            <div class="col-1" id="18:00">18:00</div>
+            <div class="col-1" id="19:00">19:00</div>
+            <div class="col-1" id="20:00">20:00</div>
+            <div class="col-1" id="21:00">21:00</div>
+            <div class="col-1" id="22:00">22:00</div>
+            <div class="col-1" id="23:00">23:00</div>
+            <br></br>
+            </div>
           <div class="modal-footer-custom d-flex justify-content-between">
             <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeEmpresas', 3)">Voltar</button>
-            <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeEmpresas', 3)">Continuar</button>
+            <button type="button" class="btn btn-secondary" onclick="fillConfirmationReservaCNPJ('modalDeEmpresas', 3)">Continuar</button>
           </div>
         </div>
 
@@ -119,6 +146,38 @@
         <div class="step" id="step4" data-header="Confirmação">
           <h4 class="mx-auto text-center">A reserva está correta?</h4>
           <p class="mx-auto text-center">Informações da reserva e horários selecionados.</p>
+          <div class="container mt-4">
+            <div class="row">
+                <div class="col-sm-6 mb-3">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">Informações do Responsável</h6>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-1"><strong>CPF:</strong> <span id="cpfUserConfirmReservaCNPJ"></span></p>
+                            <p class="mb-1"><strong>Nascimento:</strong> <span id="aniversarioConfirmResrvaCNPJ"></span></p>
+                            <p class="mb-1"><strong>Nome:</strong> <span id="nomeConfirmSpanCNPJ"></span></p>
+                            <p class="mb-1"><strong>Email:</strong> <span id="emailConfirmSpanCNPJ"></span></p>
+                            <p class="mb-1"><strong>Nº de telefone:</strong> <span id="numTelConfirmSpanCNPJ"></span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 mb-3">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">Informações da Reserva</h6>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-1"><strong>Sala:</strong> <span id="salaConfirmSpanCNPJ"></span></p>
+                            <p class="mb-1"><strong>Data:</strong> <span id="dataConfirmSpanCNPJ"></span></p>
+                            <p class="mb-1"><strong>Entrada:</strong> <span id="horarioConfirmSpanCNPJ"></span></p>
+                            <p class="mb-1"><strong>Saída:</strong> <span id="horarioSaidaConfirmSpanCNPJ"></span></p>
+                            <p class="mb-1"><strong>Motivo:</strong> <span id="motivoReservaSpanCNPJ"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
           <div class="modal-footer-custom d-flex justify-content-between">
             <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeEmpresas', 4)">Voltar</button>
             <button type="button" class="btn btn-secondary" onclick="nextStep('modalDeEmpresas', 4)">Confirmar</button>
