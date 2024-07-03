@@ -915,6 +915,16 @@ static async fazerLogin() {
                                     }
                                 });
                                 break;
+                            case 'salasDropdown':
+                                const salas = await this.listarSalas();
+                                const salasEmpresa = salas.filter(sala => sala.andar !== 0);
+                                salasEmpresa.forEach(sala => {
+                                    const option = document.createElement('option');
+                                    option.value = sala.id;
+                                    option.textContent = sala.nome;
+                                    selectElement.appendChild(option);
+                                });
+                                break;
                         default:
                             throw new Error('ID do elemento select não suportado');
                     }
@@ -977,6 +987,110 @@ static async fazerLogin() {
                     });
                 } catch (error) {
                     console.error('Erro ao colorir agenda:', error);
+                }
+            }
+
+            
+            static filtrarReservasMesAno(reservas, dia) {
+                return reservas.filter(reserva => {
+                    const dataReservada = new Date(reserva.dataReservada + 'T00:00:00Z');
+            
+                    const dataReservadaMes = dataReservada.getUTCMonth() + 1; 
+                    const dataReservadaAno = dataReservada.getUTCFullYear(); 
+            
+                    const diaMes = parseInt(dia.split('-')[1], 10); 
+                    const diaAno = parseInt(dia.split('-')[0], 10);
+            
+                    const isMatch = dataReservadaMes === diaMes && dataReservadaAno === diaAno;
+                    console.log(`Reserva ${reserva.id} corresponde ao filtro: ${isMatch}`);
+                    return isMatch;
+                });
+            }
+
+            static async filtrarAndarEmpresa(reservas){
+                const salas = await this.listarSalas();
+                const salasFiltradas = salas.filter(sala => sala.andar != 0);
+                const salasFiltradasIds = salasFiltradas.map(sala => sala.id);
+                return reservas.filter(reserva => salasFiltradasIds.includes(reserva.idSala));
+            }
+
+            static resetarDias() {
+                const diasNoCalendario = Array.from(document.querySelectorAll('.calendar-days div'));
+        
+                diasNoCalendario.forEach(diaDiv => {
+                    const diaInput = diaDiv.querySelector('input');
+                    if (diaInput){
+                        diaDiv.style.backgroundColor = 'lightgreen';
+                    }
+                });
+            }
+            /*limitei o horario de funcionamento das salas de 7h as 20h porque se nao 
+             os dias do calendario ficam sempre verdes por causa das horas de madrugada o que 
+             atrapalha a visualização */
+            static verificarHorariosOcupados(reservasDoDia) {
+                const inicioPermitido = 7 * 60; 
+                const fimPermitido = 20 * 60; 
+            
+                const intervalosOcupados = reservasDoDia.map(reserva => {
+                    const [inicioHora, inicioMinuto] = reserva.horaInicio.split(':').map(num => parseInt(num, 10));
+                    const [fimHora, fimMinuto] = reserva.horaFimReserva.split(':').map(num => parseInt(num, 10));
+                    return { inicio: inicioHora * 60 + inicioMinuto, fim: fimHora * 60 + fimMinuto };
+                });
+            
+                intervalosOcupados.sort((a, b) => a.inicio - b.inicio);
+            
+                let ultimoFim = inicioPermitido;
+                for (let intervalo of intervalosOcupados) {
+                    if (intervalo.inicio >= inicioPermitido && intervalo.fim <= fimPermitido) {
+                        console.log('Verificando intervalo:', intervalo);
+                        if (intervalo.inicio > ultimoFim) {
+                            console.log('Intervalo ocupado mas ainda sem lotação:', intervalo);
+                            return false; 
+                        }
+                        ultimoFim = intervalo.fim; 
+                    }
+                }
+                console.log('Todos os horários estão ocupados dentro do horário permitido');
+                return true; 
+            }
+
+            static colorirDias(reservasFiltradas) {
+                const diasNoCalendario = Array.from(document.querySelectorAll('.calendar-days div'));
+            
+                const padronizarFormatacao = (dateString) => {
+                    const parts = dateString.split('-');
+                    return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+                };
+            
+                diasNoCalendario.forEach(diaDiv => {
+                    const diaInput = diaDiv.querySelector('input');
+                    if (diaInput) {
+                        const dia = padronizarFormatacao(diaInput.id);
+                        const reservasDoDia = reservasFiltradas.filter(reserva => 
+                            padronizarFormatacao(reserva.dataReservada) === dia);
+            
+                        if (reservasDoDia.length === 0 || !this.verificarHorariosOcupados(reservasDoDia)) {
+                            diaDiv.style.backgroundColor = 'lightgreen';
+                        } else {
+                            diaDiv.style.backgroundColor = 'lightgray';
+                        }
+                    }
+                });
+            }
+            
+            static async dinamizarCalendario(dia) {
+                try {
+                    const reservas = await axios.get('http://localhost:3000/reserva');
+                    const reservasData = reservas.data;
+                    const reservasCnpj = await this.filtrarAndarEmpresa(reservasData);
+                    const reservasFiltradas = this.filtrarReservasMesAno(reservasCnpj, dia);
+                    
+                    this.resetarDias();
+                    this.colorirDias(reservasFiltradas);
+                    
+                    console.log('Reservas filtradas:', reservasFiltradas);
+                } catch (error) {
+                    console.error('Erro ao colorir calendario:', error);
                 }
             }
             
@@ -1062,17 +1176,30 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    observeElement('calendar-days', () => {
+    observeElement('calendar-days', async ()  => {
         const dayOptions = document.querySelectorAll('input[name="dayOptionsCalendar"]');
-        dayOptions.forEach(radio => {
-        radio.addEventListener('change', () => {
-           const selectedDate = radio.id; // Obtém o número do dia selecionado
-            console.log('Dia selecionado:', selectedDate);
-          /*localStorage.setItem('diaEscolhido', selectedDate);
-            const idReserva = localStorage.getItem('idReserva');
-            Controller.dinamizarAgenda(selectedDate, idReserva);*/
-        });
-      });
+        if(dayOptions.length > 0){
+            const firstRadio = dayOptions[0];
+            firstRadio.checked = true;
+            
+            const today = new Date().toISOString().split('T')[0];
+            localStorage.setItem('diaEscolhido', today);
+            console.log('Data selecionada:', today);
+            await Controller.dinamizarCalendario(today);
+
+            dayOptions.forEach(radio => {
+                radio.addEventListener('change', async  () => {
+                    localStorage.setItem('diaEscolhido', radio.id);
+                    const selectedDate = localStorage.getItem('diaEscolhido');
+                    console.log('Data selecionada:', selectedDate);
+                    await Controller.dinamizarCalendario(selectedDate);
+                });
+            });
+        }
+    });
+
+    observeElement('modalDeEmpresas', () => {
+        Controller.preencherModalComAPI('salasDropdown');
     });
 
     observeElement('andar', ()=>{
