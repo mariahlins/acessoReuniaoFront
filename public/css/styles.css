@@ -250,20 +250,29 @@ td .btn{
     background-color: #007bff;
 }
 
-.btn.btn-outline-primary-day{
-    color: #00047E;
-    border-color: #00047e65;
-    border-radius: 20px; 
+.btn.btn-outline-sucess {
+    color: #585d67;
+    border-color: #565D6D;
+    border: 1.5px solid;
     width: 40px; 
     height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 50%;
+    font-weight: 550;
 }
 
-.btn.btn-outline-primary-day:hover{
-    color:white;
-    background-color: #007bff;
+.btn.btn-outline-sucess:hover{
+    color: #333;
+    border-color: #565c6a;
+    border-width: 2.4px;
+}
+
+.disabled-day {
+    background-color: rgba(127, 127, 127, 0.451); 
+    pointer-events: none;
+    color: #999999; 
 }
 
 .btn.btn-final{
@@ -601,6 +610,9 @@ dt{
     position: relative;
     cursor: pointer;
     animation: to-top 1s forwards;
+    border-radius: 50%; /* Para tornar a div redonda */
+    box-sizing: border-box; /* Para incluir o padding e border no tamanho total */
+    overflow: hidden; /* Para garantir que o conteúdo não exceda os limites da div */
 }
 
 .calendar-days div span {

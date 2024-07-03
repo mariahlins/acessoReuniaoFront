@@ -34,13 +34,13 @@ const generateCalendar = (month, year) => {
             dayInput.autocomplete = 'off';
             
             let dayLabel = document.createElement('label');
-            dayLabel.classList.add('btn', 'btn-outline-primary-day');
+            dayLabel.classList.add('btn', 'btn-outline-sucess');
             dayLabel.htmlFor = `${year}-${month+1}-${dayNumber}`;
             dayLabel.textContent = dayNumber;
             
             if (new Date(year, month, dayNumber+1) < currDate) {
                 dayInput.disabled = true;
-                dayLabel.classList.add('disabled');
+                dayLabel.classList.add('disabled-day');
             }
             
             day.appendChild(dayInput);
