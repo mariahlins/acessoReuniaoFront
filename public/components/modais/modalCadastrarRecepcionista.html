@@ -1,4 +1,5 @@
-<div class="modal fade" id="modalCadastrarRecepcionista" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-modal="true">
+<div class="modal fade" id="modalCadastrarRecepcionista" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalCenterTitle" aria-modal="true">
     <div class="modal-dialog modal-dialog-centered custom-modal-size" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -8,24 +9,31 @@
 
             <div class="modal-body custom-modal-body">
                 <div class="step active" id="step1" data-header="Informações do recepcionista">
-                    <input type="text" id="nome" class="form-control mb-2 custom-input" placeholder="Nome" autocomplete="off" required>
-                    <input type="text" id="sobrenome" class="form-control mb-2 custom-input" placeholder="Sobrenome" autocomplete="off" required>
-                    <input type="text" id="login" class="form-control mb-2 custom-input" placeholder="Login" autocomplete="off" required>
-                    <input type="password" id="senha" class="form-control mb-2 custom-input" placeholder="Senha" autocomplete="off" required>
+                    <input type="text" id="nome" class="form-control mb-2 custom-input" placeholder="Nome"
+                        autocomplete="off" required>
+                    <input type="text" id="sobrenome" class="form-control mb-2 custom-input" placeholder="Sobrenome"
+                        autocomplete="off" required>
+                    <input type="text" id="login" class="form-control mb-2 custom-input" placeholder="Login"
+                        autocomplete="off" required>
+                    <input type="password" id="senha" class="form-control mb-2 custom-input" placeholder="Senha"
+                        autocomplete="off" required>
                     <div class="d-flex justify-content-between">
                         <button class="btn btn-invisible"></button>
-                        <button type="button" class="btn btn-secondary" onclick="nextStep('modalCadastrarRecepcionista',1)">Continuar</button>
+                        <button type="button" class="btn btn-secondary"
+                            onclick="nextStep('modalCadastrarRecepcionista',1)">Continuar</button>
                     </div>
                 </div>
-                
+
                 <div class="step" id="step2" data-header="Nível de acesso">
                     <h4 class="mx-auto text-center mb-3 mt-1">Qual nível de acesso o usuário terá?</h4>
                     <select id="nivelAcesso" class="form-control mb-2 custom-input" required>
                         <option>Selecione um nível</option>
                     </select>
                     <div class="d-flex justify-content-between">
-                        <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalCadastrarRecepcionista',2)">Voltar</button>
-                        <button type="button" class="btn btn-secondary" onclick="fillConfirmationRecepcionista('modalCadastrarRecepcionista',2)">Confirmar</button>
+                        <button type="button" class="btn btn-outline-primary"
+                            onclick="prevStep('modalCadastrarRecepcionista',2)">Voltar</button>
+                        <button type="button" class="btn btn-secondary"
+                            onclick="fillConfirmationRecepcionista('modalCadastrarRecepcionista',2)">Confirmar</button>
                     </div>
                 </div>
 
@@ -41,29 +49,38 @@
                                     <p class="mb-1"><strong>Nome: </strong><span id="confirmNome"></span></p>
                                     <p class="mb-1"><strong>Sobrenome: </strong><span id="confirmSobrenome"></span></p>
                                     <p class="mb-1"><strong>Login: </strong><span id="confirmLogin"></span></p>
-                                    <p class="mb-1"><strong>Nível de acesso: </strong><span id="confirmNivelAcesso"></span></span></p>
+                                    <p class="mb-1"><strong>Nível de acesso: </strong><span
+                                            id="confirmNivelAcesso"></span></span></p>
                                     <p style="display:hidden"><span id="hiddenSenha"></span></p>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer-custom d-flex justify-content-between">
-                        <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalCadastrarRecepcionista', 3)">Voltar</button>
-                        <button type="button" class="btn btn-secondary" id="confirmarRecepcionista" onclick="createEntity('recepcionista',3)">Cadastrar</button>
+                        <button type="button" class="btn btn-outline-primary"
+                            onclick="prevStep('modalCadastrarRecepcionista', 3)">Voltar</button>
+                        <button type="button" class="btn btn-secondary" id="confirmarRecepcionista"
+                            onclick="createEntity('recepcionista',3)">Cadastrar</button>
                     </div>
                 </div>
-                
+
                 <div class="step" id="step4" data-header="">
                     <h4 class="tsucesso mx-auto text-center mt-4">Usuário criado com sucesso!</h4>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="7rem" height="7rem" fill="#3D9200" class="bi bi-check2-circle mx-auto d-block mt-4" viewBox="0 0 16 16">
-                      <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0"></path>
-                      <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"></path>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="7rem" height="7rem" fill="#3D9200"
+                        class="bi bi-check2-circle mx-auto d-block mt-4" viewBox="0 0 16 16">
+                        <path
+                            d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0">
+                        </path>
+                        <path
+                            d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z">
+                        </path>
                     </svg>
                     <p class="subTitulo2 mx-auto text-center">O usuário já pode acessar o sistema</p>
                     <div class="modal-footer-custom d-flex justify-content-center">
-                        <button type="button" class="btn btn-final" onclick="finish('modalCadastrarRecepcionista')">Concluir</button>
+                        <button type="button" class="btn btn-final"
+                            onclick="finish('modalCadastrarRecepcionista')">Concluir</button>
                     </div>
-                  </div>
+                </div>
             </div>
         </div>
     </div>
