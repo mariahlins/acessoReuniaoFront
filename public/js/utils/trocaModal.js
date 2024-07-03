@@ -40,11 +40,11 @@ function removerPontos(data) {
   return data.replace(/\D/g, '');
 }
 
-function adicionarHora(time) {
+function adicionarHora(time, tempoReserva) {
   const [hour, minute] = time.split(':').map(Number);
-  let novaHora = hour + 3;
+  let novaHora = hour + Number(tempoReserva);
 
-  if (novaHora >= 23) novaHora -= 23;
+  if (novaHora >= 23) novaHora -= 24;
   return `${novaHora.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
 }
 
@@ -178,9 +178,16 @@ async function createEntity(entityType, stepAtual) {
       if (req2.status !== 200) responseStatus = req2.status;
       responseData = { req1: req1.data, req2: req2.data };
     } else {
-      const req = await axios.post(`http://localhost:3000/${entityType}`, entityData, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      let req;
+      if(entityType === 'reservaEmpresa'){
+         req= await axios.post(`http://localhost:3000/reserva`, entityData, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+      }else{
+         req = await axios.post(`http://localhost:3000/${entityType}`, entityData, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });  
+      }
       if (req.status !== 200) responseStatus = req.status;
       responseData = req.data;
     }
@@ -198,8 +205,15 @@ async function createEntity(entityType, stepAtual) {
       localStorage.setItem('nome', `${responseData.nome} ${responseData.sobrenome}`);
       localStorage.setItem('email', responseData.email);
       localStorage.setItem('numTelefone', responseData.numTelefone);
+    }else{
+      localStorage.removeItem('motivoDaReuniao');
+      localStorage.removeItem('idReserva');
     }
-  }
+  }else if(entityType === 'reservaEmpresa'){
+    localStorage.removeItem('motivoDaReuniao');
+    localStorage.removeItem('idReservaCNPJ');
+    modalId = 'modalDeEmpresas';
+  } 
   console.log('modalId', modalId)
   if (responseStatus === 200) {
     return nextStep(modalId, stepAtual);
@@ -245,7 +259,8 @@ async function sendUpdateRequest(entityType, id, entityData, token, modalId) {
     'recepcionistaEdit': 'recepcionista',
     'usuarioEdit': 'usuario',
     'onlyUsuarioEdit': 'usuario',
-    'reserva': 'reserva'
+    'reserva': 'reserva',
+    'reservaEmpresa': 'reserva'
   };
 
   const finalEntityType = entityTypeMap[entityType] || entityType;
@@ -332,7 +347,9 @@ function getFormData(entityType) {
       var email = document.getElementById('emailWithCpf')?.value;
       var numTelefone = document.getElementById('telefoneWithCpf')?.value;
       var motivoReserva = document.getElementById('motivoDaReuniaoWithCpf')?.value;
-
+      
+      localStorage.setItem('motivoDaReuniao', motivoReserva);
+      
       const campos = {
         cpf: identificador,
         dataNascimento,
@@ -353,7 +370,7 @@ function getFormData(entityType) {
       var email = document.getElementById('emailWithCpf').value;
       var numTelefone = document.getElementById('telefoneWithCpf').value;
       var motivoReserva = document.getElementById('motivoDaReuniaoWithCpf').value;
-
+      
     case 'usuario':
       var identificador = removerPontos(document.getElementById('confirmCPFWithCpf').innerText);
       var dataNascimento = converterDataEUA(document.getElementById('confirmDataNascimentoWithCpf').innerText);
@@ -362,7 +379,6 @@ function getFormData(entityType) {
       var email = document.getElementById('emailWithCpf').value;
       var numTelefone = removerPontos(document.getElementById('telefoneWithCpf').value);
       var motivoReserva = document.getElementById('motivoDaReuniaoWithCpf').value;
-
       localStorage.setItem('cpf', identificador);
       localStorage.setItem('dataNascimento', dataNascimento);
       localStorage.setItem('nome', `${nome} ${sobrenome}`);
@@ -379,6 +395,17 @@ function getFormData(entityType) {
       var dataReservada = converterDataEUA(document.getElementById('dataConfirmSpan').innerText);
       var horaInicio = document.getElementById('horarioConfirmSpan').innerText;
       return converterDateType({ idRecepcionista, idUsuario, idSala, motivoReserva, dataReservada, horaInicio });
+
+    case 'reservaEmpresa':
+      var idRecepcionista = Number(localStorage.getItem('idRecepcionista'));
+      var idUsuario = Number(localStorage.getItem('id'));
+      var idSala = Number(localStorage.getItem('idReservaCNPJ'));
+      var motivoReserva = localStorage.getItem('motivoDaReuniao') || 'não informado';
+      var dataReservada = converterDataEUA(document.getElementById('dataConfirmSpanCNPJ').innerText);
+      var horaInicio = document.getElementById('horarioConfirmSpanCNPJ').innerText;
+      var horarioSaida = document.getElementById('horarioSaidaConfirmSpanCNPJ').innerText;
+      return converterDateType({idRecepcionista, idUsuario, idSala, motivoReserva, dataReservada, horaInicio, horarioSaida });
+
   }
 }
 
@@ -437,8 +464,8 @@ function fillConfirmationReserva(modalId, currentStep) {
   setElementTextContentById('salaConfirmSpan', localStorage.getItem('nomeSala'));
   setElementTextContentById('dataConfirmSpan', formatarDataBr(localStorage.getItem('diaEscolhido')));
   setElementTextContentById('horarioConfirmSpan', getElementValueById('selecao-horario-modal'));
-  setElementTextContentById('horarioSaidaConfirmSpan', adicionarHora(getElementValueById('selecao-horario-modal')));
-  setElementTextContentById('motivoReservaSpan', localStorage.getItem('motivoDaReuniao'));
+  setElementTextContentById('horarioSaidaConfirmSpan', adicionarHora(getElementValueById('selecao-horario-modal'), 3));
+  setElementTextContentById('motivoReservaSpan',  localStorage.getItem('motivoDaReuniao'));
 }
 
 function fillConfirmationReservaCNPJ(modalId, currentStep) {
@@ -449,6 +476,11 @@ function fillConfirmationReservaCNPJ(modalId, currentStep) {
   setElementTextContentById('nomeConfirmSpanCNPJ', localStorage.getItem('nome'));
   setElementTextContentById('emailConfirmSpanCNPJ', localStorage.getItem('email'));
   setElementTextContentById('numTelConfirmSpanCNPJ', localStorage.getItem('numTelefone'));
+
+  setElementTextContentById('salaConfirmSpanCNPJ', localStorage.getItem('nomeSala'));
+  setElementTextContentById('dataConfirmSpanCNPJ', formatarDataBr(localStorage.getItem('diaEscolhido')));
+  setElementTextContentById('horarioConfirmSpanCNPJ', getElementValueById('horariosDropdown'));
+  setElementTextContentById('horarioSaidaConfirmSpanCNPJ', adicionarHora(getElementValueById('horariosDropdown'), getElementValueById('duracaoReserva')));
   setElementTextContentById('motivoReservaSpanCNPJ', localStorage.getItem('motivoDaReuniao') ? localStorage.getItem('motivoDaReuniao') : 'não informado');
 
 }

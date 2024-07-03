@@ -930,12 +930,13 @@ class Controller {
                             option.textContent = sala.nome;
                     
                             if (primeiraOpcao) {
-                                localStorage.setItem('idReserva', option.value);
+                                localStorage.setItem('idReservaCNPJ', option.value);
                                 option.selected = true;
                                 primeiraOpcao = false;
                             }
                             selectElement.appendChild(option);
                         });
+                        
                         break;
 
                 default:
@@ -961,11 +962,18 @@ class Controller {
         try {
             const reservas = await axios.get(`http://localhost:3000/reserva/${idReserva}/${dia}`);
             const reservasData = reservas.data;
+            
             //pegar só o dia
             const hoje = new Date().toISOString().split('T')[0];
 
             const selectContainer = document.getElementById('selecao-horario-modal');
-            const spaces = Array.from(document.querySelectorAll('div.row.blocks .col-1'));
+            const allSpaces = Array.from(document.querySelectorAll('div.row.blocks .col-1'));
+            let spaces = [];
+
+            for (let i = 0; i < 23; i++) {
+                spaces.push(allSpaces[i]);
+            }
+
             const currentHour = new Date().getHours();
 
             const resetarBlocos = () => {
@@ -1003,10 +1011,8 @@ class Controller {
         }
     }static async dinamizarAgendaCNPJ() {
         try {
-            // Obtenha o dia escolhido do localStorage
             const diaEscolhido = localStorage.getItem('diaEscolhido');
-            const idReserva = localStorage.getItem('idReserva');
-            console.log('Dia Escolhido:', diaEscolhido, 'ID Reserva:', idReserva);
+            const idReserva = localStorage.getItem('idReservaCNPJ');
             
             if (!diaEscolhido) {
                 console.warn('Nenhum dia escolhido encontrado no localStorage.');
@@ -1016,12 +1022,10 @@ class Controller {
             const reservas = await axios.get(`http://localhost:3000/reserva/${idReserva}/${diaEscolhido}`);
             const reservasData = reservas.data;
             
-            console.log('Response: ', reservasData);
-            
             // Pegue a data de hoje
             const hoje = new Date().toISOString().split('T')[0];
             
-            const selectContainer = document.getElementById('selecao-horario-modal');
+            const selectContainer = document.getElementById('horariosDropdown');
             const allSpaces = Array.from(document.querySelectorAll('div.row.blocks .col-1'));
             let spaces = [];
             const index23 = allSpaces.findIndex(element => element.id === '23:00');
@@ -1061,20 +1065,14 @@ class Controller {
             reservasData.forEach(reserva => {
                 if (reserva.horaInicio && typeof reserva.horaInicio === 'string') {
                     const horaReservada = reserva.horaInicio.slice(0, 3) + '00';
-                    console.log(horaReservada);
                     const timeBlockIndex = spaces.findIndex(space => space.id === horaReservada);
                     if (timeBlockIndex !== -1) {
-                        console.log(timeBlockIndex);
                         for (let i = timeBlockIndex; i < timeBlockIndex + 3 && i < spaces.length; i++) {
                             spaces[i].style.backgroundColor = 'lightgray';
                             selectContainer.children[i + 1].style.display = 'none';
                         }
-                    } else {
-                        console.warn('Bloco de tempo não encontrado para:', horaReservada);
                     }
-                } else {
-                    console.warn('Hora reservada inválida:', reserva.horaInicio);
-                }
+                } 
             });
         } catch (error) {
             console.error('Erro ao colorir agenda:', error);
@@ -1299,7 +1297,7 @@ document.addEventListener('DOMContentLoaded', () => {
             dayOptions.forEach(radio => {
                 if (radio.id === hojeFormatado) {
                     radio.checked = true;
-                    const idReserva = localStorage.getItem('idReserva');
+                    const idReserva = localStorage.getItem('idReservaCNPJ');
                     localStorage.setItem('diaEscolhido', hojeFormatado);
                     Controller.dinamizarAgendaCNPJ(idReserva);
                 }
@@ -1318,13 +1316,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (salasDropdown) {
             const selectedOption = salasDropdown.options[salasDropdown.selectedIndex];
             
-            localStorage.setItem('idReserva', selectedOption.value);
+            localStorage.setItem('nomeSala', selectedOption.textContent);
+            localStorage.setItem('idReservaCNPJ', selectedOption.value);
             await Controller.dinamizarAgendaCNPJ(selectedOption.value);
             
             salasDropdown.addEventListener("change", async () => {
                 const selectedOption = salasDropdown.options[salasDropdown.selectedIndex];
-                console.log('Sala selecionada:', selectedOption.textContent);
-                localStorage.setItem('idReserva', selectedOption.value);
+                localStorage.setItem('nomeSala', selectedOption.textContent);
+                localStorage.setItem('idReservaCNPJ', selectedOption.value);
                 await Controller.dinamizarAgendaCNPJ();
             });
         }

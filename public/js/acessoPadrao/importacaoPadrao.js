@@ -20,27 +20,21 @@ $(function() {
                     break;
                 case "reservas.html":
                     loadModalsAndBody(
-                        [
-                            "/public/components/modais/modalcpf.html",
-                            "/public/components/modais/modalcnpj.html"
-                        ],
+                        [],
                         "/public/components/body/corpoReservas.html"
                     );
                     break;
                 case "salas.html":
                     loadModalsAndBody(
                         [
-                            "/public/components/modais/modalcpf.html",
-                            "/public/components/modais/modalcnpj.html"
-                        ],
+                            "/public/components/modais/modalEditarSala.html",
+                         ],
                         "/public/components/body/corpoSalas.html"
                     );
                     break;
                 case "usuarios.html":
                     loadModalsAndBody(
                         [
-                            "/public/components/modais/modalcpf.html",
-                            "/public/components/modais/modalcnpj.html",
                             "/public/components/botoes/botaoListaNegraPadrao.html",
                             "/public/components/modais/modalEditarUsuario.html"
                         ],
@@ -50,8 +44,6 @@ $(function() {
                 case "listaNegraPadrao.html":
                     loadModalsAndBody(
                         [
-                            "/public/components/modais/modalcpf.html",
-                            "/public/components/modais/modalcnpj.html",
                             "/public/components/botoes/botoaUsuarioPadtao.html"
                         ],
                         "/public/components/body/corpoListaNegra.html"
