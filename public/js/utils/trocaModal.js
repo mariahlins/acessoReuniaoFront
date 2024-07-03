@@ -118,7 +118,7 @@ function setElementInputValueById(id, value) {
 //SETs
 
 // Gestão do modal
-//document.getElementById("botao").disabled = true;
+document.getElementById("botao").disabled = true;
 function checkInputs() {
     var nascimento = document.getElementById("dataNascimentoWithCpf").value;
     var cpff = document.getElementById("cpfWithCpf").value;
@@ -502,84 +502,68 @@ async function criarUsuario(entityData, modalId, currentStep) {
   setElementTextContentById('confirmDataNascimentoWithCpf', converterData(entityData.dataNascimento));
 }
 
-// Função para exibir o conteúdo da etapa 2
-async function exibirStep2() {
-  return `
-  <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="confirmCPFWithCpf"></span></strong></p>
-  <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="confirmDataNascimentoWithCpf"></span></strong></p>
-  <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="nomeWithCpf"></span></strong></p>
-  <input type="text" id="emailWithCpf" class="form-control mb-2 custom-input" placeholder="Email" required>
-  <input type="text" id="telefoneWithCpf" class="form-control mb-2 custom-input" placeholder="Número de telefone" minlength="12" maxlength="14" required>
-  <input type="text" id="motivoDaReuniaoWithCpf" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião" required> 
-  <div class="d-flex justify-content-between">
-    <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 2)">Voltar</button>
-    <button type="button" class="btn btn-secondary" onclick="updateEntity('usuarioEdit', 2)">Continuar</button>
-  </div>`;
-}
-
-async function exibirStep3() {
-  return `
-  <p class="form-control mb-2 custom-input"><strong><span id="confirmCPFWithCpf"></span></strong></p>
-  <p class="form-control mb-2 custom-input"><strong><span id="confirmDataNascimentoWithCpf"></span></strong></p>
-  <input type="text" id="nomeWithCpf" class="form-control mb-2 custom-input" placeholder="Nome">
-  <input type="text" id="sobrenomeWithCpf" class="form-control mb-2 custom-input" placeholder="Sobrenome">
-  <input type="text" id="emailWithCpf" class="form-control mb-2 custom-input" placeholder="Email" required>
-  <input type="text" id="telefoneWithCpf" class="form-control mb-2 custom-input" placeholder="Número de telefone" minlength="12" maxlength="14" required>
-  <input type="text" id="motivoDaReuniaoWithCpf" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião" required>
-  <div class="d-flex justify-content-between">
-      <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 2)">Voltar</button>
-      <button type="button" class="btn btn-secondary" onclick="createEntity('usuario', 2)">Continuar</button>
-  </div>`;
-}
-
 async function obterEntityData(modalId) {
+
+}
+
+async function usuarioExiste(modalId, currentStep) {
+  let entityData;
   switch (modalId) {
     case 'modalDeEmpresas':
-      return getFormData('usuarioCNPJVerifica');
+      entityData= getFormData('usuarioCNPJVerifica');
     case 'modalDeCoworking':
-      return getFormData('usuarioVerifica');
+      entityData= getFormData('usuarioVerifica');
     default:
       console.error('Modal ID desconhecido:', modalId);
-      return;
   }
-}
-
-async function consultarUsuario(entityData) {
   try {
     const token = localStorage.getItem('token');
     const response = await axios.get(`http://localhost:3000/usuario/consulta/${entityData.cpf}/${entityData.dataNascimento}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    return response;
-  } catch (error) {
-    throw error;
-  }
-}
+      if(modalId==='modalDeCoworking'){
+        document.getElementById('step2').innerHTML = `
+        <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="confirmCPFWithCpf"></span></strong></p>
+        <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="confirmDataNascimentoWithCpf"></span></strong></p>
+        <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="nomeWithCpf"></span></strong></p>
+        <input type="text" id="emailWithCpf" class="form-control mb-2 custom-input" placeholder="Email" required>
+        <input type="text" id="telefoneWithCpf" class="form-control mb-2 custom-input" placeholder="Número de telefone" minlength="12" maxlength="14" required>
+        <input type="text" id="motivoDaReuniaoWithCpf" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião" required> 
+        <div class="d-flex justify-content-between">
+          <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 2)">Voltar</button>
+          <button type="button" class="btn btn-secondary" onclick="updateEntity('usuarioEdit', 2)">Continuar</button>
+        </div>`;
 
-async function usuarioExiste(modalId, currentStep) {
-  const entityData = await obterEntityData(modalId);
-  //Está a haver um erro, este comendario serve para verificar o que está a acontecer
-  console.log(entityData, modalId);
-  try {
-    const response = await consultarUsuario(entityData);
+        const telefoneInput = document.getElementById('telefoneWithCpf');
+        if (telefoneInput) telefoneInput.addEventListener('input', formatNumTel);
 
-    switch (modalId) {
-      case 'modalDeEmpresas':
-        if (response.status === 200) {
-          nextStep(modalId, currentStep);
-        } else {
-          alert('Usuário não tem acesso');
-        }
-        break;
-      case 'modalDeCoworking':
-        document.getElementById('step2').innerHTML = await exibirStep2();
         fillConfirmationUsuario(response.data, modalId, currentStep);
-        break;
-    }
+      }else if(modalId==='modalDeEmpresas'){
+          if (response.status === 200) {
+            nextStep(modalId, currentStep);
+          } else {
+            alert('Usuário não tem acesso');
+          }
+      }
   } catch (error) {
     if (error.response && error.response.status === 404 && modalId === 'modalDeCoworking') {
-      document.getElementById('step2').innerHTML = await exibirStep3();
+      document.getElementById('step2').innerHTML = `
+      <p class="form-control mb-2 custom-input"><strong><span id="confirmCPFWithCpf"></span></strong></p>
+      <p class="form-control mb-2 custom-input"><strong><span id="confirmDataNascimentoWithCpf"></span></strong></p>
+      <input type="text" id="nomeWithCpf" class="form-control mb-2 custom-input" placeholder="Nome">
+      <input type="text" id="sobrenomeWithCpf" class="form-control mb-2 custom-input" placeholder="Sobrenome">
+      <input type="text" id="emailWithCpf" class="form-control mb-2 custom-input" placeholder="Email" required>
+      <input type="text" id="telefoneWithCpf" class="form-control mb-2 custom-input" placeholder="Número de telefone" minlength="12" maxlength="14" required>
+      <input type="text" id="motivoDaReuniaoWithCpf" class="form-control mb-2 custom-input" placeholder="Motivo da Reunião" required>
+      <div class="d-flex justify-content-between">
+          <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 2)">Voltar</button>
+          <button type="button" class="btn btn-secondary" onclick="createEntity('usuario', 2)">Continuar</button>
+      </div>`;
       criarUsuario(entityData, modalId, currentStep);
+      
+      const telefoneInput = document.getElementById('telefoneWithCpf');
+      if (telefoneInput) telefoneInput.addEventListener('input', formatNumTel);
+
     } else {
       const errorMessage = error.response && error.response.data && error.response.data.message
         ? error.response.data.message

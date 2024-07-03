@@ -34,7 +34,7 @@ const generateCalendar = (month, year) => {
             dayInput.autocomplete = 'off';
             
             let dayLabel = document.createElement('label');
-            dayLabel.classList.add('btn', 'btn-outline-primary');
+            dayLabel.classList.add('btn', 'btn-outline-primary-day');
             dayLabel.htmlFor = `${year}-${month+1}-${dayNumber}`;
             dayLabel.textContent = dayNumber;
             

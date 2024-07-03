@@ -851,7 +851,7 @@ static async fazerLogin() {
                 setElementInputValueById('nomeWithCpf', entity.nome);
                 setElementInputValueById('sobrenomeWithCpf', entity.sobrenome);
                 setElementInputValueById('emailWithCpf', entity.email);
-                setElementInputValueById('telefoneWithCpf', entity.numTelefone);
+                setElementInputValueById('telefoneWithCpf', converterNumTel(entity.numTelefone));
             }
 
 

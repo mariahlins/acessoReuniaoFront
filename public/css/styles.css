@@ -250,6 +250,22 @@ td .btn{
     background-color: #007bff;
 }
 
+.btn.btn-outline-primary-day{
+    color: #00047E;
+    border-color: #00047e65;
+    border-radius: 20px; 
+    width: 40px; 
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn.btn-outline-primary-day:hover{
+    color:white;
+    background-color: #007bff;
+}
+
 .btn.btn-final{
     background-color: #0624AA;
     color:#F2F6FA;
@@ -369,7 +385,7 @@ dt{
 
 .custom-modal-body {
     overflow-y: auto; 
-    max-height: calc(90vh - 200px); 
+    max-height: calc(95.7vh - 200px); 
 }
 
 .modal-footer-custom button {
@@ -539,7 +555,7 @@ dt{
     height: max-content;
     background-color: var(--main);
     border-radius: 30px;
-    padding: 20px;
+    padding: 15px;
     position: relative;
     overflow: hidden;
     box-shadow: var(--shadow);
@@ -551,12 +567,12 @@ dt{
     align-items: center;
     font-size: 25px;
     font-weight: 600;
-    color: var(--text);
-    padding: 10px;
+    color: #00047E;
+    padding: 5px;
 }
 
 .calendar-week-day {
-    height: 50px;
+    height: 30px;
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     font-weight: 400;
@@ -565,23 +581,23 @@ dt{
 .calendar-week-day div {
     display: grid;
     place-items: center;
-    color: var(--azulTitulo);
+    color: #00047E;
 }
 
 .calendar-days {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 2px;
+    gap: 4px;
     color: var(--text);
 }
 
 .calendar-days div {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 5px;
+    padding: 4px;
     position: relative;
     cursor: pointer;
     animation: to-top 1s forwards;
