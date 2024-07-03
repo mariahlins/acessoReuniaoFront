@@ -11,6 +11,11 @@ function formatarDataEUA(dataBR) {
     return `${ano}-${mes}-${dia}`;
 }
 
+function formatarDataCalendario(today) {
+    let formattedDate = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+    return formattedDate.split('-').map(part => parseInt(part, 10)).join('-');
+}
+
 function ocultarDocumento(documento) {
     const inicio = documento.slice(0, 3);
     const meio = '***.***';
@@ -916,8 +921,7 @@ static async fazerLogin() {
                                 });
                                 break;
                             case 'salasDropdown':
-                                const salas = await this.listarSalas();
-                                const salasEmpresa = salas.filter(sala => sala.andar !== 0);
+                                const salasEmpresa = await this.listarSalasEmpresa();
                                 salasEmpresa.forEach(sala => {
                                     const option = document.createElement('option');
                                     option.value = sala.id;
@@ -991,27 +995,27 @@ static async fazerLogin() {
             }
 
             
-            static filtrarReservasMesAno(reservas, dia) {
+            static filtrarReservasMesAno(reservas, data) {
                 return reservas.filter(reserva => {
                     const dataReservada = new Date(reserva.dataReservada + 'T00:00:00Z');
             
                     const dataReservadaMes = dataReservada.getUTCMonth() + 1; 
                     const dataReservadaAno = dataReservada.getUTCFullYear(); 
             
-                    const diaMes = parseInt(dia.split('-')[1], 10); 
-                    const diaAno = parseInt(dia.split('-')[0], 10);
+                    const diaMes = parseInt(data.split('-')[1], 10); 
+                    const diaAno = parseInt(data.split('-')[0], 10);
             
-                    const isMatch = dataReservadaMes === diaMes && dataReservadaAno === diaAno;
-                    console.log(`Reserva ${reserva.id} corresponde ao filtro: ${isMatch}`);
-                    return isMatch;
+                   return (dataReservadaMes === diaMes && dataReservadaAno === diaAno);
                 });
             }
-
-            static async filtrarAndarEmpresa(reservas){
+            static async listarSalasEmpresa() {
                 const salas = await this.listarSalas();
-                const salasFiltradas = salas.filter(sala => sala.andar != 0);
-                const salasFiltradasIds = salasFiltradas.map(sala => sala.id);
-                return reservas.filter(reserva => salasFiltradasIds.includes(reserva.idSala));
+                return salas.filter(sala => sala.andar !== 0);
+            }
+
+            static filtrarReservasEmpresa(reservas, salas){
+                const salasEmpresa = salas.map(sala => sala.id);
+                return reservas.filter(reserva => salasEmpresa.includes(reserva.idSala))
             }
 
             static resetarDias() {
@@ -1024,80 +1028,106 @@ static async fazerLogin() {
                     }
                 });
             }
+
             /*limitei o horario de funcionamento das salas de 7h as 20h porque se nao 
              os dias do calendario ficam sempre verdes por causa das horas de madrugada o que 
              atrapalha a visualização */
-            static verificarHorariosOcupados(reservasDoDia) {
-                const inicioPermitido = 7 * 60; 
-                const fimPermitido = 20 * 60; 
+             static async verificarLotacao(reservasDoDia) {
+
+                const inicioPico = 7, fimPico = 20;
+                const salasEmpresa = await this.listarSalasEmpresa();
+                
+                const salasComReservasIds = reservasDoDia.map(reserva => reserva.idSala);
+                const salasSemReservas = salasEmpresa.filter(sala => !salasComReservasIds.includes(sala.id));
+                if (salasSemReservas.length > 0) {
+                    console.log('Salas sem reservas encontradas, lotação não completa.');
+                    return false;
+                }
             
-                const intervalosOcupados = reservasDoDia.map(reserva => {
-                    const [inicioHora, inicioMinuto] = reserva.horaInicio.split(':').map(num => parseInt(num, 10));
-                    const [fimHora, fimMinuto] = reserva.horaFimReserva.split(':').map(num => parseInt(num, 10));
-                    return { inicio: inicioHora * 60 + inicioMinuto, fim: fimHora * 60 + fimMinuto };
-                });
+                const horariosDePico = [];
+                for (let hora = inicioPico; hora <= fimPico; hora++) {
+                    horariosDePico.push(hora);
+                }
             
-                intervalosOcupados.sort((a, b) => a.inicio - b.inicio);
+                for (const sala of salasEmpresa) {
+                    const reservasDaSala = reservasDoDia.filter(reserva => reserva.idSala === sala.id);
+                    const horariosOcupados = reservasDaSala.map(reserva => {
+                        const inicio = parseInt(reserva.horaInicio.split(':')[0], 10);
+                        const fim = parseInt(reserva.horaFimReserva.split(':')[0], 10);
+                        return Array.from({ length: fim - inicio + 1 }, (_, i) => inicio + i);
+                    }).flat();
             
-                let ultimoFim = inicioPermitido;
-                for (let intervalo of intervalosOcupados) {
-                    if (intervalo.inicio >= inicioPermitido && intervalo.fim <= fimPermitido) {
-                        console.log('Verificando intervalo:', intervalo);
-                        if (intervalo.inicio > ultimoFim) {
-                            console.log('Intervalo ocupado mas ainda sem lotação:', intervalo);
-                            return false; 
-                        }
-                        ultimoFim = intervalo.fim; 
+                    const horariosDisponiveis = horariosDePico.filter(hora => !horariosOcupados.includes(hora));
+                    if (horariosDisponiveis.length > 0) {
+                        console.log('Horários disponíveis encontrados, lotação não completa.');
+                        return false;
                     }
                 }
-                console.log('Todos os horários estão ocupados dentro do horário permitido');
-                return true; 
+                console.log('Lotação completa, colorindo de cinza.');
+                return true;
             }
 
-            static colorirDias(reservasFiltradas) {
-                const diasNoCalendario = Array.from(document.querySelectorAll('.calendar-days div'));
-            
-                const padronizarFormatacao = (dateString) => {
-                    const parts = dateString.split('-');
-                    return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
-                };
-            
-                diasNoCalendario.forEach(diaDiv => {
-                    const diaInput = diaDiv.querySelector('input');
-                    if (diaInput) {
-                        const dia = padronizarFormatacao(diaInput.id);
-                        const reservasDoDia = reservasFiltradas.filter(reserva => 
-                            padronizarFormatacao(reserva.dataReservada) === dia);
-            
-                        if (reservasDoDia.length === 0 || !this.verificarHorariosOcupados(reservasDoDia)) {
-                            diaDiv.style.backgroundColor = 'lightgreen';
-                        } else {
-                            diaDiv.style.backgroundColor = 'lightgray';
-                        }
+            static async colorirDias(reservasDoMes) {
+            const diasNoCalendario = document.querySelectorAll('.calendar-days div');
+
+            const formatarData = (data) => {
+                if (typeof data === 'string') {
+                    data = new Date(data);
+                }
+                return data.toISOString().split('T')[0];
+            };
+
+            const hoje = new Date();
+            const dataAtualFormatada = formatarData(hoje);
+
+            for (const diaDiv of diasNoCalendario) {
+                const diaInput = diaDiv.querySelector('input');
+                if (diaInput) {
+                    const dia = formatarData(diaInput.id);
+                    const reservasDoDia = reservasDoMes.filter(reserva => formatarData(reserva.dataReservada) === dia);
+
+                    let corDeFundo = 'lightgreen';
+                    if (dia < dataAtualFormatada || (reservasDoDia.length > 0 && await this.verificarLotacao(reservasDoDia))) {
+                        corDeFundo = 'lightgray';
                     }
-                });
-            }
-            
-            static async dinamizarCalendario(dia) {
-                try {
-                    const reservas = await axios.get('http://localhost:3000/reserva');
-                    const reservasData = reservas.data;
-                    const reservasCnpj = await this.filtrarAndarEmpresa(reservasData);
-                    const reservasFiltradas = this.filtrarReservasMesAno(reservasCnpj, dia);
-                    
-                    this.resetarDias();
-                    this.colorirDias(reservasFiltradas);
-                    
-                    console.log('Reservas filtradas:', reservasFiltradas);
-                } catch (error) {
-                    console.error('Erro ao colorir calendario:', error);
+                    diaDiv.style.backgroundColor = corDeFundo;
                 }
             }
+        }
+            
+        static async dinamizarCalendario(data) {
+            try {
+                const reservas = await this.listarReservas();
+                const salasEmpresa = await this.listarSalasEmpresa();
+                const reservasEmpresas = this.filtrarReservasEmpresa(reservas, salasEmpresa);
+                const reservasDoMes = this.filtrarReservasMesAno(reservasEmpresas, data);
+        
+                const selectContainer = document.getElementById('horariosDropdown');
+                const hoje = new Date().toISOString().split('T')[0];
+               
+                const dataFormatada = data.split('-').map((num) => num.padStart(2, '0')).join('-');
+                const currentHour = new Date().getHours();
+                Array.from(selectContainer.children).forEach(child => {
+                    if (hoje === dataFormatada) {
+                        if (parseInt(child.value) >= parseInt(currentHour)) return child.style.display = 'block';
+                        else child.style.display = 'none';
+                    } else {
+                        child.style.display = 'block';
+                    }
+                });
+        
+                this.resetarDias();
+                this.colorirDias(reservasDoMes);
+        
+            } catch (error) {
+                console.error('Erro ao colorir calendario:', error);
+            }
+        }
             
             
             
         /*Atualizar*/
-
+            
         
 } 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1176,25 +1206,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    observeElement('calendar-days', async ()  => {
+    observeElement('calendar-days', async () => {
         const dayOptions = document.querySelectorAll('input[name="dayOptionsCalendar"]');
-        if(dayOptions.length > 0){
-            const firstRadio = dayOptions[0];
-            firstRadio.checked = true;
-            
-            const today = new Date().toISOString().split('T')[0];
-            localStorage.setItem('diaEscolhido', today);
-            console.log('Data selecionada:', today);
-            await Controller.dinamizarCalendario(today);
-
+        if (dayOptions.length > 0) {
+            let today = new Date();
+            let hojeFormatado = formatarDataCalendario(today);
             dayOptions.forEach(radio => {
-                radio.addEventListener('change', async  () => {
+                if (radio.id === hojeFormatado) {
+                    radio.checked = true;
+                    foundTodayRadio = true;
+                    localStorage.setItem('diaEscolhido', hojeFormatado);
+                    Controller.dinamizarCalendario(hojeFormatado);
+                }
+                radio.addEventListener('change', async () => {
                     localStorage.setItem('diaEscolhido', radio.id);
                     const selectedDate = localStorage.getItem('diaEscolhido');
-                    console.log('Data selecionada:', selectedDate);
                     await Controller.dinamizarCalendario(selectedDate);
                 });
-            });
+            }); 
         }
     });
 
