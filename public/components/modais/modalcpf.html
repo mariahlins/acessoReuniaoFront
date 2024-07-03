@@ -1,4 +1,5 @@
-<div class="modal fade" id="modalDeCoworking" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<div class="modal fade" id="modalDeCoworking" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+  aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered custom-modal-size" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -6,37 +7,43 @@
         <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
       </div>
 
-        <div class="modal-body custom-modal-body">
-          <div class="step active" id="step1" data-header="Informações do responsável">
-              <input type="text" id="cpfWithCpf" class="form-control custom-input" placeholder="CPF" minlength="14" maxlength="14" required>
-              <input type="text" id="dataNascimentoWithCpf" class="form-control mb-2 custom-input" placeholder="Data de Nascimento" required onfocus="this.type='date'"  onblur="if (!this.value) this.type='text'">
-              <div class="d-flex justify-content-between">
-              <button class="btn btn-invisible"></button>
-              <button type="button" class="btn btn-secondary" id="botao" onclick="usuarioExiste('modalDeCoworking', 1)" disabled>Continuar</button>
-            </div>
+      <div class="modal-body custom-modal-body">
+        <div class="step active" id="step1" data-header="Informações do responsável">
+          <input type="text" id="cpfWithCpf" class="form-control custom-input" placeholder="CPF" minlength="14"
+            maxlength="14" required>
+          <input type="text" id="dataNascimentoWithCpf" class="form-control mb-2 custom-input"
+            placeholder="Data de Nascimento" required onfocus="this.type='date'"
+            onblur="if (!this.value) this.type='text'">
+          <div class="d-flex justify-content-between">
+            <button class="btn btn-invisible"></button>
+            <button type="button" class="btn btn-secondary" id="botao" onclick="usuarioExiste('modalDeCoworking', 1)"
+              >Continuar</button>
           </div>
+        </div>
 
-          <div class="step" id="step2" data-header="Informações do responsável">
-          </div>
+        <div class="step" id="step2" data-header="Informações do responsável">
+        </div>
 
         <div class="step" id="step3" data-header="Consulta de Horários">
           <div class="h6-container">
             <div class="h6-item">
               <h6>Selecione uma sala:</h6>
-              <div class="btn-group d-flex justify-content-between" id="selecao-salas-modal" role="group" aria-label="Toggle buttons example"></div>
+              <div class="btn-group d-flex justify-content-between" id="selecao-salas-modal" role="group"
+                aria-label="Toggle buttons example"></div>
             </div>
 
             <div class="h6-item">
               <h6>Selecione um dia:</h6>
-              <div class="btn-group d-flex justify-content-between" id="selecao-dia-modal" role="group" aria-label="Toggle buttons example">
+              <div class="btn-group d-flex justify-content-between" id="selecao-dia-modal" role="group"
+                aria-label="Toggle buttons example">
                 <input type="radio" class="btn-check" name="dayOptions" id="hoje" autocomplete="off" checked>
                 <label class="btn btn-outline-primary" for="hoje">Hoje</label>
-            
+
                 <input type="radio" class="btn-check" name="dayOptions" id="amanha" autocomplete="off">
                 <label class="btn btn-outline-primary" for="amanha">Amanhã</label>
               </div>
             </div>
-            
+
 
             <div class="h6-item">
               <h6>Selecione um horário:</h6>
@@ -99,10 +106,12 @@
             <div class="col-1" id="22:00">22:00</div>
             <div class="col-1" id="23:00">23:00</div>
             <br></br>
-            </div>
+          </div>
           <div class="modal-footer-custom d-flex justify-content-between mt-2">
-            <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 3)">Voltar</button>
-            <button type="button" class="btn btn-secondary" onclick="fillConfirmationReserva('modalDeCoworking', 3)">Continuar</button>
+            <button type="button" class="btn btn-outline-primary"
+              onclick="prevStep('modalDeCoworking', 3)">Voltar</button>
+            <button type="button" class="btn btn-secondary"
+              onclick="fillConfirmationReserva('modalDeCoworking', 3)">Continuar</button>
           </div>
         </div>
 
@@ -111,62 +120,67 @@
           <p class="mx-auto text-center">Informações da reserva e horários selecionados.</p>
           <div class="container mt-4">
             <div class="row">
-                <div class="col-sm-6 mb-3">
-                    <div class="card">
-                        <div class="card-header">
-                            <h6 class="mb-0">Informações do Responsável</h6>
-                        </div>
-                        <div class="card-body">
-                            <p class="mb-1"><strong>CPF:</strong> <span id="cpfUserConfirmReserva"></span></p>
-                            <p class="mb-1"><strong>Nascimento:</strong> <span id="aniversarioConfirmResrva"></span></p>
-                            <p class="mb-1"><strong>Nome:</strong> <span id="nomeConfirmSpan"></span></p>
-                            <p class="mb-1"><strong>Email:</strong> <span id="emailConfirmSpan"></span></p>
-                            <p class="mb-1"><strong>Nº de telefone:</strong> <span id="numTelConfirmSpan"></span></p>
-                        </div>
-                    </div>
+              <div class="col-sm-6 mb-3">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="mb-0">Informações do Responsável</h6>
+                  </div>
+                  <div class="card-body">
+                    <p class="mb-1"><strong>CPF:</strong> <span id="cpfUserConfirmReserva"></span></p>
+                    <p class="mb-1"><strong>Nascimento:</strong> <span id="aniversarioConfirmResrva"></span></p>
+                    <p class="mb-1"><strong>Nome:</strong> <span id="nomeConfirmSpan"></span></p>
+                    <p class="mb-1"><strong>Email:</strong> <span id="emailConfirmSpan"></span></p>
+                    <p class="mb-1"><strong>Nº de telefone:</strong> <span id="numTelConfirmSpan"></span></p>
+                  </div>
                 </div>
-                <div class="col-sm-6 mb-3">
-                    <div class="card">
-                        <div class="card-header">
-                            <h6 class="mb-0">Informações da Reserva</h6>
-                        </div>
-                        <div class="card-body">
-                            <p class="mb-1"><strong>Sala:</strong> <span id="salaConfirmSpan"></span></p>
-                            <p class="mb-1"><strong>Data:</strong> <span id="dataConfirmSpan"></span></p>
-                            <p class="mb-1"><strong>Entrada:</strong> <span id="horarioConfirmSpan"></span></p>
-                            <p class="mb-1"><strong>Saída:</strong> <span id="horarioSaidaConfirmSpan"></span></p>
-                            <p class="mb-1"><strong>Motivo:</strong> <span id="motivoReservaSpan"></span></p>
-                        </div>
-                    </div>
+              </div>
+              <div class="col-sm-6 mb-3">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="mb-0">Informações da Reserva</h6>
+                  </div>
+                  <div class="card-body">
+                    <p class="mb-1"><strong>Sala:</strong> <span id="salaConfirmSpan"></span></p>
+                    <p class="mb-1"><strong>Data:</strong> <span id="dataConfirmSpan"></span></p>
+                    <p class="mb-1"><strong>Entrada:</strong> <span id="horarioConfirmSpan"></span></p>
+                    <p class="mb-1"><strong>Saída:</strong> <span id="horarioSaidaConfirmSpan"></span></p>
+                    <p class="mb-1"><strong>Motivo:</strong> <span id="motivoReservaSpan"></span></p>
+                  </div>
                 </div>
+              </div>
             </div>
-        </div>
-        
-        
+          </div>
+
+
           <div class="modal-footer-custom d-flex justify-content-between">
-            <button type="button" class="btn btn-outline-primary" onclick="prevStep('modalDeCoworking', 4)">Voltar</button>
+            <button type="button" class="btn btn-outline-primary"
+              onclick="prevStep('modalDeCoworking', 4)">Voltar</button>
             <button type="button" class="btn btn-secondary" onclick="createEntity('reserva', 4)">Confirmar</button>
           </div>
         </div>
-        
+
 
 
         <div class="step" id="step5" data-header="">
           <h4 class="tsucesso mx-auto text-center mt-4">Sala reservada com sucesso!</h4>
-          <svg xmlns="http://www.w3.org/2000/svg" width="6rem" height="6rem" fill="#3D9200" class="bi bi-check2-circle mx-auto d-block mt-4" viewBox="0 0 16 16">
-            <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0"/>
-            <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
+          <svg xmlns="http://www.w3.org/2000/svg" width="6rem" height="6rem" fill="#3D9200"
+            class="bi bi-check2-circle mx-auto d-block mt-4" viewBox="0 0 16 16">
+            <path
+              d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0" />
+            <path
+              d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z" />
           </svg>
           <p class="subTitulo2 mx-auto text-center">Um email com as regras de uso da sala foi enviado</p>
           <p class="subTitulo2 mx-auto text center"> para o email fulano@gmail.com</p>
           <div class="modal-footer-custom d-flex justify-content-center">
-          <button type="button" class="btn btn-final" onclick="finish('modalDeCoworking')">Voltar para tela inicial</button>
+            <button type="button" class="btn btn-final" onclick="finish('modalDeCoworking')">Voltar para tela
+              inicial</button>
           </div>
-        </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 </div>
 <script src="/public/js/utils/trocaModal.js"></script>
 <script>

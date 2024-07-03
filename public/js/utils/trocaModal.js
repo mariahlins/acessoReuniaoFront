@@ -12,39 +12,39 @@ function formatCPF(event) {
 function formatNumTel(event) {
   let numTel = event.target.value;
   numTel = numTel.replace(/\D/g, '');
-  numTel = numTel.replace(/(\d{2})(\d)/, '($1) $2'); 
+  numTel = numTel.replace(/(\d{2})(\d)/, '($1) $2');
   numTel = numTel.replace(/(\d{5})(\d{4})/, '$1-$2');
   event.target.value = numTel;
 }
 
 //Formatar para campos de textos
-function converterNumTel(numTel){
+function converterNumTel(numTel) {
   return numTel.replace(/\D/g, '').replace(/(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
 }
 
-function converterCPF(cpf){
+function converterCPF(cpf) {
   return cpf.replace(/\D/g, '').replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})$/, '$1.$2.$3-$4');
 }
 
-function converterData(dataEUA){
+function converterData(dataEUA) {
   const data = dataEUA.split('-');
   return `${data[2]}/${data[1]}/${data[0]}`;
 }
 
-function converterDataEUA(dataBR){
+function converterDataEUA(dataBR) {
   const data = dataBR.split('/');
   return `${data[2]}-${data[1]}-${data[0]}`;
 }
 
-function removerPontos(data){
+function removerPontos(data) {
   return data.replace(/\D/g, '');
 }
 
 function adicionarHora(time) {
   const [hour, minute] = time.split(':').map(Number);
-  let novaHora=hour+3;
+  let novaHora = hour + 3;
 
-  if(novaHora>=23) novaHora-=23;
+  if (novaHora >= 23) novaHora -= 23;
   return `${novaHora.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
 }
 
@@ -54,12 +54,12 @@ function converterPrimeiraLetraMaiuscula(string) {
 
 function converterAndar(andar) {
   switch (andar) {
-      case 0: return 'Térreo';
-      case 1: return 'Primeiro andar';
-      case 2: return 'Segundo andar';
-      case 3: return 'Terceiro andar';
-      case 4: return 'Quarto andar';
-      default: return 'informação invalida';
+    case 0: return 'Térreo';
+    case 1: return 'Primeiro andar';
+    case 2: return 'Segundo andar';
+    case 3: return 'Terceiro andar';
+    case 4: return 'Quarto andar';
+    default: return 'informação invalida';
   }
 }
 
@@ -98,7 +98,7 @@ function getElementValueById(id) {
   return document.getElementById(id).value;
 }
 
-function getId(){
+function getId() {
   return Number(localStorage.getItem('id'));
 }
 //GETs
@@ -114,32 +114,9 @@ function setElementTextContentById(id, text) {
 }
 
 function setElementInputValueById(id, value) {
-  document.getElementById(id).value=value;
+  document.getElementById(id).value = value;
 }
 //SETs
-
-// Gestão do modal
-document.getElementById("botao").disabled = true;
-function checkInputs() {
-    var nascimento = document.getElementById("dataNascimentoWithCpf").value;
-    var cpff = document.getElementById("cpfWithCpf").value;
-
-    //aceita se os dois estiverem okeis
-    if (nascimento.trim() !== '' && cpff.trim() !== '') {
-        document.getElementById("botao").disabled = false;
-    } else {
-        //esse else é pra caso algum dos campos seja apagado
-        document.getElementById("botao").disabled = true;
-    }
-}
-//pega a data de nascimento
-document.getElementById("dataNascimentoWithCpf").addEventListener("input", function(event) {
-    checkInputs();
-});
-//pega o cpf digitado
-document.getElementById("cpfWithCpf").addEventListener("input", function(event) {
-    checkInputs();
-});
 
 function updateModalContent(modalId, step) {
   const currentStep = document.querySelector(`#${modalId} #step${step}`);
@@ -148,16 +125,16 @@ function updateModalContent(modalId, step) {
   document.querySelector(`#${modalId} .modal-title`).textContent = newHeader;
 }
 
-function nextStep(modalId, currentStep){
+function nextStep(modalId, currentStep) {
   const modalElement = document.getElementById(modalId);
-  const next=currentStep+1
+  const next = currentStep + 1
   modalElement.querySelector(`#step${currentStep}`).classList.remove('active');
   modalElement.querySelector(`#step${next}`).classList.add('active');
   updateModalContent(modalId, next);
 }
 
 function prevStep(modalId, currentStep) {
-  const prev=currentStep-1;
+  const prev = currentStep - 1;
   const modalElement = document.getElementById(modalId);
   modalElement.querySelector(`#step${currentStep}`).classList.remove('active');
   modalElement.querySelector(`#step${prev}`).classList.add('active');
@@ -183,28 +160,28 @@ function finish(modalId) {
 async function createEntity(entityType, stepAtual) {
   const entityData = getFormData(entityType);
   const token = localStorage.getItem('token');
-  let responseStatus = 200; 
+  let responseStatus = 200;
   let responseData = {};
 
   try {
     if (entityType === 'sala') {
-      const {observacao, ...entityDataSala} = entityData;
+      const { observacao, ...entityDataSala } = entityData;
       const req1 = await axios.post(`http://localhost:3000/${entityType}`, entityDataSala, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (req1.status !== 200) responseStatus = req1.status;
       const idSala = req1.data.id;
-      const estadoSalaData = {idSala, observacao};
+      const estadoSalaData = { idSala, observacao };
       const req2 = await axios.post(`http://localhost:3000/estadoSala`, estadoSalaData, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (req2.status !== 200) responseStatus = req2.status;
-      responseData = {req1: req1.data, req2: req2.data}; 
+      responseData = { req1: req1.data, req2: req2.data };
     } else {
       const req = await axios.post(`http://localhost:3000/${entityType}`, entityData, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (req.status !== 200) responseStatus = req.status; 
+      if (req.status !== 200) responseStatus = req.status;
       responseData = req.data;
     }
   } catch (error) {
@@ -303,7 +280,7 @@ function handleCreateEntityError(error, entityType) {
 
 // Get - pegar os dados
 function getFormData(entityType) {
-  switch(entityType) {
+  switch (entityType) {
     // Get span
     case 'sala':
       var nome = document.getElementById('confirmNomeSala').textContent;
@@ -311,7 +288,7 @@ function getFormData(entityType) {
       var area = document.getElementById('confirmArea').textContent;
       var capMax = Number(getElementValueById('capMax'));
       var observacao = document.getElementById('confirmEstadoSala').textContent;
-      return converterDateType({nome, andar, area, capMax, observacao});
+      return converterDateType({ nome, andar, area, capMax, observacao });
 
     case 'recepcionista':
       var nome = document.getElementById('confirmNome').textContent;
@@ -319,35 +296,35 @@ function getFormData(entityType) {
       var login = document.getElementById('confirmLogin').textContent;
       var senha = document.getElementById('senha').value;
       var nivelAcesso = Number(document.getElementById('nivelAcesso').value);
-      return converterDateType({nome, sobrenome, login, senha, nivelAcesso});
+      return converterDateType({ nome, sobrenome, login, senha, nivelAcesso });
 
     case 'salaEdit':
       var nome = document.getElementById('confirmNomeSalaEdit').textContent;
       var andar = Number(getElementValueById('editAndar'));
       var area = document.getElementById('confirmAreaEdit').textContent;
       var capMax = Number(getElementValueById('editCapMax'));
-      return converterDateType({nome, andar, area, capMax});
+      return converterDateType({ nome, andar, area, capMax });
 
     case 'recepcionistaEdit':
       var nome = document.getElementById('confirmNomeEdit').textContent;
       var sobrenome = document.getElementById('confirmSobrenomeEdit').textContent;
       var login = document.getElementById('confirmLoginEdit').textContent;
       var nivelAcesso = Number(document.getElementById('editNivelAcesso').value);
-      return converterDateType({nome, sobrenome, login, nivelAcesso});
+      return converterDateType({ nome, sobrenome, login, nivelAcesso });
 
     // Get inputs
     //Chamado na primeira tela do modal
     case 'usuarioVerifica':
       var cpf = removerPontos(document.getElementById('cpfWithCpf').value);
       var dataNascimento = document.getElementById('dataNascimentoWithCpf').value;
-      return converterDateType({cpf, dataNascimento});
+      return converterDateType({ cpf, dataNascimento });
 
     case 'usuarioCNPJVerifica':
       var cpf = removerPontos(document.getElementById('cpfWithCNPJ').value);
       var dataNascimento = document.getElementById('dataNascimentoWithCNPJ').value;
-      return converterDateType({cpf, dataNascimento});
+      return converterDateType({ cpf, dataNascimento });
 
-      case 'usuarioEdit':
+    case 'usuarioEdit':
       var identificador = removerPontos(document.getElementById('confirmCPFWithCpf')?.innerText);
       var dataNascimento = converterDataEUA(document.getElementById('confirmDataNascimentoWithCpf')?.innerText);
       var nome = document.getElementById('nomeWithCpf')?.value;
@@ -363,7 +340,6 @@ function getFormData(entityType) {
         sobrenome,
         email,
         numTelefone: numTelefone ? removerPontos(numTelefone) : null,
-        motivoDaReuniao: motivoReserva
       };
 
       const dadosValidos = obtemDadosValidos(campos);
@@ -388,21 +364,21 @@ function getFormData(entityType) {
       var motivoReserva = document.getElementById('motivoDaReuniaoWithCpf').value;
 
       localStorage.setItem('cpf', identificador);
-      localStorage.setItem('dataNascimento',dataNascimento);
+      localStorage.setItem('dataNascimento', dataNascimento);
       localStorage.setItem('nome', `${nome} ${sobrenome}`);
       localStorage.setItem('email', email);
       localStorage.setItem('numTelefone', numTelefone);
-      localStorage.setItem('motivoDaReuniao', motivoReserva);  
-      return converterDateType({identificador, dataNascimento, nome, sobrenome, email, numTelefone});
-  
+      localStorage.setItem('motivoDaReuniao', motivoReserva);
+      return converterDateType({ identificador, dataNascimento, nome, sobrenome, email, numTelefone });
+
     case 'reserva':
-      var idRecepcionista=Number(localStorage.getItem('idRecepcionista'));
-      var idUsuario=Number(localStorage.getItem('id'));
-      var idSala=Number(localStorage.getItem('idReserva'));
+      var idRecepcionista = Number(localStorage.getItem('idRecepcionista'));
+      var idUsuario = Number(localStorage.getItem('id'));
+      var idSala = Number(localStorage.getItem('idReserva'));
       var motivoReserva = localStorage.getItem('motivoDaReuniao');
       var dataReservada = converterDataEUA(document.getElementById('dataConfirmSpan').innerText);
       var horaInicio = document.getElementById('horarioConfirmSpan').innerText;
-      return converterDateType({idRecepcionista, idUsuario, idSala, motivoReserva, dataReservada, horaInicio});
+      return converterDateType({ idRecepcionista, idUsuario, idSala, motivoReserva, dataReservada, horaInicio });
   }
 }
 
@@ -421,10 +397,10 @@ function fillConfirmationSala(modalId, currentStep) {
 function fillConfirmationRecepcionista(modalId, currentStep) {
   nextStep(modalId, currentStep);
 
-  setElementTextContentById('confirmNome',converterPrimeiraLetraMaiuscula(getElementValueById('nome')));
+  setElementTextContentById('confirmNome', converterPrimeiraLetraMaiuscula(getElementValueById('nome')));
   setElementTextContentById('confirmSobrenome', converterPrimeiraLetraMaiuscula(getElementValueById('sobrenome')));
   setElementTextContentById('confirmLogin', getElementValueById('login'));
-  
+
   // Corrigindo a linha para obter o texto da opção selecionada
   const nivelAcessoElement = document.getElementById('nivelAcesso');
   setElementTextContentById('confirmNivelAcesso', converterPrimeiraLetraMaiuscula(nivelAcessoElement.options[nivelAcessoElement.selectedIndex].text));
@@ -434,8 +410,8 @@ function fillConfirmationRecepcionista(modalId, currentStep) {
 function fillConfirmationSalaEdit(modalId, currentStep) {
   nextStep(modalId, currentStep);
 
-  setElementTextContentById('confirmNomeSalaEdit',converterPrimeiraLetraMaiuscula(getElementValueById('editNomeSala')));
-  setElementTextContentById('confirmAndarEdit',  converterAndar(Number(getElementValueById('editAndar'))));
+  setElementTextContentById('confirmNomeSalaEdit', converterPrimeiraLetraMaiuscula(getElementValueById('editNomeSala')));
+  setElementTextContentById('confirmAndarEdit', converterAndar(Number(getElementValueById('editAndar'))));
   setElementTextContentById('confirmAreaEdit', getElementValueById('editArea'));
   setElementTextContentById('confirmCapMaxEdit', getElementValueById('editCapMax'));
 
@@ -447,7 +423,7 @@ function fillConfirmationUsuarioEditUnique(modalId, currentStep) {
   setElementTextContentById('confirmCPFWithCpfConfirm', document.getElementById('confirmCPFWithCpf').innerText);
   setElementTextContentById('confirmDataNascimentoWithCpfConfirm', document.getElementById('confirmDataNascimentoWithCpf').innerText);
   setElementTextContentById('confirmNomeWithCpfConfirm', `${converterPrimeiraLetraMaiuscula(getElementValueById('nomeWithCpf'))} ${converterPrimeiraLetraMaiuscula(getElementValueById('sobrenomeWithCpf'))}`);
-  setElementTextContentById('confirmEmailWithCpfConfirm',  getElementValueById('emailWithCpf'));
+  setElementTextContentById('confirmEmailWithCpfConfirm', getElementValueById('emailWithCpf'));
   setElementTextContentById('confirmTelefoneWithCpfConfirm', converterNumTel(getElementValueById('telefoneWithCpf')));
 
 }
@@ -463,15 +439,26 @@ function fillConfirmationReserva(modalId, currentStep) {
   setElementTextContentById('horarioConfirmSpan', getElementValueById('selecao-horario-modal'));
   setElementTextContentById('horarioSaidaConfirmSpan', adicionarHora(getElementValueById('selecao-horario-modal')));
   setElementTextContentById('motivoReservaSpan', localStorage.getItem('motivoDaReuniao'));
+}
+
+function fillConfirmationReservaCNPJ(modalId, currentStep) {
+  nextStep(modalId, currentStep);
+
+  setElementTextContentById('cpfUserConfirmReservaCNPJ', localStorage.getItem('cpf'));
+  setElementTextContentById('aniversarioConfirmResrvaCNPJ', formatarDataBr(localStorage.getItem('dataNascimento')));
+  setElementTextContentById('nomeConfirmSpanCNPJ', localStorage.getItem('nome'));
+  setElementTextContentById('emailConfirmSpanCNPJ', localStorage.getItem('email'));
+  setElementTextContentById('numTelConfirmSpanCNPJ', localStorage.getItem('numTelefone'));
+  setElementTextContentById('motivoReservaSpanCNPJ', localStorage.getItem('motivoDaReuniao') ? localStorage.getItem('motivoDaReuniao') : 'não informado');
 
 }
 
 function fillConfirmationRecepcionistaEdit(modalId, currentStep) {
   nextStep(modalId, currentStep);
-  setElementTextContentById('confirmNomeEdit',converterPrimeiraLetraMaiuscula(getElementValueById('editNome')));
+  setElementTextContentById('confirmNomeEdit', converterPrimeiraLetraMaiuscula(getElementValueById('editNome')));
   setElementTextContentById('confirmSobrenomeEdit', converterPrimeiraLetraMaiuscula(getElementValueById('editSobrenome')));
   setElementTextContentById('confirmLoginEdit', getElementValueById('editLogin'));
-  
+
   // Corrigindo a linha para obter o texto da opção selecionada
   const nivelAcessoElement = document.getElementById('editNivelAcesso');
   setElementTextContentById('confirmNivelAcessoEdit', converterPrimeiraLetraMaiuscula(nivelAcessoElement.options[nivelAcessoElement.selectedIndex].text));
@@ -480,12 +467,12 @@ function fillConfirmationRecepcionistaEdit(modalId, currentStep) {
 // Confirmar - para Usuários
 function fillConfirmationUsuario(response, modalId, currentStep) {
   nextStep(modalId, currentStep);
-  
+
   // Preenche os campos com os dados do usuário existente
   setElementTextContentById('confirmCPFWithCpf', converterCPF(response.identificador));
   setElementTextContentById('confirmDataNascimentoWithCpf', converterData(response.dataNascimento));
   setElementTextContentById('nomeWithCpf', `${converterPrimeiraLetraMaiuscula(response.nome)} ${converterPrimeiraLetraMaiuscula(response.sobrenome)}`);
-  
+
   // Atualiza campos editáveis se necessário
   setElementInputValueById('emailWithCpf', response.email);
   setElementInputValueById('telefoneWithCpf', converterNumTel(response.numTelefone));
@@ -565,12 +552,12 @@ async function consultarUsuario(entityData) {
 }
 
 async function usuarioExiste(modalId, currentStep) {
-  const conteinerStep=document.getElementById('step2');
+  const conteinerStep = document.getElementById('step2');
   const entityData = await obterEntityData(modalId);
   try {
     const response = await consultarUsuario(entityData);
     if (modalId === 'modalDeCoworking') {
-      conteinerStep.innerHTML=await exibirStep2();
+      conteinerStep.innerHTML = await exibirStep2();
       const telefoneInput = document.getElementById('telefoneWithCpf');
       if (telefoneInput) telefoneInput.addEventListener('input', formatNumTel);
       fillConfirmationUsuario(response.data, modalId, currentStep);
@@ -583,7 +570,7 @@ async function usuarioExiste(modalId, currentStep) {
     }
   } catch (error) {
     if (error.response && error.response.status === 404 && modalId === 'modalDeCoworking') {
-      conteinerStep.innerHTML=await exibirStep3();
+      conteinerStep.innerHTML = await exibirStep3();
       await criarUsuario(entityData, modalId, currentStep);
       const telefoneInput = document.getElementById('telefoneWithCpf');
       if (telefoneInput) telefoneInput.addEventListener('input', formatNumTel);

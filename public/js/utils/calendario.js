@@ -8,37 +8,40 @@ const month_names = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
 
 const generateCalendar = (month, year) => {
     const days_of_month = [31, (year % 4 === 0 && year % 100 !== 0 || year % 400 === 0) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-    
+
     calendar_days.innerHTML = '';
-    
+
     let currDate = new Date();
     if (!month) month = currDate.getMonth();
     if (!year) year = currDate.getFullYear();
-    
+
     let curr_month = `${month_names[month]}`;
     month_picker.innerHTML = curr_month;
     calendar_header_year.innerHTML = year;
-    
+
     let first_day = new Date(year, month, 1);
-    
+
     for (let i = 0; i < days_of_month[month] + first_day.getDay(); i++) {
         let day = document.createElement('div');
         if (i >= first_day.getDay()) {
             let dayNumber = i - first_day.getDay() + 1;
+
+            let formattedMonth = (month + 1).toString().padStart(2, '0'); // Formata o mês com duas casas decimais
+            let formattedDay = dayNumber.toString().padStart(2, '0'); // Formata o dia com duas casas decimais
             
             let dayInput = document.createElement('input');
             dayInput.type = 'radio';
             dayInput.classList.add('btn-check');
             dayInput.name = 'dayOptionsCalendar';
-            dayInput.id = `${year}-${month+1}-${dayNumber}`; 
+            dayInput.id = `${year}-${formattedMonth}-${formattedDay}`;
             dayInput.autocomplete = 'off';
             
             let dayLabel = document.createElement('label');
-            dayLabel.classList.add('btn', 'btn-outline-sucess');
-            dayLabel.htmlFor = `${year}-${month+1}-${dayNumber}`;
-            dayLabel.textContent = dayNumber;
+            dayLabel.classList.add('btn', 'btn-outline-primary-day');
+            dayLabel.htmlFor = `${year}-${formattedMonth}-${formattedDay}`;
+            dayLabel.textContent = formattedDay;
             
-            if (new Date(year, month, dayNumber+1) < currDate) {
+            if (new Date(year, month, dayNumber + 1) < currDate) {
                 dayInput.disabled = true;
                 dayLabel.classList.add('disabled-day');
             }
