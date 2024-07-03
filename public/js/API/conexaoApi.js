@@ -920,22 +920,23 @@ class Controller {
                         }
                     });
                     break;
-                case 'salasDropdown':
-                    const salasEmpresa = await this.listarSalasEmpresa();
-                    let primeiraOpcao = true;
-                    salasEmpresa.forEach(sala => {
-                        const option = document.createElement('option');
-                        option.value = sala.id;
-                        option.textContent = sala.nome;
-
-                        if (primeiraOpcao) {
-                            localStorage.setItem('idReserva', option.value);
-                            option.selected = true;
-                            primeiraOpcao = false;
-                        }
-                        selectElement.appendChild(option);
-                    });
-                    break;
+                    case 'salasDropdown':
+                        const salasEmpresa = await this.listarSalasEmpresa();
+                        let primeiraOpcao = true;
+                        salasEmpresa.forEach(sala => {
+                            const option = document.createElement('option');
+                            option.value = sala.id;
+                            option.id='salaSelecionada';
+                            option.textContent = sala.nome;
+                    
+                            if (primeiraOpcao) {
+                                localStorage.setItem('idReserva', option.value);
+                                option.selected = true;
+                                primeiraOpcao = false;
+                            }
+                            selectElement.appendChild(option);
+                        });
+                        break;
 
                 default:
                     throw new Error('ID do elemento select não suportado');
@@ -1000,58 +1001,70 @@ class Controller {
         } catch (error) {
             console.error('Erro ao colorir agenda:', error);
         }
-    }
-
-    static async dinamizarAgendaCNPJ(idReserva) {
+    }static async dinamizarAgendaCNPJ() {
         try {
             // Obtenha o dia escolhido do localStorage
             const diaEscolhido = localStorage.getItem('diaEscolhido');
-            console.log(diaEscolhido);
+            const idReserva = localStorage.getItem('idReserva');
+            console.log('Dia Escolhido:', diaEscolhido, 'ID Reserva:', idReserva);
+            
             if (!diaEscolhido) {
                 console.warn('Nenhum dia escolhido encontrado no localStorage.');
                 return;
             }
-
-            // Obtenha as reservas para o dia e idReserva especificados
+            
             const reservas = await axios.get(`http://localhost:3000/reserva/${idReserva}/${diaEscolhido}`);
             const reservasData = reservas.data;
-
+            
+            console.log('Response: ', reservasData);
+            
             // Pegue a data de hoje
             const hoje = new Date().toISOString().split('T')[0];
-
+            
             const selectContainer = document.getElementById('selecao-horario-modal');
-            const spaces = Array.from(document.querySelectorAll('div.row.blocks .col-1'));
+            const allSpaces = Array.from(document.querySelectorAll('div.row.blocks .col-1'));
+            let spaces = [];
+            const index23 = allSpaces.findIndex(element => element.id === '23:00');
+            if (index23 !== -1) {
+                spaces = allSpaces.slice(index23 + 1);
+            }
             const currentHour = new Date().getHours();
-
+            
             const resetarBlocos = () => {
                 spaces.forEach(space => {
-                    console.log(diaEscolhido, hoje, hoje === diaEscolhido);
                     if (hoje === diaEscolhido) {
-                        if (currentHour > parseInt(space.id)) space.style.backgroundColor = 'lightgray';
+                        if (parseInt(space.id) <= currentHour) {
+                            space.style.backgroundColor = 'lightgray';
+                        } else {
+                            space.style.backgroundColor = 'lightgreen';
+                        }
                     } else {
                         space.style.backgroundColor = 'lightgreen';
                     }
                 });
-                Array.from(selectContainer.children).forEach(child => {
+    
+                Array.from(selectContainer.children).forEach((child, index) => {
                     if (hoje === diaEscolhido) {
-                        if (parseInt(child.value) >= parseInt(currentHour)) {
-                            child.style.display = 'block';
-                        } else {
+                        if (parseInt(child.value) < currentHour) {
                             child.style.display = 'none';
+                        } else {
+                            child.style.display = 'block';
                         }
                     } else {
                         child.style.display = 'block';
                     }
                 });
             };
-
+    
             resetarBlocos();
-
+    
             reservasData.forEach(reserva => {
                 if (reserva.horaInicio && typeof reserva.horaInicio === 'string') {
                     const horaReservada = reserva.horaInicio.slice(0, 3) + '00';
+                    console.log(horaReservada);
                     const timeBlockIndex = spaces.findIndex(space => space.id === horaReservada);
                     if (timeBlockIndex !== -1) {
+                        console.log(timeBlockIndex);
                         for (let i = timeBlockIndex; i < timeBlockIndex + 3 && i < spaces.length; i++) {
                             spaces[i].style.backgroundColor = 'lightgray';
                             selectContainer.children[i + 1].style.display = 'none';
@@ -1067,8 +1080,7 @@ class Controller {
             console.error('Erro ao colorir agenda:', error);
         }
     }
-
-
+    
     static filtrarReservasMesAno(reservas, data) {
         return reservas.filter(reserva => {
             const dataReservada = new Date(reserva.dataReservada + 'T00:00:00Z');
@@ -1261,8 +1273,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     });
-
-
+    
+  
     observeElement('selecao-dia-modal', () => {
         const dayOptions = document.querySelectorAll('input[name="dayOptions"]');
 
@@ -1283,6 +1295,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (dayOptions.length > 0) {
             let today = new Date();
             let hojeFormatado = formatarDataCalendario(today);
+            
             dayOptions.forEach(radio => {
                 if (radio.id === hojeFormatado) {
                     radio.checked = true;
@@ -1292,17 +1305,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 radio.addEventListener('change', async () => {
                     localStorage.setItem('diaEscolhido', radio.id);
-                    const idReserva = localStorage.getItem('idReserva');
-                    await Controller.dinamizarAgendaCNPJ(idReserva);
+                    await Controller.dinamizarAgendaCNPJ();
                 });
             });
         }
     });
 
-    observeElement('modalDeEmpresas', () => {
-        Controller.preencherModalComAPI('salasDropdown');
-    });
+    observeElement('modalDeEmpresas', async () => {
+        await Controller.preencherModalComAPI('salasDropdown');
 
+        const salasDropdown = document.getElementById('salasDropdown');
+        if (salasDropdown) {
+            const selectedOption = salasDropdown.options[salasDropdown.selectedIndex];
+            
+            localStorage.setItem('idReserva', selectedOption.value);
+            await Controller.dinamizarAgendaCNPJ(selectedOption.value);
+            
+            salasDropdown.addEventListener("change", async () => {
+                const selectedOption = salasDropdown.options[salasDropdown.selectedIndex];
+                console.log('Sala selecionada:', selectedOption.textContent);
+                localStorage.setItem('idReserva', selectedOption.value);
+                await Controller.dinamizarAgendaCNPJ();
+            });
+        }
+    });
+    
+        
     observeElement('andar', () => {
         Controller.preencherModalComAPI('andar');
     });

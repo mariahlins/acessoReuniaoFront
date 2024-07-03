@@ -118,29 +118,6 @@ function setElementInputValueById(id, value) {
 }
 //SETs
 
-// Gestão do modal
-document.getElementById("botao").disabled = true;
-function checkInputs() {
-  var nascimento = document.getElementById("dataNascimentoWithCpf").value;
-  var cpff = document.getElementById("cpfWithCpf").value;
-
-  //aceita se os dois estiverem okeis
-  if (nascimento.trim() !== '' && cpff.trim() !== '') {
-    document.getElementById("botao").disabled = false;
-  } else {
-    //esse else é pra caso algum dos campos seja apagado
-    document.getElementById("botao").disabled = true;
-  }
-}
-//pega a data de nascimento
-document.getElementById("dataNascimentoWithCpf").addEventListener("input", function (event) {
-  checkInputs();
-});
-//pega o cpf digitado
-document.getElementById("cpfWithCpf").addEventListener("input", function (event) {
-  checkInputs();
-});
-
 function updateModalContent(modalId, step) {
   const currentStep = document.querySelector(`#${modalId} #step${step}`);
   if (!currentStep) return;
