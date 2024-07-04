@@ -91,6 +91,15 @@ function armazenaDadosLocalStorage(campos) {
   });
 }
 
+function localStorageUsuario(identificador, dataNascimento, nome, sobrenome, email, numTelefone, motivoReserva) {
+  localStorage.setItem('cpf', identificador);
+  localStorage.setItem('dataNascimento', dataNascimento);
+  localStorage.setItem('nome', `${nome} ${sobrenome}`);
+  localStorage.setItem('email', email);
+  localStorage.setItem('numTelefone', numTelefone);
+  localStorage.setItem('motivoDaReuniao', motivoReserva);
+}
+
 
 //Formatar para campos de textos
 //GETs
@@ -160,7 +169,7 @@ function finish(modalId) {
 async function createEntity(entityType, stepAtual) {
   const entityData = getFormData(entityType);
   const token = localStorage.getItem('token');
-  let responseStatus = 200;
+  let responseStatus = 400;
   let responseData = {};
 
   try {
@@ -179,16 +188,16 @@ async function createEntity(entityType, stepAtual) {
       responseData = { req1: req1.data, req2: req2.data };
     } else {
       let req;
-      if(entityType === 'reservaEmpresa'){
-         req= await axios.post(`http://localhost:3000/reserva`, entityData, {
+      if (entityType === 'reservaEmpresa') {
+        req = await axios.post(`http://localhost:3000/reserva`, entityData, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-      }else{
-         req = await axios.post(`http://localhost:3000/${entityType}`, entityData, {
+      } else {
+        req = await axios.post(`http://localhost:3000/${entityType}`, entityData, {
           headers: { 'Authorization': `Bearer ${token}` }
-        });  
+        });
       }
-      if (req.status !== 200) responseStatus = req.status;
+      responseStatus = req.status;
       responseData = req.data;
     }
   } catch (error) {
@@ -205,18 +214,23 @@ async function createEntity(entityType, stepAtual) {
       localStorage.setItem('nome', `${responseData.nome} ${responseData.sobrenome}`);
       localStorage.setItem('email', responseData.email);
       localStorage.setItem('numTelefone', responseData.numTelefone);
-    }else{
+    } else {
       localStorage.removeItem('motivoDaReuniao');
       localStorage.removeItem('idReserva');
     }
-  }else if(entityType === 'reservaEmpresa'){
+  } else if (entityType === 'reservaEmpresa') {
     localStorage.removeItem('motivoDaReuniao');
     localStorage.removeItem('idReservaCNPJ');
     modalId = 'modalDeEmpresas';
-  } 
-  console.log('modalId', modalId)
+  }
+  console.log('modalId', modalId);
   if (responseStatus === 200) {
-    return nextStep(modalId, stepAtual);
+    nextStep(modalId, stepAtual);
+    if (entityType === 'reservaEmpresa') {
+      setElementTextContentById('confirmaEmailEndReservaCNPJ', localStorage.getItem('email'));
+    } else if (entityType === 'reserva') {
+      setElementTextContentById('confirmaEmailEndReserva', localStorage.getItem('email'));
+    }
   } else {
     alert(`Erro ao criar ${entityType}. Por favor, tente novamente.`);
   }
@@ -263,7 +277,7 @@ async function sendUpdateRequest(entityType, id, entityData, token, modalId) {
     'reservaEmpresa': 'reserva'
   };
 
-  if(entityType === 'salaEdit'){
+  if (entityType === 'salaEdit') {
     console.log('entityData', entityData)
     const { observacao, ...entityDataSala } = entityData;
     console.log('entityDataSala', entityDataSala)
@@ -303,6 +317,7 @@ function handleCreateEntityError(error, entityType) {
     else alert(`Erro ao criar ${entityType}. Por favor, tente novamente. Status: ${error.response.status}`);
   } else {
     alert(`Erro ao criar ${entityType}. Por favor, verifique sua conexão e tente novamente.`);
+    return;
   }
 }
 
@@ -332,7 +347,7 @@ function getFormData(entityType) {
       var area = document.getElementById('confirmAreaEdit').textContent;
       var capMax = Number(getElementValueById('editCapMax'));
       var observacao = document.getElementById('confirmEstadoSalaEdit').textContent;
-      return converterDateType({ nome, andar, area, capMax, observacao});
+      return converterDateType({ nome, andar, area, capMax, observacao });
 
     case 'recepcionistaEdit':
       var nome = document.getElementById('confirmNomeEdit').textContent;
@@ -361,9 +376,9 @@ function getFormData(entityType) {
       var email = document.getElementById('emailWithCpf')?.value;
       var numTelefone = document.getElementById('telefoneWithCpf')?.value;
       var motivoReserva = document.getElementById('motivoDaReuniaoWithCpf')?.value;
-      
+
       localStorage.setItem('motivoDaReuniao', motivoReserva);
-      
+
       const campos = {
         cpf: identificador,
         dataNascimento,
@@ -384,7 +399,7 @@ function getFormData(entityType) {
       var email = document.getElementById('emailWithCpf').value;
       var numTelefone = document.getElementById('telefoneWithCpf').value;
       var motivoReserva = document.getElementById('motivoDaReuniaoWithCpf').value;
-      
+
     case 'usuario':
       var identificador = removerPontos(document.getElementById('confirmCPFWithCpf').innerText);
       var dataNascimento = converterDataEUA(document.getElementById('confirmDataNascimentoWithCpf').innerText);
@@ -393,12 +408,9 @@ function getFormData(entityType) {
       var email = document.getElementById('emailWithCpf').value;
       var numTelefone = removerPontos(document.getElementById('telefoneWithCpf').value);
       var motivoReserva = document.getElementById('motivoDaReuniaoWithCpf').value;
-      localStorage.setItem('cpf', identificador);
-      localStorage.setItem('dataNascimento', dataNascimento);
-      localStorage.setItem('nome', `${nome} ${sobrenome}`);
-      localStorage.setItem('email', email);
-      localStorage.setItem('numTelefone', numTelefone);
-      localStorage.setItem('motivoDaReuniao', motivoReserva);
+
+      localStorageUsuario(identificador, dataNascimento, nome, sobrenome, email, numTelefone, motivoReserva);
+
       return converterDateType({ identificador, dataNascimento, nome, sobrenome, email, numTelefone });
 
     case 'reserva':
@@ -418,7 +430,7 @@ function getFormData(entityType) {
       var dataReservada = converterDataEUA(document.getElementById('dataConfirmSpanCNPJ').innerText);
       var horaInicio = document.getElementById('horarioConfirmSpanCNPJ').innerText;
       var horarioSaida = document.getElementById('horarioSaidaConfirmSpanCNPJ').innerText;
-      return converterDateType({idRecepcionista, idUsuario, idSala, motivoReserva, dataReservada, horaInicio, horarioSaida });
+      return converterDateType({ idRecepcionista, idUsuario, idSala, motivoReserva, dataReservada, horaInicio, horarioSaida });
 
   }
 }
@@ -480,7 +492,7 @@ function fillConfirmationReserva(modalId, currentStep) {
   setElementTextContentById('dataConfirmSpan', formatarDataBr(localStorage.getItem('diaEscolhido')));
   setElementTextContentById('horarioConfirmSpan', getElementValueById('selecao-horario-modal'));
   setElementTextContentById('horarioSaidaConfirmSpan', adicionarHora(getElementValueById('selecao-horario-modal'), 3));
-  setElementTextContentById('motivoReservaSpan',  localStorage.getItem('motivoDaReuniao'));
+  setElementTextContentById('motivoReservaSpan', localStorage.getItem('motivoDaReuniao'));
 }
 
 function fillConfirmationReservaCNPJ(modalId, currentStep) {
@@ -490,12 +502,12 @@ function fillConfirmationReservaCNPJ(modalId, currentStep) {
   setElementTextContentById('aniversarioConfirmResrvaCNPJ', formatarDataBr(localStorage.getItem('dataNascimento')));
   setElementTextContentById('nomeConfirmSpanCNPJ', localStorage.getItem('nome'));
   setElementTextContentById('emailConfirmSpanCNPJ', localStorage.getItem('email'));
-  setElementTextContentById('numTelConfirmSpanCNPJ', localStorage.getItem('numTelefone'));
+  setElementTextContentById('numTelConfirmSpanCNPJ', converterNumTel(localStorage.getItem('numTelefone')));
 
   setElementTextContentById('salaConfirmSpanCNPJ', localStorage.getItem('nomeSala'));
   setElementTextContentById('dataConfirmSpanCNPJ', formatarDataBr(localStorage.getItem('diaEscolhido')));
   setElementTextContentById('horarioConfirmSpanCNPJ', getElementValueById('horariosDropdown'));
-  setElementTextContentById('horarioSaidaConfirmSpanCNPJ', adicionarHora(getElementValueById('horariosDropdown'), getElementValueById('duracaoReserva')));
+  setElementTextContentById('horarioSaidaConfirmSpanCNPJ', adicionarHora(getElementValueById('horariosDropdown'), getElementValueById('duracaoReserva') - 1));
   setElementTextContentById('motivoReservaSpanCNPJ', localStorage.getItem('motivoDaReuniao') ? localStorage.getItem('motivoDaReuniao') : 'não informado');
 
 }
@@ -512,7 +524,21 @@ function fillConfirmationRecepcionistaEdit(modalId, currentStep) {
 }
 
 // Confirmar - para Usuários
-function fillConfirmationUsuario(response, modalId, currentStep) {
+function showLoadingIndicator(containerId) {
+  const container = document.getElementById(containerId);
+  if (container) {
+    container.innerHTML = '<div class="loading-indicator">Carregando...</div>';
+  }
+}
+
+function hideLoadingIndicator(containerId) {
+  const container = document.getElementById(containerId);
+  if (container) {
+    container.querySelector('.loading-indicator')?.remove();
+  }
+}
+
+async function fillConfirmationUsuario(response, modalId, currentStep) {
   nextStep(modalId, currentStep);
 
   // Preenche os campos com os dados do usuário existente
@@ -523,7 +549,7 @@ function fillConfirmationUsuario(response, modalId, currentStep) {
   // Atualiza campos editáveis se necessário
   setElementInputValueById('emailWithCpf', response.email);
   setElementInputValueById('telefoneWithCpf', converterNumTel(response.numTelefone));
-  localStorage.setItem('id', response.id)
+  localStorage.setItem('id', response.id);
 }
 
 async function criarUsuario(entityData, modalId, currentStep) {
@@ -532,6 +558,7 @@ async function criarUsuario(entityData, modalId, currentStep) {
   setElementTextContentById('confirmCPFWithCpf', converterCPF(entityData.cpf));
   setElementTextContentById('confirmDataNascimentoWithCpf', converterData(entityData.dataNascimento));
 }
+
 function pegarDadosUsuario(modal) {
   switch (modal) {
     case 'modalDeEmpresas':
@@ -542,6 +569,7 @@ function pegarDadosUsuario(modal) {
       console.error('Modal ID desconhecido:', modal);
   }
 }
+
 async function exibirStep2() {
   return `
     <p class="form-control mb-2 custom-input bg-secondary-subtle"><strong><span id="confirmCPFWithCpf"></span></strong></p>
@@ -601,15 +629,19 @@ async function consultarUsuario(entityData) {
 async function usuarioExiste(modalId, currentStep) {
   const conteinerStep = document.getElementById('step2');
   const entityData = await obterEntityData(modalId);
+  showLoadingIndicator('step2');
+
   try {
     const response = await consultarUsuario(entityData);
     if (modalId === 'modalDeCoworking') {
       conteinerStep.innerHTML = await exibirStep2();
+      hideLoadingIndicator('step2');
       const telefoneInput = document.getElementById('telefoneWithCpf');
       if (telefoneInput) telefoneInput.addEventListener('input', formatNumTel);
       fillConfirmationUsuario(response.data, modalId, currentStep);
     } else if (modalId === 'modalDeEmpresas') {
       if (response.status === 200) {
+        localStorageUsuario(response.data.identificador, response.data.dataNascimento, response.data.nome, response.data.sobrenome, response.data.email, response.data.numTelefone);
         nextStep(modalId, currentStep);
       } else {
         alert('Usuário não tem acesso');
@@ -618,6 +650,7 @@ async function usuarioExiste(modalId, currentStep) {
   } catch (error) {
     if (error.response && error.response.status === 404 && modalId === 'modalDeCoworking') {
       conteinerStep.innerHTML = await exibirStep3();
+      hideLoadingIndicator('step2');
       await criarUsuario(entityData, modalId, currentStep);
       const telefoneInput = document.getElementById('telefoneWithCpf');
       if (telefoneInput) telefoneInput.addEventListener('input', formatNumTel);
@@ -625,6 +658,7 @@ async function usuarioExiste(modalId, currentStep) {
       const errorMessage = error.response?.data?.message || 'Erro ao buscar usuário. Por favor, tente novamente mais tarde.';
       alert(errorMessage);
     }
+  } finally {
+    hideLoadingIndicator('step2');
   }
 }
-
