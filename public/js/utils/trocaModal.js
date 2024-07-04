@@ -263,6 +263,19 @@ async function sendUpdateRequest(entityType, id, entityData, token, modalId) {
     'reservaEmpresa': 'reserva'
   };
 
+  if(entityType === 'salaEdit'){
+    console.log('entityData', entityData)
+    const { observacao, ...entityDataSala } = entityData;
+    console.log('entityDataSala', entityDataSala)
+    await axios.put(`http://localhost:3000/sala/${id}`, entityDataSala, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    console.log('observacao', observacao)
+    return await axios.put(`http://localhost:3000/estadoSala/${id}`, { observacao }, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+  }
+
   const finalEntityType = entityTypeMap[entityType] || entityType;
   const url = `http://localhost:3000/${finalEntityType}/${id}`;
 
@@ -318,7 +331,8 @@ function getFormData(entityType) {
       var andar = Number(getElementValueById('editAndar'));
       var area = document.getElementById('confirmAreaEdit').textContent;
       var capMax = Number(getElementValueById('editCapMax'));
-      return converterDateType({ nome, andar, area, capMax });
+      var observacao = document.getElementById('confirmEstadoSalaEdit').textContent;
+      return converterDateType({ nome, andar, area, capMax, observacao});
 
     case 'recepcionistaEdit':
       var nome = document.getElementById('confirmNomeEdit').textContent;
@@ -441,6 +455,7 @@ function fillConfirmationSalaEdit(modalId, currentStep) {
   setElementTextContentById('confirmAndarEdit', converterAndar(Number(getElementValueById('editAndar'))));
   setElementTextContentById('confirmAreaEdit', getElementValueById('editArea'));
   setElementTextContentById('confirmCapMaxEdit', getElementValueById('editCapMax'));
+  setElementTextContentById('confirmEstadoSalaEdit', converterPrimeiraLetraMaiuscula(getElementValueById('editEstadoSala')));
 
 }
 

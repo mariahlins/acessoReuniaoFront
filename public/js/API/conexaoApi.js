@@ -6,6 +6,13 @@ function formatarDataBr(dataEUA) {
     return `${dia}/${mes}/${ano}`;
 }
 
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 function formatarDataEUA(dataBR) {
     const [dia, mes, ano] = dataBR.split('/');
     return `${ano}-${mes}-${dia}`;
@@ -253,6 +260,10 @@ class Controller {
 
     static async obterSala(id) {
         return this.obterPorId('sala', id);
+    }
+
+    static async obterEstadoSala(id) {
+        return this.obterPorId('estadoSala', id);
     }
 
     /* consular por ID*/
@@ -833,11 +844,13 @@ class Controller {
     }
     static async editarSala(id) {
         const entity = await this.obterSala(id);
+        const estadoSala = await this.obterEstadoSala(id);
         setId(id);
         setElementInputValueById('editNomeSala', entity.nome);
         setElementInputValueById('editAndar', entity.andar);
         setElementInputValueById('editArea', entity.area);
         setElementInputValueById('editCapMax', entity.capMax);
+        setElementInputValueById('editEstadoSala', estadoSala.observacao);
     }
 
     static async editarRecepcionista(id) {
