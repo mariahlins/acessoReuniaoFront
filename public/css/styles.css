@@ -299,9 +299,9 @@ td .btn {
 }
 
 .btn.btn-outline-sucess {
-    color: #585d67;
+    color: #9097a7;
     border-color: #565D6D;
-    border: 1.5px solid;
+    border: 1.7px solid;
     width: 40px; 
     height: 40px;
     display: flex;
@@ -444,8 +444,8 @@ dt {
 }
 
 .custom-modal-size {
-    max-width: 105vh;
-    max-height: 90vh;
+    max-width: 107vh;
+    max-height: 92vh;
 }
 
 .custom-modal-body {
@@ -479,6 +479,7 @@ dt {
 .h6-container {
     display: flex;
     justify-content: space-between;
+    gap: 1vh;
 }
 
 .h6-item {
@@ -564,6 +565,7 @@ dt {
     /* Espaço entre os blocos */
     margin-top: 10px;
     /* Margem superior para separação */
+    margin-bottom: 10px;
 }
 
 /* Estilos para cada bloco de horário */

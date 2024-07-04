@@ -2,13 +2,14 @@
   <div class="modal-dialog modal-dialog-centered custom-modal-size" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h6 class="modal-title text-center w-100" id="modalHeader">Informações da Reserva</h6>
+        <h6 class="modal-title text-center w-100" id="modalHeader">Nova reserva</h6>
         <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
       </div>
 
 
       <div class="modal-body custom-modal-body">
         <div class="step active" id="step1" data-header="Informações do responsável">
+          <p class="text-center mb-3">Preencha com as informações do responsável:</p>
           <input type="text" id="cpfWithCNPJ" class="form-control custom-input" placeholder="CPF" minlength="14" maxlength="14" required>
           <input type="text" id="dataNascimentoWithCNPJ" class="form-control mb-2 custom-input" placeholder="Data de Nascimento" required onfocus="this.type='date'"  onblur="if (!this.value) this.type='text'">
         <div class="d-flex justify-content-between">
