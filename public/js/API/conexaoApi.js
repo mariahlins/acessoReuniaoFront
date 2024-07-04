@@ -1275,15 +1275,30 @@ document.addEventListener('DOMContentLoaded', () => {
   
     observeElement('selecao-dia-modal', () => {
         const dayOptions = document.querySelectorAll('input[name="dayOptions"]');
-
+    
+        const hojeRadio = Array.from(dayOptions).find(radio => radio.id === 'hoje');
+        if (hojeRadio) {
+            hojeRadio.checked = true;
+            const todayFormatted = formatDate(new Date());
+            localStorage.setItem('diaEscolhido', todayFormatted);
+            const selectedDate = localStorage.getItem('diaEscolhido');
+            const idReserva = localStorage.getItem('idReserva');
+            Controller.dinamizarAgenda(selectedDate, idReserva);
+        }
         dayOptions.forEach(radio => {
             radio.addEventListener('change', () => {
-                Controller.getSelectedDate(radio.id).then(valor => {
-                    localStorage.setItem('diaEscolhido', valor);
-                    const selectedDate = localStorage.getItem('diaEscolhido');
-                    const idReserva = localStorage.getItem('idReserva');
-                    Controller.dinamizarAgenda(selectedDate, idReserva);
-                });
+                let selectDataFormatada;
+                if (radio.id === 'hoje') {
+                    selectDataFormatada = formatDate(new Date());
+                } else {
+                    const amanha = new Date();
+                    amanha.setDate(amanha.getDate() + 1);
+                    selectDataFormatada = formatDate(amanha);
+                }
+                localStorage.setItem('diaEscolhido', selectDataFormatada);
+                const selectedDate = localStorage.getItem('diaEscolhido');
+                const idReserva = localStorage.getItem('idReserva');
+                Controller.dinamizarAgenda(selectedDate, idReserva);
             });
         });
     });
