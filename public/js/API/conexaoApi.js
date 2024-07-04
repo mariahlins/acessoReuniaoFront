@@ -262,6 +262,10 @@ class Controller {
         return this.obterPorId('sala', id);
     }
 
+    static async obterEstadoSala(id) {
+        return this.obterPorId('estadoSala', id);
+    }
+
     /* consular por ID*/
 
     /*Mostrar */
@@ -840,11 +844,13 @@ class Controller {
     }
     static async editarSala(id) {
         const entity = await this.obterSala(id);
+        const estadoSala = await this.obterEstadoSala(id);
         setId(id);
         setElementInputValueById('editNomeSala', entity.nome);
         setElementInputValueById('editAndar', entity.andar);
         setElementInputValueById('editArea', entity.area);
         setElementInputValueById('editCapMax', entity.capMax);
+        setElementInputValueById('editEstadoSala', estadoSala.observacao);
     }
 
     static async editarRecepcionista(id) {
